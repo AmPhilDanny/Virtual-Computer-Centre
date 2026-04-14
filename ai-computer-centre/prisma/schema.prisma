@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // =========================================
@@ -16,7 +15,7 @@ model User {
   name          String?
   email         String    @unique
   emailVerified DateTime?
-  image         String?
+  image         String?   @db.Text
   password      String?
   phone         String?
   role          UserRole  @default(CLIENT)
@@ -168,7 +167,7 @@ model BlogPost {
   slug        String   @unique
   excerpt     String?
   content     Json?
-  coverImage  String?
+  coverImage  String?  @db.Text
   isPublished Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
