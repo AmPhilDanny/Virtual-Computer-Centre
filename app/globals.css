@@ -347,10 +347,11 @@ a:hover { color: var(--brand-secondary); }
 .btn-secondary {
   background: transparent;
   color: var(--text-primary);
-  border: 1.5px solid var(--border-medium);
+  border: 1.5px solid var(--border-strong);
 }
 .btn-secondary:hover {
   border-color: var(--brand-primary);
+  background: var(--bg-subtle);
   color: var(--brand-primary);
 }
 

@@ -31,20 +31,7 @@ export default function DashboardLayout({
   return (
     <div className="dashboard-layout">
       {/* Mobile Header */}
-      <div 
-        className="mobile-dashboard-header"
-        style={{
-          display: "none",
-          padding: "var(--space-4)",
-          background: "var(--bg-surface)",
-          borderBottom: "1px solid var(--border-subtle)",
-          alignItems: "center",
-          justifyContent: "between",
-          position: "sticky",
-          top: 0,
-          zIndex: 100
-        }}
-      >
+      <div className="mobile-dashboard-header">
         <Link href="/" className="navbar-logo">
           <div className="navbar-logo-icon" style={{ width: 28, height: 28, fontSize: "0.8rem" }}>
             🤖
@@ -53,11 +40,20 @@ export default function DashboardLayout({
         </Link>
         <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          style={{ background: "none", border: "none", color: "var(--text-primary)" }}
+          className="btn btn-ghost btn-sm"
+          style={{ padding: "8px", borderRadius: "8px" }}
         >
-          {isSidebarOpen ? <X /> : <Menu />}
+          {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
+
+      {/* Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="sidebar-overlay"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
 
       {/* Sidebar */}
       <aside className={`sidebar ${isSidebarOpen ? 'mobile-open' : ''}`}>
@@ -109,8 +105,23 @@ export default function DashboardLayout({
 
       {/* Main Content Area */}
       <main className="main-content">
-        <header className="flex justify-between items-center" style={{ marginBottom: "var(--space-8)" }}>
-          <h1 style={{ fontSize: "1.5rem" }}>Client Portal</h1>
+        <header 
+          className="flex justify-between items-center" 
+          style={{ 
+            marginBottom: "var(--space-8)",
+            paddingBottom: "var(--space-4)",
+            borderBottom: "1px solid var(--border-subtle)",
+            position: "sticky",
+            top: 0,
+            background: "var(--bg-base)",
+            zIndex: 10,
+            marginTop: "-var(--space-2)"
+          }}
+        >
+          <div className="flex-col">
+            <h1 style={{ fontSize: "1.5rem", margin: 0 }}>Client Portal</h1>
+            <p className="text-muted" style={{ fontSize: "0.875rem" }}>Welcome back, {session.user.name || "User"}</p>
+          </div>
           <div className="flex items-center gap-4">
              <div className="badge badge-primary">
                Wallet: ₦{(session.user as any).walletBalance?.toLocaleString() || "0.00"}
@@ -127,7 +138,9 @@ export default function DashboardLayout({
              </div>
           </div>
         </header>
-        {children}
+        <div className="admin-content-inner">
+          {children}
+        </div>
       </main>
     </div>
   );
