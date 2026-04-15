@@ -1108,6 +1108,9 @@ a:hover { color: var(--brand-secondary); }
     font-size: 3rem;
   }
 }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
   50%       { opacity: 0.5; }
 }
 @keyframes spin {
