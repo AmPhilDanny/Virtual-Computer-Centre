@@ -121,8 +121,23 @@ export default function AdminLayout({
 
       {/* Main Content Area */}
       <main className="main-content">
-        <header className="flex justify-between items-center" style={{ marginBottom: "var(--space-8)" }}>
-          <h1 style={{ fontSize: "1.5rem" }}>Admin Workspace</h1>
+        <header 
+          className="flex justify-between items-center" 
+          style={{ 
+            marginBottom: "var(--space-8)",
+            paddingBottom: "var(--space-4)",
+            borderBottom: "1px solid var(--border-subtle)",
+            position: "sticky",
+            top: 0,
+            background: "var(--bg-base)",
+            zIndex: 10,
+            marginTop: "-var(--space-2)"
+          }}
+        >
+          <div className="flex-col">
+            <h1 style={{ fontSize: "1.5rem", margin: 0 }}>Admin Workspace</h1>
+            <p className="text-muted" style={{ fontSize: "0.875rem" }}>Manage your digital computer centre platform</p>
+          </div>
           <div className="flex items-center gap-4">
              <div className="badge badge-danger">
                Admin Active
@@ -139,7 +154,9 @@ export default function AdminLayout({
              </div>
           </div>
         </header>
-        {children}
+        <div className="admin-content-inner">
+          {children}
+        </div>
       </main>
     </div>
   );

@@ -84,29 +84,60 @@
 }
 
 [data-theme="light"] {
-  --bg-base:        #F8F9FF;
+  --bg-base:        #F5F7FA;
   --bg-surface:     #FFFFFF;
-  --bg-elevated:    #F0F2FF;
+  --bg-elevated:    #EDF2F7;
   --bg-card:        #FFFFFF;
-  --bg-overlay:     rgba(248, 249, 255, 0.85);
+  --bg-overlay:     rgba(245, 247, 250, 0.9);
   --bg-subtle:      rgba(108, 71, 255, 0.05);
 
-  --border-subtle:  rgba(108, 71, 255, 0.1);
-  --border-medium:  rgba(108, 71, 255, 0.2);
-  --border-strong:  rgba(108, 71, 255, 0.4);
+  --border-subtle:  rgba(0, 0, 0, 0.08);
+  --border-medium:  rgba(0, 0, 0, 0.15);
+  --border-strong:  rgba(0, 0, 0, 0.25);
 
-  --text-primary:   #090912;
-  --text-secondary: #4A4A68;
-  --text-muted:     #80809A;
-  --text-inverse:   #F0F0FF;
+  --text-primary:   #1A202C;
+  --text-secondary: #4A5568;
+  --text-muted:     #718096;
+  --text-inverse:   #F7FAFC;
 
-  --grad-hero:      linear-gradient(160deg, #F0F2FF 0%, #FFFFFF 100%);
-  --grad-card:      linear-gradient(145deg, rgba(108,71,255,0.05) 0%, rgba(0,212,255,0.03) 100%);
+  --grad-hero:      linear-gradient(160deg, #EDF2F7 0%, #FFFFFF 100%);
+  --grad-card:      linear-gradient(145deg, rgba(108,71,255,0.03) 0%, rgba(0,212,255,0.02) 100%);
   
   .glass-card {
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(108, 71, 255, 0.1);
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
+
+  .sidebar {
+    background: #FFFFFF;
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .sidebar-nav li a:hover {
+    background: rgba(108, 71, 255, 0.05);
+  }
+
+  .sidebar-nav li a.active {
+    background: rgba(108, 71, 255, 0.1);
+  }
+
+  .main-content {
+    background: #F5F7FA;
+  }
+
+  .form-input, .form-select, .form-textarea {
+    background: #FFFFFF;
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #1A202C;
+  }
+
+  .table th {
+    background: #F7FAFC;
+    color: #4A5568;
+  }
+
+  .badge-primary { background: rgba(108, 71, 255, 0.1); color: #5B21B6; border: 1px solid rgba(108, 71, 255, 0.2); }
 }
 
 /* ==========================================
@@ -852,7 +883,14 @@ a:hover { color: var(--brand-secondary); }
 .main-content {
   background: var(--bg-base);
   min-height: 100vh;
-  padding: var(--space-10);
+  padding: var(--space-8);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-content-inner {
+  flex: 1;
   width: 100%;
 }
 
