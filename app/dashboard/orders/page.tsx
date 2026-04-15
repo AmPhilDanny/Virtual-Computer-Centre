@@ -48,7 +48,7 @@ export default async function OrdersPage() {
                       {order.status}
                     </span>
                   </td>
-                  <td>₦{order.service.price || "0.00"}</td>
+                  <td>₦{order.service.basePrice || "0.00"}</td>
                   <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                 </tr>
               ))}
