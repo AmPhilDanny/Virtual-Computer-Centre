@@ -772,6 +772,10 @@ a:hover { color: var(--brand-secondary); }
   width: 100%;
 }
 
+.mobile-dashboard-header {
+  display: none; /* Hidden by default on desktop */
+}
+
 @media (max-width: 1024px) {
   .dashboard-layout {
     grid-template-columns: 1fr;
@@ -822,6 +826,21 @@ a:hover { color: var(--brand-secondary); }
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+  }
 }
 
 .sidebar-logo {

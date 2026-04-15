@@ -41,16 +41,8 @@ export default function AdminLayout({
         </Link>
         <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          style={{ 
-            background: "rgba(108, 71, 255, 0.1)", 
-            border: "1px solid var(--border-subtle)", 
-            color: "var(--text-primary)",
-            padding: "8px",
-            borderRadius: "8px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
-          }}
+          className="btn btn-ghost btn-sm"
+          style={{ padding: "8px", borderRadius: "8px" }}
         >
           {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -61,13 +53,6 @@ export default function AdminLayout({
         <div 
           className="sidebar-overlay"
           onClick={() => setIsSidebarOpen(false)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.5)",
-            backdropFilter: "blur(4px)",
-            zIndex: 999
-          }}
         />
       )}
 
