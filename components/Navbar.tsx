@@ -1,6 +1,9 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { useSettings } from "./SettingsProvider";
+import { useTheme } from "./ThemeProvider";
+import { Sun, Moon } from "lucide-react";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -12,16 +15,24 @@ const navLinks = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const settings = useSettings();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <nav className="navbar">
       <div className="container navbar-inner">
         {/* Logo */}
         <Link href="/" className="navbar-logo">
-          <div className="navbar-logo-icon">⚡</div>
-          <span className="navbar-logo-text">
-            AI<span>Centre</span>
-          </span>
+          {settings.logoUrl ? (
+            <img src={settings.logoUrl} alt={settings.siteName} style={{ height: "40px", objectFit: "contain" }} />
+          ) : (
+            <>
+              <div className="navbar-logo-icon">⚡</div>
+              <span className="navbar-logo-text">
+                {settings.siteName.split(" ")[0]}<span>{settings.siteName.split(" ").slice(1).join("")}</span>
+              </span>
+            </>
+          )}
         </Link>
 
         {/* Desktop Nav */}
@@ -35,6 +46,14 @@ export default function Navbar() {
 
         {/* Actions */}
         <div className="navbar-actions">
+          <button 
+            onClick={toggleTheme}
+            className="btn btn-ghost btn-sm"
+            style={{ padding: "8px", borderRadius: "10px", width: "40px", height: "40px" }}
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
           <Link href="/auth/login" className="btn btn-secondary btn-sm">
             Sign In
           </Link>
@@ -90,14 +109,23 @@ export default function Navbar() {
           <div
             style={{
               display: "flex",
+              alignItems: "center",
               gap: "var(--space-3)",
               marginTop: "var(--space-4)",
             }}
           >
-            <Link href="/auth/login" className="btn btn-secondary btn-sm">
+            <button 
+              onClick={toggleTheme}
+              className="btn btn-ghost btn-sm"
+              style={{ padding: "8px", borderRadius: "10px", width: "40px", height: "40px" }}
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+            <Link href="/auth/login" className="btn btn-secondary btn-sm" style={{ flex: 1 }}>
               Sign In
             </Link>
-            <Link href="/auth/register" className="btn btn-primary btn-sm">
+            <Link href="/auth/register" className="btn btn-primary btn-sm" style={{ flex: 1 }}>
               Get Started
             </Link>
           </div>

@@ -16,35 +16,35 @@ export default async function AdminServicesPage() {
         </Link>
       </div>
 
-      <div className="glass-card" style={{ padding: "var(--space-1)" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="table-container">
+        <table className="table">
           <thead>
-            <tr style={{ borderBottom: "1px solid var(--border-medium)", textAlign: "left", background: "var(--bg-elevated)" }}>
-              <th style={{ padding: "var(--space-4)", color: "var(--text-secondary)", fontSize: "0.875rem" }}>Name</th>
-              <th style={{ padding: "var(--space-4)", color: "var(--text-secondary)", fontSize: "0.875rem" }}>Category</th>
-              <th style={{ padding: "var(--space-4)", color: "var(--text-secondary)", fontSize: "0.875rem" }}>Price</th>
-              <th style={{ padding: "var(--space-4)", color: "var(--text-secondary)", fontSize: "0.875rem" }}>AI Autonomy</th>
-              <th style={{ padding: "var(--space-4)", color: "var(--text-secondary)", fontSize: "0.875rem", textAlign: "right" }}>Actions</th>
+            <tr>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>AI Autonomy</th>
+              <th style={{ textAlign: "right" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {services.map(svc => (
-              <tr key={svc.id} style={{ borderBottom: "1px solid var(--border-subtle)" }}>
-                <td style={{ padding: "var(--space-4)", fontWeight: 600 }}>
+              <tr key={svc.id}>
+                <td style={{ fontWeight: 600 }}>
                   {svc.name}
                   {!svc.isActive && <span className="badge badge-danger" style={{marginLeft: 8}}>Disabled</span>}
                 </td>
-                <td style={{ padding: "var(--space-4)", color: "var(--text-muted)", fontSize: "0.875rem" }}>{svc.category}</td>
-                <td style={{ padding: "var(--space-4)" }}>₦{svc.basePrice}</td>
-                <td style={{ padding: "var(--space-4)" }}>
+                <td style={{ color: "var(--text-muted)", fontSize: "0.875rem" }}>{svc.category.replace("_", " ")}</td>
+                <td>₦{svc.basePrice.toLocaleString()}</td>
+                <td>
                   <span className={`badge badge-${svc.autonomyLevel === 'AI_ONLY' ? 'success' : svc.autonomyLevel === 'HUMAN_ONLY' ? 'danger' : 'primary'}`}>
                     {svc.autonomyLevel.replace("_", " ")}
                   </span>
                 </td>
-                <td style={{ padding: "var(--space-4)", textAlign: "right" }}>
+                <td style={{ textAlign: "right" }}>
                    <div className="flex gap-2 justify-end">
-                     <button className="btn btn-ghost btn-sm"><Edit3 size={16} /></button>
-                     <button className="btn btn-ghost btn-sm" style={{color: "var(--brand-danger)"}}><Trash2 size={16} /></button>
+                     <button className="btn btn-ghost btn-sm" title="Edit"><Edit3 size={16} /></button>
+                     <button className="btn btn-ghost btn-sm" style={{color: "var(--brand-danger)"}} title="Delete"><Trash2 size={16} /></button>
                    </div>
                 </td>
               </tr>

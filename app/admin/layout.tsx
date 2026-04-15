@@ -32,36 +32,47 @@ export default function AdminLayout({
   return (
     <div className="dashboard-layout">
       {/* Mobile Header */}
-      <div 
-        className="mobile-dashboard-header"
-        style={{
-          display: "none",
-          padding: "var(--space-4)",
-          background: "var(--bg-surface)",
-          borderBottom: "1px solid var(--border-subtle)",
-          alignItems: "center",
-          justifyContent: "between",
-          position: "sticky",
-          top: 0,
-          zIndex: 100
-        }}
-      >
+      <div className="mobile-dashboard-header">
         <Link href="/admin" className="navbar-logo">
-          <div className="navbar-logo-icon" style={{ width: 28, height: 28, fontSize: "0.8rem", background: "var(--brand-danger)" }}>
+          <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "0.9rem", background: "var(--brand-danger)" }}>
             🛡️
           </div>
-          <span className="navbar-logo-text" style={{ fontSize: "1rem" }}>Admin<span>Panel</span></span>
+          <span className="navbar-logo-text" style={{ fontSize: "1.1rem" }}>Admin<span>Panel</span></span>
         </Link>
         <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          style={{ background: "none", border: "none", color: "var(--text-primary)" }}
+          style={{ 
+            background: "rgba(108, 71, 255, 0.1)", 
+            border: "1px solid var(--border-subtle)", 
+            color: "var(--text-primary)",
+            padding: "8px",
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
         >
-          {isSidebarOpen ? <X /> : <Menu />}
+          {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
+      {/* Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="sidebar-overlay"
+          onClick={() => setIsSidebarOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            backdropFilter: "blur(4px)",
+            zIndex: 999
+          }}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className={`sidebar ${isSidebarOpen ? 'mobile-open' : ''}`} style={{ background: "var(--bg-elevated)", borderRightColor: "var(--border-strong)" }}>
+      <aside className={`sidebar ${isSidebarOpen ? 'mobile-open' : ''}`}>
         <Link href="/admin" className="sidebar-logo">
           <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "1rem", background: "var(--brand-danger)" }}>
             🛡️

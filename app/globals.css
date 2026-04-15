@@ -17,14 +17,15 @@
   --grad-primary:   linear-gradient(135deg, #6C47FF 0%, #00D4FF 100%);
   --grad-card:      linear-gradient(145deg, rgba(108,71,255,0.12) 0%, rgba(0,212,255,0.08) 100%);
   --grad-hero:      linear-gradient(160deg, #0A0A1A 0%, #0D0D2B 40%, #0A1128 100%);
-  --grad-glow:      radial-gradient(ellipse at center, rgba(108,71,255,0.25) 0%, transparent 70%);
+  --grad-glow:      radial-gradient(ellipse at center, rgba(1, 0, 3, 0.25) 0%, transparent 70%);
 
-  /* Dark Background System */
+  /* Dark Background System (Default) */
   --bg-base:        #090912;
   --bg-surface:     #0F0F1E;
   --bg-elevated:    #161628;
   --bg-card:        #1A1A30;
   --bg-overlay:     rgba(9, 9, 18, 0.85);
+  --bg-subtle:      rgba(108, 71, 255, 0.05);
 
   /* Border */
   --border-subtle:  rgba(108, 71, 255, 0.15);
@@ -80,6 +81,32 @@
   --z-sticky:   200;
   --z-modal:    300;
   --z-toast:    400;
+}
+
+[data-theme="light"] {
+  --bg-base:        #F8F9FF;
+  --bg-surface:     #FFFFFF;
+  --bg-elevated:    #F0F2FF;
+  --bg-card:        #FFFFFF;
+  --bg-overlay:     rgba(248, 249, 255, 0.85);
+  --bg-subtle:      rgba(108, 71, 255, 0.05);
+
+  --border-subtle:  rgba(108, 71, 255, 0.1);
+  --border-medium:  rgba(108, 71, 255, 0.2);
+  --border-strong:  rgba(108, 71, 255, 0.4);
+
+  --text-primary:   #090912;
+  --text-secondary: #4A4A68;
+  --text-muted:     #80809A;
+  --text-inverse:   #F0F0FF;
+
+  --grad-hero:      linear-gradient(160deg, #F0F2FF 0%, #FFFFFF 100%);
+  --grad-card:      linear-gradient(145deg, rgba(108,71,255,0.05) 0%, rgba(0,212,255,0.03) 100%);
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(108, 71, 255, 0.1);
+  }
 }
 
 /* ==========================================
@@ -711,29 +738,46 @@ a:hover { color: var(--brand-secondary); }
   display: grid;
   grid-template-columns: 260px 1fr;
   min-height: 100vh;
+  width: 100%;
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1024px) {
   .dashboard-layout {
     grid-template-columns: 1fr;
   }
+  
   .sidebar {
     position: fixed;
-    left: -260px;
+    left: -280px;
     top: 0;
     bottom: 0;
     z-index: 1000;
-    width: 260px;
-    transition: left var(--transition-base);
+    width: 280px;
+    height: 100vh !important;
+    transition: transform var(--transition-base);
     display: flex !important;
+    transform: translateX(0);
   }
+  
   .sidebar.mobile-open {
-    left: 0;
-    box-shadow: var(--shadow-lg);
+    transform: translateX(280px);
+    box-shadow: 20px 0 50px rgba(0,0,0,0.5);
   }
+  
   .mobile-dashboard-header {
     display: flex !important;
     justify-content: space-between;
+    align-items: center;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: var(--space-4) var(--space-6);
+    position: sticky;
+    top: 0;
+    z-index: 900;
+  }
+
+  .main-content {
+    padding: var(--space-6) !important;
   }
 }
 
@@ -753,6 +797,9 @@ a:hover { color: var(--brand-secondary); }
   padding: 0 var(--space-5) var(--space-6);
   border-bottom: 1px solid var(--border-subtle);
   margin-bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .sidebar-section-label {
@@ -804,13 +851,18 @@ a:hover { color: var(--brand-secondary); }
 
 .main-content {
   background: var(--bg-base);
-  overflow-y: auto;
-  padding: var(--space-8);
+  min-height: 100vh;
+  padding: var(--space-10);
+  width: 100%;
 }
 
 @media (max-width: 768px) {
   .main-content {
     padding: var(--space-4);
+  }
+  
+  .grid-2, .grid-3, .grid-4 {
+    grid-template-columns: 1fr !important;
   }
 }
 
@@ -896,6 +948,24 @@ a:hover { color: var(--brand-secondary); }
   padding: var(--space-4) var(--space-5);
   background: var(--bg-elevated);
   border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background: rgba(108, 71, 255, 0.03);
 }
 
 .table td {
