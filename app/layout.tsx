@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: {
@@ -26,6 +27,9 @@ export const metadata: Metadata = {
       "AI-powered digital computer centre. Submit any task and our intelligent agents handle the rest.",
   },
   manifest: "/manifest.json",
+};
+
+export const viewport = {
   themeColor: "#6C47FF",
 };
 
@@ -48,7 +52,9 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
