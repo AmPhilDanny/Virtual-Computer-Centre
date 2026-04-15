@@ -269,6 +269,13 @@ a:hover { color: var(--brand-secondary); }
   transition: all var(--transition-base);
 }
 
+@media (max-width: 768px) {
+  .glass-card {
+    padding: var(--space-4) !important;
+    border-radius: var(--radius-lg);
+  }
+}
+
 .glass-card::before {
   content: '';
   position: absolute;

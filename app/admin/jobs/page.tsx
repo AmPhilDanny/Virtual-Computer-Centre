@@ -33,14 +33,14 @@ export default function AdminJobsPage() {
   return (
     <div>
       <h2 style={{ fontSize: "1.25rem", marginBottom: "var(--space-6)" }}>Job Management</h2>
-      <div className="glass-card" style={{ padding: "var(--space-1)" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="table-container">
+        <table className="table">
           <thead>
-             <tr style={{ background: "var(--bg-elevated)", borderBottom: "1px solid var(--border-medium)" }}>
-               <th style={{ padding: "var(--space-4)", textAlign: "left" }}>ID</th>
-               <th style={{ padding: "var(--space-4)", textAlign: "left" }}>Title</th>
-               <th style={{ padding: "var(--space-4)", textAlign: "left" }}>Status</th>
-               <th style={{ padding: "var(--space-4)", textAlign: "right" }}>Actions</th>
+             <tr>
+               <th>ID</th>
+               <th>Title</th>
+               <th>Status</th>
+               <th style={{ textAlign: "right" }}>Actions</th>
              </tr>
           </thead>
           <tbody>
@@ -50,11 +50,11 @@ export default function AdminJobsPage() {
               <tr><td colSpan={4} className="text-center text-muted" style={{padding: "var(--space-10)"}}>No jobs found. (Note: create an API to list jobs for production).</td></tr>
             ) : (
               jobs.map(job => (
-                 <tr key={job.id} style={{ borderBottom: "1px solid var(--border-subtle)" }}>
-                    <td style={{ padding: "var(--space-4)" }}>{job.id.slice(0,8)}</td>
-                    <td style={{ padding: "var(--space-4)" }}>{job.title}</td>
-                    <td style={{ padding: "var(--space-4)" }}>{job.status}</td>
-                    <td style={{ padding: "var(--space-4)", textAlign: "right" }}>
+                 <tr key={job.id}>
+                    <td>{job.id.slice(0,8)}</td>
+                    <td>{job.title}</td>
+                    <td>{job.status}</td>
+                    <td style={{ textAlign: "right" }}>
                        <button onClick={() => triggerExecution(job.id)} className="btn btn-primary btn-sm">
                          <Play size={16} /> Run AI Agent
                        </button>

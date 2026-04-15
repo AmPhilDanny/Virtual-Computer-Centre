@@ -7,7 +7,7 @@ export default async function AdminUsersPage() {
   });
 
   return (
-    <div className="glass-card" style={{ padding: "var(--space-8)" }}>
+    <div className="glass-card">
       <div className="flex justify-between items-center" style={{ marginBottom: "var(--space-8)" }}>
         <h2 style={{ fontSize: "1.25rem", margin: 0 }}>System Users & Clients</h2>
         <button className="btn btn-primary btn-sm">
