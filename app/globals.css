@@ -345,14 +345,13 @@ a:hover { color: var(--brand-secondary); }
 }
 
 .btn-secondary {
-  background: transparent;
-  color: var(--text-primary);
-  border: 1.5px solid var(--border-strong);
+  background: var(--bg-surface);
+  color: var(--brand-primary);
+  border: 1.5px solid var(--brand-primary);
 }
 .btn-secondary:hover {
-  border-color: var(--brand-primary);
-  background: var(--bg-subtle);
-  color: var(--brand-primary);
+  background: var(--brand-primary);
+  color: #fff;
 }
 
 .btn-ghost {
@@ -774,19 +773,43 @@ a:hover { color: var(--brand-secondary); }
    DASHBOARD SIDEBAR
    ========================================== */
 .dashboard-layout {
-  display: grid;
-  grid-template-columns: 260px 1fr;
+  display: flex;
   min-height: 100vh;
   width: 100%;
 }
 
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-subtle);
+  padding: var(--space-6) 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.main-content {
+  flex: 1;
+  background: var(--bg-base);
+  min-height: 100vh;
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
 .mobile-dashboard-header {
-  display: none; /* Hidden by default on desktop */
+  display: none;
 }
 
 @media (max-width: 1024px) {
   .dashboard-layout {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
   
   .sidebar {
@@ -794,11 +817,8 @@ a:hover { color: var(--brand-secondary); }
     left: -280px;
     top: 0;
     bottom: 0;
-    z-index: 1000;
     width: 280px;
-    height: 100vh !important;
     transition: transform var(--transition-base);
-    display: flex !important;
     transform: translateX(0);
   }
   
@@ -808,7 +828,7 @@ a:hover { color: var(--brand-secondary); }
   }
   
   .mobile-dashboard-header {
-    display: flex !important;
+    display: flex;
     justify-content: space-between;
     align-items: center;
     background: var(--bg-surface);
@@ -820,20 +840,8 @@ a:hover { color: var(--brand-secondary); }
   }
 
   .main-content {
-    padding: var(--space-6) !important;
+    padding: var(--space-6);
   }
-}
-
-.sidebar {
-  background: var(--bg-surface);
-  border-right: 1px solid var(--border-subtle);
-  padding: var(--space-6) 0;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
 }
 
 .sidebar-overlay {
