@@ -49,7 +49,6 @@ export default function Navbar() {
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
           style={{
-            display: "none",
             background: "none",
             border: "1px solid var(--border-subtle)",
             borderRadius: "var(--radius-md)",

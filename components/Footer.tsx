@@ -32,14 +32,7 @@ export default function Footer() {
       }}
     >
       <div className="container">
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1.5fr 1fr 1fr 1fr",
-            gap: "var(--space-8)",
-            marginBottom: "var(--space-12)",
-          }}
-        >
+        <div className="footer-grid">
           {/* Brand */}
           <div>
             <div className="navbar-logo" style={{ marginBottom: "var(--space-4)" }}>
@@ -133,7 +126,9 @@ export default function Footer() {
             justifyContent: "space-between",
             flexWrap: "wrap",
             gap: "var(--space-3)",
+            textAlign: "center"
           }}
+          className="footer-bottom"
         >
           <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>
             © {new Date().getFullYear()} AI Computer Centre. All rights reserved.

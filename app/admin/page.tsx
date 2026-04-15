@@ -42,54 +42,52 @@ export default async function AdminOverviewPage() {
         </div>
       </div>
 
-      <div className="flex gap-6">
-        <div className="glass-card flex-1" style={{ padding: "var(--space-6)" }}>
-           <div className="flex justify-between items-center" style={{ marginBottom: "var(--space-6)" }}>
-             <h3 style={{ fontSize: "1.125rem", margin: 0 }}>Recent Intakes</h3>
-             <Link href="/admin/jobs" className="btn btn-secondary btn-sm">View All</Link>
-           </div>
-           
-           <table style={{ width: "100%", borderCollapse: "collapse" }}>
-             <thead>
-               <tr style={{ borderBottom: "1px solid var(--border-medium)", textAlign: "left" }}>
-                 <th style={{ padding: "var(--space-3) 0", color: "var(--text-muted)", fontSize: "0.875rem" }}>Client</th>
-                 <th style={{ padding: "var(--space-3) var(--space-4)", color: "var(--text-muted)", fontSize: "0.875rem" }}>Service</th>
-                 <th style={{ padding: "var(--space-3) var(--space-4)", color: "var(--text-muted)", fontSize: "0.875rem" }}>Status</th>
-                 <th style={{ padding: "var(--space-3) var(--space-4)", color: "var(--text-muted)", fontSize: "0.875rem" }}>Priority</th>
+      <div className="glass-card" style={{ padding: "var(--space-6)", width: "100%" }}>
+         <div className="flex justify-between items-center" style={{ marginBottom: "var(--space-6)" }}>
+           <h3 style={{ fontSize: "1.125rem", margin: 0 }}>Recent Intakes</h3>
+           <Link href="/admin/jobs" className="btn btn-secondary btn-sm">View All</Link>
+         </div>
+         
+         <table style={{ width: "100%", borderCollapse: "collapse" }}>
+           <thead>
+             <tr style={{ borderBottom: "1px solid var(--border-medium)", textAlign: "left" }}>
+               <th style={{ padding: "var(--space-3) 0", color: "var(--text-muted)", fontSize: "0.875rem" }}>Client</th>
+               <th style={{ padding: "var(--space-3) var(--space-4)", color: "var(--text-muted)", fontSize: "0.875rem" }}>Service</th>
+               <th style={{ padding: "var(--space-3) var(--space-4)", color: "var(--text-muted)", fontSize: "0.875rem" }}>Status</th>
+               <th style={{ padding: "var(--space-3) var(--space-4)", color: "var(--text-muted)", fontSize: "0.875rem" }}>Priority</th>
+             </tr>
+           </thead>
+           <tbody>
+             {recentJobs.map((job: any) => (
+               <tr key={job.id} style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+                 <td style={{ padding: "var(--space-3) 0" }}>
+                   <div style={{ fontWeight: 600 }}>{job.user.name || "Unknown"}</div>
+                   <div style={{ fontSize: "0.8125rem", color: "var(--text-secondary)" }}>{job.user.email}</div>
+                 </td>
+                 <td style={{ padding: "var(--space-3) var(--space-4)" }}>{job.service.name}</td>
+                 <td style={{ padding: "var(--space-3) var(--space-4)" }}>
+                   <span className={`badge badge-${job.status === 'SUBMITTED' ? 'warning' : 'info'}`}>
+                     {job.status}
+                   </span>
+                 </td>
+                 <td style={{ padding: "var(--space-3) var(--space-4)" }}>
+                    {job.priority === "EXPRESS" ? (
+                      <span style={{ color: "var(--brand-danger)", fontWeight: 'bold', fontSize: "0.8125rem" }}><AlertTriangle size={14} style={{display:'inline', verticalAlign:'middle'}}/> Express</span>
+                    ) : (
+                      <span style={{ color: "var(--text-muted)", fontSize: "0.8125rem" }}>Normal</span>
+                    )}
+                 </td>
                </tr>
-             </thead>
-             <tbody>
-               {recentJobs.map((job: any) => (
-                 <tr key={job.id} style={{ borderBottom: "1px solid var(--border-subtle)" }}>
-                   <td style={{ padding: "var(--space-3) 0" }}>
-                     <div style={{ fontWeight: 600 }}>{job.user.name || "Unknown"}</div>
-                     <div style={{ fontSize: "0.8125rem", color: "var(--text-secondary)" }}>{job.user.email}</div>
-                   </td>
-                   <td style={{ padding: "var(--space-3) var(--space-4)" }}>{job.service.name}</td>
-                   <td style={{ padding: "var(--space-3) var(--space-4)" }}>
-                     <span className={`badge badge-${job.status === 'SUBMITTED' ? 'warning' : 'info'}`}>
-                       {job.status}
-                     </span>
-                   </td>
-                   <td style={{ padding: "var(--space-3) var(--space-4)" }}>
-                      {job.priority === "EXPRESS" ? (
-                        <span style={{ color: "var(--brand-danger)", fontWeight: 'bold', fontSize: "0.8125rem" }}><AlertTriangle size={14} style={{display:'inline', verticalAlign:'middle'}}/> Express</span>
-                      ) : (
-                        <span style={{ color: "var(--text-muted)", fontSize: "0.8125rem" }}>Normal</span>
-                      )}
-                   </td>
-                 </tr>
-               ))}
-               {recentJobs.length === 0 && (
-                 <tr>
-                   <td colSpan={4} className="text-center" style={{ padding: "var(--space-8) 0", color: "var(--text-muted)" }}>
-                     No jobs submitted yet.
-                   </td>
-                 </tr>
-               )}
-             </tbody>
-           </table>
-        </div>
+             ))}
+             {recentJobs.length === 0 && (
+               <tr>
+                 <td colSpan={4} className="text-center" style={{ padding: "var(--space-8) 0", color: "var(--text-muted)" }}>
+                   No jobs submitted yet.
+                 </td>
+               </tr>
+             )}
+           </tbody>
+         </table>
       </div>
     </div>
   );

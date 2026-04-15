@@ -1,14 +1,21 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import Link from "next/link";
-import { LogOut, Home, FileText, PlusCircle, CreditCard, User, Settings } from "lucide-react";
+"use client";
 
-export default async function DashboardLayout({
+import { redirect, usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
+import Link from "next/link";
+import { LogOut, Home, FileText, PlusCircle, CreditCard, User, Menu, X } from "lucide-react";
+
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const { data: session, status } = useSession();
+  const pathname = usePathname();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  if (status === "loading") return null;
 
   if (!session?.user) {
     redirect("/auth/login");
@@ -19,10 +26,41 @@ export default async function DashboardLayout({
     redirect("/admin");
   }
 
+  const isActive = (path: string) => pathname === path || (path !== "/dashboard" && pathname?.startsWith(path));
+
   return (
     <div className="dashboard-layout">
+      {/* Mobile Header */}
+      <div 
+        className="mobile-dashboard-header"
+        style={{
+          display: "none",
+          padding: "var(--space-4)",
+          background: "var(--bg-surface)",
+          borderBottom: "1px solid var(--border-subtle)",
+          alignItems: "center",
+          justifyContent: "between",
+          position: "sticky",
+          top: 0,
+          zIndex: 100
+        }}
+      >
+        <Link href="/" className="navbar-logo">
+          <div className="navbar-logo-icon" style={{ width: 28, height: 28, fontSize: "0.8rem" }}>
+            🤖
+          </div>
+          <span className="navbar-logo-text" style={{ fontSize: "1rem" }}>AI<span>Centre</span></span>
+        </Link>
+        <button 
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          style={{ background: "none", border: "none", color: "var(--text-primary)" }}
+        >
+          {isSidebarOpen ? <X /> : <Menu />}
+        </button>
+      </div>
+
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${isSidebarOpen ? 'mobile-open' : ''}`}>
         <Link href="/" className="sidebar-logo">
           <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "1rem" }}>
             🤖
@@ -33,22 +71,22 @@ export default async function DashboardLayout({
         <div className="sidebar-section-label">Main Menu</div>
         <ul className="sidebar-nav">
           <li>
-            <Link href="/dashboard" className="active">
+            <Link href="/dashboard" className={pathname === "/dashboard" ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <Home className="nav-icon" /> Dashboard
             </Link>
           </li>
           <li>
-            <Link href="/dashboard/services">
+            <Link href="/dashboard/services" className={isActive("/dashboard/services") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <PlusCircle className="nav-icon" /> New Order
             </Link>
           </li>
           <li>
-            <Link href="/dashboard/orders">
+            <Link href="/dashboard/orders" className={isActive("/dashboard/orders") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <FileText className="nav-icon" /> Order History
             </Link>
           </li>
           <li>
-            <Link href="/dashboard/wallet">
+            <Link href="/dashboard/wallet" className={isActive("/dashboard/wallet") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <CreditCard className="nav-icon" /> Wallet
             </Link>
           </li>
@@ -57,7 +95,7 @@ export default async function DashboardLayout({
         <div className="sidebar-section-label" style={{ marginTop: "var(--space-6)" }}>Settings</div>
         <ul className="sidebar-nav">
           <li>
-            <Link href="/dashboard/profile">
+            <Link href="/dashboard/profile" className={isActive("/dashboard/profile") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <User className="nav-icon" /> Profile
             </Link>
           </li>
@@ -75,7 +113,7 @@ export default async function DashboardLayout({
           <h1 style={{ fontSize: "1.5rem" }}>Client Portal</h1>
           <div className="flex items-center gap-4">
              <div className="badge badge-primary">
-               Wallet: ₦0.00
+               Wallet: ₦{(session.user as any).walletBalance?.toLocaleString() || "0.00"}
              </div>
              <div 
                style={{ 

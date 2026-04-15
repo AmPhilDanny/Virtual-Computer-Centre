@@ -1,14 +1,21 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import Link from "next/link";
-import { LogOut, LayoutDashboard, Briefcase, Users, LayoutTemplate, Settings } from "lucide-react";
+"use client";
 
-export default async function AdminLayout({
+import { redirect, usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
+import Link from "next/link";
+import { LogOut, LayoutDashboard, Briefcase, Users, LayoutTemplate, Settings, Menu, X } from "lucide-react";
+
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const { data: session, status } = useSession();
+  const pathname = usePathname();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  if (status === "loading") return null;
 
   if (!session?.user) {
     redirect("/auth/login");
@@ -20,10 +27,41 @@ export default async function AdminLayout({
     redirect("/dashboard");
   }
 
+  const isActive = (path: string) => pathname === path || (path !== "/admin" && pathname?.startsWith(path));
+
   return (
     <div className="dashboard-layout">
+      {/* Mobile Header */}
+      <div 
+        className="mobile-dashboard-header"
+        style={{
+          display: "none",
+          padding: "var(--space-4)",
+          background: "var(--bg-surface)",
+          borderBottom: "1px solid var(--border-subtle)",
+          alignItems: "center",
+          justifyContent: "between",
+          position: "sticky",
+          top: 0,
+          zIndex: 100
+        }}
+      >
+        <Link href="/admin" className="navbar-logo">
+          <div className="navbar-logo-icon" style={{ width: 28, height: 28, fontSize: "0.8rem", background: "var(--brand-danger)" }}>
+            🛡️
+          </div>
+          <span className="navbar-logo-text" style={{ fontSize: "1rem" }}>Admin<span>Panel</span></span>
+        </Link>
+        <button 
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          style={{ background: "none", border: "none", color: "var(--text-primary)" }}
+        >
+          {isSidebarOpen ? <X /> : <Menu />}
+        </button>
+      </div>
+
       {/* Sidebar */}
-      <aside className="sidebar" style={{ background: "var(--bg-elevated)", borderRightColor: "var(--border-strong)" }}>
+      <aside className={`sidebar ${isSidebarOpen ? 'mobile-open' : ''}`} style={{ background: "var(--bg-elevated)", borderRightColor: "var(--border-strong)" }}>
         <Link href="/admin" className="sidebar-logo">
           <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "1rem", background: "var(--brand-danger)" }}>
             🛡️
@@ -34,22 +72,22 @@ export default async function AdminLayout({
         <div className="sidebar-section-label">Management</div>
         <ul className="sidebar-nav">
           <li>
-            <Link href="/admin" className="active">
+            <Link href="/admin" className={pathname === "/admin" ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <LayoutDashboard className="nav-icon" /> Overview
             </Link>
           </li>
           <li>
-            <Link href="/admin/jobs">
+            <Link href="/admin/jobs" className={isActive("/admin/jobs") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <Briefcase className="nav-icon" /> Manage Jobs
             </Link>
           </li>
           <li>
-            <Link href="/admin/services">
+            <Link href="/admin/services" className={isActive("/admin/services") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <LayoutTemplate className="nav-icon" /> Services Catalog
             </Link>
           </li>
           <li>
-            <Link href="/admin/users">
+            <Link href="/admin/users" className={isActive("/admin/users") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <Users className="nav-icon" /> Users & Clients
             </Link>
           </li>
@@ -58,7 +96,7 @@ export default async function AdminLayout({
         <div className="sidebar-section-label" style={{ marginTop: "var(--space-6)" }}>System</div>
         <ul className="sidebar-nav">
           <li>
-            <Link href="/admin/settings">
+            <Link href="/admin/settings" className={isActive("/admin/settings") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <Settings className="nav-icon" /> Analytics & Settings
             </Link>
           </li>
