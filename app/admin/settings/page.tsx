@@ -40,6 +40,8 @@ export default function AdminSettingsPage() {
     STATUS_UPDATE_WHAPP_TEMPLATE: "",
     AI_COMPLETED_EMAIL_TEMPLATE: "",
     AI_COMPLETED_WHAPP_TEMPLATE: "",
+    pwaName: "Virtual Computer Centre",
+    pwaSplashColor: "#6366f1",
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -565,6 +567,48 @@ export default function AdminSettingsPage() {
                   <option value="AI_PLUS_HUMAN">AI + Human Review</option>
                   <option value="HUMAN_ONLY">Human Only (Manual)</option>
               </select>
+            </div>
+ 
+            <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
+
+            <h4 className="flex items-center gap-2" style={{ margin: 0 }}>
+              <Globe size={18} style={{ color: "var(--brand-primary)" }} /> PWA / Mobile App Settings
+            </h4>
+
+            <div className="grid-2 gap-6">
+              <div className="form-group">
+                <label className="form-label">App Home Screen Name</label>
+                <input 
+                  type="text" 
+                  name="pwaName"
+                  className="form-input" 
+                  value={settings.pwaName || ""} 
+                  onChange={handleChange}
+                  placeholder="e.g. Virtual Centre"
+                />
+                <p className="text-muted" style={{ fontSize: "0.7rem", marginTop: "var(--space-1)" }}>This name appears under the icon on mobile devices.</p>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Splash Screen Color</label>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="color" 
+                    name="pwaSplashColor"
+                    className="color-picker" 
+                    value={settings.pwaSplashColor || "#ffffff"} 
+                    onChange={handleChange}
+                    style={{ width: "40px", height: "40px", padding: 0, border: "none", borderRadius: "4px", cursor: "pointer" }}
+                  />
+                  <input 
+                    type="text" 
+                    name="pwaSplashColor"
+                    className="form-input" 
+                    value={settings.pwaSplashColor || ""} 
+                    onChange={handleChange}
+                    style={{ flex: 1 }}
+                  />
+                </div>
+              </div>
             </div>
 
 
