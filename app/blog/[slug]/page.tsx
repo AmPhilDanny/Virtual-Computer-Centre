@@ -67,10 +67,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
             <div className="flex items-center gap-4 py-4 border-y border-subtle">
                <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--brand-primary)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: "bold" }}>
-                 {post.author.name.charAt(0)}
+                 {(post.author.name || "Admin").charAt(0)}
                </div>
                <div className="flex-col">
-                  <div className="font-bold text-sm">By {post.author.name}</div>
+                  <div className="font-bold text-sm">By {post.author.name || "Admin"}</div>
                   <div className="text-secondary text-xs">AI Computer Centre Specialist</div>
                </div>
             </div>
