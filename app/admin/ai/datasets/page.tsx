@@ -7,7 +7,7 @@ import {
   Trash2, 
   Edit3, 
   Plus, 
-  Global, 
+  Globe, 
   Search, 
   BookOpen,
   Info,
