@@ -618,7 +618,7 @@ export default function AdminSettingsPage() {
             <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
 
             <h4 className="flex items-center gap-2" style={{ margin: 0 }}>
-              <Settings icon={18} style={{ color: "var(--brand-warning)" }} /> Payment & Monetization
+              <Settings size={18} style={{ color: "var(--brand-warning)" }} /> Payment & Monetization
             </h4>
 
             <div className="grid-2 gap-8">
