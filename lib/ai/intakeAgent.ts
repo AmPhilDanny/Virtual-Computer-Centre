@@ -30,7 +30,7 @@ export async function analyzeJobIntake(
     `;
 
     const { text } = await generateText({
-      model: google("gemini-2.5-flash"),
+      model: google("gemini-1.5-flash"),
       prompt: intakePrompt,
       system: "You are a precise JSON-only outputting intake agent."
     });
