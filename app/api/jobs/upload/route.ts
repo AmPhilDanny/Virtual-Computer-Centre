@@ -1,4 +1,4 @@
-import { handleUpload, type HandleUploadBody } from '@vercel/blob/next';
+import { handleUpload, type HandleUploadBody } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 
