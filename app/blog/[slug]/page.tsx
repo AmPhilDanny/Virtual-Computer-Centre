@@ -2,14 +2,15 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Clock, User, ArrowLeft, Calendar, Tag } from "lucide-react";
+import { ArrowLeft, Calendar } from "lucide-react";
 import Link from "next/link";
 import CommentSection from "@/components/blog/CommentSection";
 import type { Metadata } from "next";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
   const post = await prisma.blogPost.findUnique({
-    where: { slug: params.slug },
+    where: { slug: slug },
   });
 
   if (!post) return {};
@@ -23,9 +24,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const post = await prisma.blogPost.findUnique({
-    where: { slug: params.slug },
+    where: { slug: slug },
     include: {
       author: { select: { name: true, image: true } },
       category: true,

@@ -1,15 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { notFound, redirect } from "next/navigation";
-import { Printer, Download, ArrowLeft, ShieldCheck } from "lucide-react";
+import { Printer, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
-export default async function ReceiptPage({ params }: { params: { id: string } }) {
+export default async function ReceiptPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user) redirect("/auth/signin");
 
   const order = await prisma.order.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       user: { select: { name: true, email: true } },
       job: { include: { service: true } }
@@ -112,7 +114,6 @@ export default async function ReceiptPage({ params }: { params: { id: string } }
         </div>
       </div>
 
-      {/* Action Bar (Not visible when printing) */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex gap-4 print:hidden bg-white/80 backdrop-blur-md p-4 rounded-full shadow-2xl border border-gray-100">
          <Link href="/dashboard" className="btn btn-ghost border border-gray-200 flex items-center gap-2">
             <ArrowLeft size={16} /> Dashboard
