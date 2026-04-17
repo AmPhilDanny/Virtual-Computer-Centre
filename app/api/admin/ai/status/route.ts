@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText } from "ai";
 
 export async function POST() {
@@ -17,10 +17,13 @@ export async function POST() {
       return NextResponse.json({ status: "inactive", message: "API Key not found in settings." }, { status: 400 });
     }
 
+    // Create a provider instance with the dynamic API key
+    const google = createGoogleGenerativeAI({ apiKey });
+
     // Try a simple call to verify the key
     try {
       await generateText({
-        model: google("gemini-1.5-flash", { apiKey }),
+        model: google("gemini-1.5-flash"),
         prompt: "Hello",
         maxTokens: 1,
       });
