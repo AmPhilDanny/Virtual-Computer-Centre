@@ -40,6 +40,11 @@ export async function generateMetadata(): Promise<Metadata> {
       description: siteDescription,
     },
     manifest: "/manifest.json",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: siteName,
+    },
   };
 }
 
