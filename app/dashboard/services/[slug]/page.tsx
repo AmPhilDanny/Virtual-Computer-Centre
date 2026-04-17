@@ -31,7 +31,12 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         </div>
 
         <div className="glass-card">
-          <ClientJobForm serviceId={service.id} schema={schemaDefinition} />
+          <ClientJobForm 
+            serviceId={service.id} 
+            schema={schemaDefinition} 
+            basePrice={service.basePrice}
+            expressMultiplier={service.expressMultiplier}
+          />
         </div>
       </div>
 

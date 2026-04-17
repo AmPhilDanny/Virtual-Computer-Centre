@@ -129,16 +129,36 @@ model Order {
   userId     String
   jobId      String      @unique
   amount     Float
+  discount   Float       @default(0)
+  total      Float
   currency   String      @default("NGN")
   status     PaymentStatus @default(PENDING)
   gateway    String?     // paystack | flutterwave
   reference  String?     @unique
+  couponId   String?
   metadata   Json?
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
-  user User @relation(fields: [userId], references: [id])
-  job  Job  @relation(fields: [jobId], references: [id])
+  user   User @relation(fields: [userId], references: [id])
+  job    Job  @relation(fields: [jobId], references: [id])
+  coupon Coupon? @relation(fields: [couponId], references: [id])
+}
+
+model Coupon {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  discountType  String    // PERCENTAGE | FIXED
+  discountValue Float
+  minAmount     Float     @default(0)
+  expiresAt     DateTime?
+  maxUses       Int?
+  usedCount     Int       @default(0)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  orders        Order[]
 }
 
 // =========================================

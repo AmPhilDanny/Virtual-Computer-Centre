@@ -5,11 +5,21 @@ import { useRouter } from "next/navigation";
 import { upload } from "@vercel/blob/client";
 import { Upload, X, Paperclip, CheckCircle } from "lucide-react";
 
-export default function ClientJobForm({ serviceId, schema }: { serviceId: string, schema: any[] }) {
+export default function ClientJobForm({ 
+  serviceId, 
+  schema,
+  basePrice,
+  expressMultiplier
+}: { 
+  serviceId: string, 
+  schema: any[],
+  basePrice: number,
+  expressMultiplier: number
+}) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [formData, setFormData] = useState<Record<string, any>>({ priority: "NORMAL" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   
@@ -17,21 +27,73 @@ export default function ClientJobForm({ serviceId, schema }: { serviceId: string
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
+  // Coupon State
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+
   const handleChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return;
+    setValidatingCoupon(true);
+    setError("");
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponCode, amount: basePrice })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAppliedCoupon(data.coupon);
+      } else {
+        setError(data.error);
+        setAppliedCoupon(null);
+      }
+    } catch (err) {
+      setError("Failed to validate coupon");
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
+  const calculateTotals = () => {
+    const isExpress = formData.priority === "EXPRESS";
+    const subtotal = basePrice;
+    const priorityFee = isExpress ? (basePrice * (expressMultiplier - 1)) : 0;
+    const preDiscountTotal = subtotal + priorityFee;
+    
+    let discount = 0;
+    if (appliedCoupon) {
+      if (appliedCoupon.discountType === "PERCENTAGE") {
+        discount = preDiscountTotal * (appliedCoupon.discountValue / 100);
+      } else {
+        discount = appliedCoupon.discountValue;
+      }
+    }
+    
+    return {
+      subtotal,
+      priorityFee,
+      discount: Math.round(discount * 100) / 100,
+      total: Math.max(0, preDiscountTotal - discount)
+    };
+  };
+
+  const { subtotal, priorityFee, discount, total } = calculateTotals();
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // ... (rest of old handleFileChange logic)
     if (e.target.files) {
       const selectedFiles = Array.from(e.target.files);
-      
-      // Validation: Total size or individual size? User said "not more than 50mb"
       const totalSize = selectedFiles.reduce((acc, file) => acc + file.size, 0);
       if (totalSize > 50 * 1024 * 1024) {
         setError("Total file size exceeds 50MB limit.");
         return;
       }
-
       setFiles(prev => [...prev, ...selectedFiles]);
       setError("");
     }
@@ -50,7 +112,7 @@ export default function ClientJobForm({ serviceId, schema }: { serviceId: string
     try {
       const uploadedUrls: string[] = [];
 
-      // 1. Upload files first if any
+      // 1. Upload files first
       if (files.length > 0) {
         setUploading(true);
         for (let i = 0; i < files.length; i++) {
@@ -65,21 +127,23 @@ export default function ClientJobForm({ serviceId, schema }: { serviceId: string
         setUploading(false);
       }
 
-      // 2. Submit Job
+      // 2. Submit Job with Pricing Info
       const res = await fetch("/api/jobs/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           serviceId,
-          title: `Job Order ${Date.now().toString().slice(-6)}`,
+          title: `${formData['title'] || 'Order'} - ${Date.now().toString().slice(-4)}`,
           formData,
-          description: "Submitted via Client Portal",
-          attachments: uploadedUrls
+          description: formData['description'] || "Submitted via Client Portal",
+          attachments: uploadedUrls,
+          couponId: appliedCoupon?.id
         }),
       });
 
       if (!res.ok) {
-        throw new Error("Failed to submit job");
+        const errData = await res.json();
+        throw new Error(errData.message || "Failed to submit job");
       }
       
       router.push("/dashboard?order_success=true");
@@ -92,122 +156,133 @@ export default function ClientJobForm({ serviceId, schema }: { serviceId: string
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex-col gap-5" style={{ padding: "var(--space-6)" }}>
-      <h3 style={{ fontSize: "1.125rem", margin: 0, borderBottom: "1px solid var(--border-subtle)", paddingBottom: "var(--space-4)" }}>
-        Order Details
-      </h3>
+    <form onSubmit={handleSubmit} className="flex-col gap-6" style={{ padding: "var(--space-6)" }}>
+      <h3 style={{ fontSize: "1.1rem", margin: 0, fontWeight: 700 }}>Order Request</h3>
 
       {error && (
-        <div style={{ padding: "var(--space-3)", background: "rgba(255, 71, 87, 0.1)", color: "var(--brand-danger)", borderRadius: "var(--radius-sm)", border: "1px solid var(--brand-danger)" }}>
+        <div style={{ padding: "var(--space-3)", background: "rgba(255, 71, 87, 0.08)", color: "var(--brand-danger)", borderRadius: "var(--radius-sm)", border: "1px solid var(--brand-danger)", fontSize: "0.875rem" }}>
           {error}
         </div>
       )}
 
-      {schema.map((field, idx) => (
-        <div key={idx} className="form-group">
-          <label className="form-label">
-            {field.label} {field.required && <span style={{color: "var(--brand-danger)"}}>*</span>}
-          </label>
-          {field.type === "textarea" ? (
-            <textarea 
-              className="form-textarea" 
-              required={field.required}
-              placeholder={`Enter ${field.label.toLowerCase()}...`}
-              value={formData[field.name] || ""}
-              onChange={(e) => handleChange(field.name, e.target.value)}
-            />
-          ) : (
-            <input 
-              type={field.type} 
-              className="form-input"
-              required={field.required}
-              placeholder={`Enter ${field.label.toLowerCase()}...`}
-              value={formData[field.name] || ""}
-              onChange={(e) => handleChange(field.name, e.target.value)}
-            />
-          )}
-        </div>
-      ))}
+      <div className="flex-col gap-4">
+        {schema.map((field, idx) => (
+          <div key={idx} className="form-group">
+            <label className="form-label">{field.label}</label>
+            {field.type === "textarea" ? (
+              <textarea 
+                className="form-textarea" 
+                required={field.required}
+                value={formData[field.name] || ""}
+                onChange={(e) => handleChange(field.name, e.target.value)}
+              />
+            ) : (
+              <input 
+                type={field.type} 
+                className="form-input"
+                required={field.required}
+                value={formData[field.name] || ""}
+                onChange={(e) => handleChange(field.name, e.target.value)}
+              />
+            )}
+          </div>
+        ))}
+      </div>
 
-      {/* File Upload Section */}
       <div className="form-group">
-        <label className="form-label">Attachments (Max 50MB total)</label>
-        <div 
-          className="file-upload-zone"
-          style={{
-            border: "2px dashed var(--border-medium)",
-            borderRadius: "var(--radius-md)",
-            padding: "var(--space-6)",
-            textAlign: "center",
-            cursor: "pointer",
-            transition: "all 0.2s ease"
-          }}
-          onClick={() => fileInputRef.current?.click()}
+        <label className="form-label">Priority Level</label>
+        <select 
+           className="form-select" 
+           value={formData['priority']} 
+           onChange={(e) => handleChange("priority", e.target.value)}
         >
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleFileChange} 
-            multiple 
-            style={{ display: "none" }} 
-          />
-          <Upload size={24} style={{ marginBottom: "var(--space-2)", color: "var(--brand-primary)" }} />
-          <p style={{ margin: 0, fontSize: "0.875rem" }}>Click to select files or drag and drop</p>
-          <p className="text-muted" style={{ fontSize: "0.75rem" }}>Supported: Images, PDF, Docs, Zip</p>
-        </div>
+          <option value="NORMAL">Standard Processing (Normal Fee)</option>
+          <option value="EXPRESS">Express Processing ({expressMultiplier}x Fee)</option>
+        </select>
+      </div>
 
+      <div className="form-group">
+        <label className="form-label">Files & Attachments</label>
+        <div className="file-upload-zone p-6 text-center border-2 border-dashed border-subtle rounded-xl cursor-pointer hover:bg-glass" onClick={() => fileInputRef.current?.click()}>
+          <input type="file" ref={fileInputRef} onChange={handleFileChange} multiple style={{ display: "none" }} />
+          <Upload size={24} className="text-primary mb-2 mx-auto" />
+          <p className="text-sm">Click to select files (Max 50MB)</p>
+        </div>
+        
         {files.length > 0 && (
-          <div className="flex-col gap-2" style={{ marginTop: "var(--space-3)" }}>
+          <div className="flex-col gap-2 mt-3">
             {files.map((file, i) => (
-              <div key={i} className="flex items-center justify-between" style={{ background: "var(--bg-elevated)", padding: "var(--space-2) var(--space-3)", borderRadius: "var(--radius-sm)", fontSize: "0.8125rem" }}>
-                <div className="flex items-center gap-2">
-                  <Paperclip size={14} className="text-muted" />
-                  <span style={{ fontWeight: 500 }}>{file.name}</span>
-                  <span className="text-muted">({(file.size / 1024 / 1024).toFixed(2)}MB)</span>
-                </div>
-                <button type="button" onClick={(e) => { e.stopPropagation(); removeFile(i); }} style={{ background: "none", border: "none", color: "var(--brand-danger)", cursor: "pointer" }}>
-                  <X size={16} />
-                </button>
+              <div key={i} className="flex items-center justify-between bg-subtle p-2 rounded-lg text-xs">
+                <span className="font-medium truncate">{file.name}</span>
+                <button type="button" onClick={() => removeFile(i)} className="text-danger"><X size={14} /></button>
               </div>
             ))}
           </div>
         )}
+      </div>
 
-        {uploading && (
-           <div style={{ marginTop: "var(--space-3)" }}>
-              <div className="flex justify-between" style={{ fontSize: "0.75rem", marginBottom: "var(--space-1)" }}>
-                <span>Uploading files...</span>
-                <span>{uploadProgress}%</span>
-              </div>
-              <div style={{ height: "4px", width: "100%", background: "var(--bg-elevated)", borderRadius: "2px", overflow: "hidden" }}>
-                <div style={{ height: "100%", width: `${uploadProgress}%`, background: "var(--grad-primary)", transition: "width 0.3s ease" }}></div>
-              </div>
-           </div>
+      {/* Coupon Section */}
+      <div className="form-group bg-subtle p-4 rounded-xl border border-subtle">
+        <label className="form-label" style={{ fontSize: "0.8rem" }}>Promo Code</label>
+        <div className="flex gap-2 mt-1">
+          <input 
+            type="text" 
+            className="form-input font-mono" 
+            placeholder="CODE..."
+            value={couponCode}
+            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+          />
+          <button 
+            type="button" 
+            className="btn btn-ghost border border-subtle" 
+            onClick={handleApplyCoupon}
+            disabled={validatingCoupon || !couponCode}
+          >
+            {validatingCoupon ? "..." : "Apply"}
+          </button>
+        </div>
+        {appliedCoupon && (
+          <div className="text-success text-xs mt-2 flex items-center gap-1">
+            <CheckCircle size={12} /> Coupon "{appliedCoupon.code}" Applied!
+          </div>
         )}
       </div>
-      
-       <div className="form-group" style={{ marginTop: "var(--space-2)" }}>
-          <label className="form-label">Priority</label>
-          <select 
-             className="form-select" 
-             value={formData['priority'] || "NORMAL"} 
-             onChange={(e) => handleChange("priority", e.target.value)}
-          >
-            <option value="NORMAL">Normal Processing</option>
-            <option value="EXPRESS">Express Processing (1.5x fee)</option>
-          </select>
-       </div>
+
+      {/* Price Summary */}
+      <div className="bg-glass p-6 rounded-2xl border border-subtle flex-col gap-3 mt-4">
+        <div className="flex justify-between text-secondary">
+          <span>Subtotal</span>
+          <span>₦{subtotal.toLocaleString()}</span>
+        </div>
+        {priorityFee > 0 && (
+          <div className="flex justify-between text-secondary">
+            <span>Priority Fee</span>
+            <span>+ ₦{priorityFee.toLocaleString()}</span>
+          </div>
+        )}
+        {discount > 0 && (
+          <div className="flex justify-between text-success">
+            <span>Discount Applied</span>
+            <span>- ₦{discount.toLocaleString()}</span>
+          </div>
+        )}
+        <hr className="border-subtle my-1" />
+        <div className="flex justify-between font-bold text-lg" style={{ color: "var(--brand-primary)" }}>
+          <span>Payable Amount</span>
+          <span>₦{total.toLocaleString()}</span>
+        </div>
+      </div>
 
       <button 
         type="submit" 
-        className="btn btn-primary btn-lg" 
-        style={{ marginTop: "var(--space-4)" }} 
+        className="btn btn-primary btn-lg mt-4 shadow-xl" 
         disabled={loading || uploading}
       >
-        {loading ? (uploading ? "Uploading..." : "Submitting...") : (
-          <>Submit Order</>
-        )}
+        {loading ? "Processing Order..." : "Submit & Checkout"}
       </button>
+    </form>
+  );
+}
     </form>
   );
 }
