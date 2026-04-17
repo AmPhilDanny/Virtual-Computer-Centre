@@ -370,10 +370,12 @@ export default function AdminSettingsPage() {
                     value={settings.geminiModel || "gemini-2.0-flash-exp"}
                     onChange={(e) => setSettings(prev => ({ ...prev, geminiModel: e.target.value }))}
                   >
-                    <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash (Experimental 2.5 Preview)</option>
-                    <option value="gemini-2.0-pro-exp">Gemini 2.0 Pro (Experimental)</option>
-                    <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro (Precision)</option>
-                    <option value="gemini-1.5-flash-latest">Gemini 1.5 Flash (Speed)</option>
+                    <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash (Experimental / 2.5 Preview)</option>
+                    <option value="gemini-2.0-pro-exp">Gemini 2.0 Pro (Experimental / 2.5 Preview)</option>
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash (Custom/Alpha)</option>
+                    <option value="gemini-2.5-pro">Gemini 2.5 Pro (Custom/Alpha)</option>
+                    <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro (Stable Precision)</option>
+                    <option value="gemini-1.5-flash-latest">Gemini 1.5 Flash (Stable Speed)</option>
                   </select>
                 </div>
               </div>
