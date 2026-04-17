@@ -5,7 +5,7 @@ import type { NextRequest } from 'next/server';
 // For production-grade rate limiting, a Redis-based approach (e.g., Upstash) is recommended.
 const rateLimitMap = new Map<string, { count: number, lastRequest: number }>();
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Protect sensitive endpoints (Job Creation, Login, Wallet Top-up)
