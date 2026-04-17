@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSettings } from "./SettingsProvider";
 import { useTheme } from "./ThemeProvider";
 import { useSession, signOut } from "next-auth/react";
+import { Sun, Moon, LogOut, User as UserIcon } from "lucide-react";
 
 const navLinks = [
   { label: "Home", href: "/" },
