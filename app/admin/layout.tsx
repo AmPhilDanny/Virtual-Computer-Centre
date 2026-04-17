@@ -4,7 +4,7 @@ import { redirect, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
-import { LogOut, LayoutDashboard, Briefcase, Users, LayoutTemplate, Settings, Menu, X } from "lucide-react";
+import { LogOut, LayoutDashboard, Briefcase, Users, LayoutTemplate, Settings, Menu, X, Cpu, CreditCard, Smartphone } from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -89,11 +89,26 @@ export default function AdminLayout({
           </li>
         </ul>
 
-        <div className="sidebar-section-label" style={{ marginTop: "var(--space-6)" }}>System</div>
+        <div className="sidebar-section-label" style={{ marginTop: "var(--space-6)" }}>System Configuration</div>
         <ul className="sidebar-nav">
           <li>
             <Link href="/admin/settings" className={isActive("/admin/settings") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
-              <Settings className="nav-icon" /> Analytics & Settings
+              <Settings className="nav-icon" /> Analytics & General
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/ai" className={isActive("/admin/ai") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
+              <Cpu className="nav-icon" /> AI Configuration
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/payments" className={isActive("/admin/payments") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
+              <CreditCard className="nav-icon" /> Monetization & Pay
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/pwa" className={isActive("/admin/pwa") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
+              <Smartphone className="nav-icon" /> PWA / Mobile App
             </Link>
           </li>
           <li>

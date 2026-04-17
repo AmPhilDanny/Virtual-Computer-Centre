@@ -54,7 +54,7 @@ export default function Navbar() {
             style={{ padding: "8px", borderRadius: "10px", width: "40px", height: "40px" }}
             aria-label="Toggle theme"
           >
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            {theme === "dark" ? <Moon size={18} /> : <Sun size={18} />}
           </button>
           
           {status === "authenticated" ? (
@@ -139,7 +139,7 @@ export default function Navbar() {
               style={{ padding: "8px", borderRadius: "10px", width: "40px", height: "40px" }}
               aria-label="Toggle theme"
             >
-              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              {theme === "dark" ? <Moon size={18} /> : <Sun size={18} />}
             </button>
             {status === "authenticated" ? (
               <>
