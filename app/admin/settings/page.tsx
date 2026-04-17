@@ -27,7 +27,19 @@ export default function AdminSettingsPage() {
     openRouterApiKey: "",
     openRouterModel: "google/gemini-2.0-flash-001",
     activeAiProvider: "google",
-    aiAutonomy: "AI_PLUS_HUMAN"
+    aiAutonomy: "AI_PLUS_HUMAN",
+    resendApiKey: "",
+    emailFromAddress: "onboarding@resend.dev",
+    adminNotificationEmail: "",
+    twilioSid: "",
+    twilioToken: "",
+    twilioFromNumber: "",
+    JOB_CREATED_EMAIL_TEMPLATE: "",
+    JOB_CREATED_WHAPP_TEMPLATE: "",
+    STATUS_UPDATE_EMAIL_TEMPLATE: "",
+    STATUS_UPDATE_WHAPP_TEMPLATE: "",
+    AI_COMPLETED_EMAIL_TEMPLATE: "",
+    AI_COMPLETED_WHAPP_TEMPLATE: "",
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -608,16 +620,120 @@ export default function AdminSettingsPage() {
            </div>
         </div>
 
-        <div className="glass-card flex-col gap-4" style={{ padding: "var(--space-6)" }}>
+        <div className="glass-card flex-col gap-6" style={{ padding: "var(--space-8)" }}>
            <h4 className="flex items-center gap-2" style={{ margin: 0 }}>
-             <Bell size={18} style={{ color: "var(--brand-warning)" }} /> System Notifications
+             <Bell size={20} style={{ color: "var(--brand-warning)" }} /> Notification Templates & Keys
            </h4>
-           <p className="text-muted" style={{ fontSize: "0.875rem", margin: 0 }}>
-             Configure how the system sends automated emails and push notifications.
-           </p>
-           <button className="btn btn-ghost btn-sm" style={{ alignSelf: "flex-start" }}>
-              Manage Alerts
-           </button>
+           
+           <div className="grid-2 gap-8">
+              {/* Email Config */}
+              <div className="flex-col gap-4">
+                 <h5 style={{ margin: 0, fontSize: "0.9rem", color: "var(--text-secondary)" }}>Email (Resend)</h5>
+                 <div className="form-group">
+                    <label className="form-label">Resend API Key</label>
+                    <input type="password" name="resendApiKey" className="form-input" value={settings.resendApiKey} onChange={handleChange} placeholder="re_..." />
+                 </div>
+                 <div className="form-group">
+                    <label className="form-label">Sender Email Address</label>
+                    <input type="email" name="emailFromAddress" className="form-input" value={settings.emailFromAddress} onChange={handleChange} />
+                 </div>
+                 <div className="form-group">
+                    <label className="form-label">Admin Alert Email</label>
+                    <input type="email" name="adminNotificationEmail" className="form-input" value={settings.adminNotificationEmail} onChange={handleChange} placeholder="admin@domain.com" />
+                 </div>
+              </div>
+
+              {/* WhatsApp Config */}
+              <div className="flex-col gap-4">
+                 <h5 style={{ margin: 0, fontSize: "0.9rem", color: "var(--text-secondary)" }}>WhatsApp (Twilio)</h5>
+                 <div className="form-group">
+                    <label className="form-label">Twilio SID</label>
+                    <input type="text" name="twilioSid" className="form-input" value={settings.twilioSid} onChange={handleChange} placeholder="AC..." />
+                 </div>
+                 <div className="form-group">
+                    <label className="form-label">Twilio Auth Token</label>
+                    <input type="password" name="twilioToken" className="form-input" value={settings.twilioToken} onChange={handleChange} />
+                 </div>
+                 <div className="form-group">
+                    <label className="form-label">Twilio From Phone (E.164)</label>
+                    <input type="text" name="twilioFromNumber" className="form-input" value={settings.twilioFromNumber} onChange={handleChange} placeholder="+123456789" />
+                 </div>
+              </div>
+           </div>
+
+           <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
+
+           <div className="flex-col gap-6">
+              <h5 style={{ margin: 0, fontSize: "1rem" }}>Message Templates</h5>
+              <div className="bg-info-subtle p-4 rounded-xl text-xs text-info leading-loose">
+                 Available tags: <code>{"{{job_id}}"}</code>, <code>{"{{customer_name}}"}</code>, <code>{"{{job_title}}"}</code>, <code>{"{{service_name}}"}</code>, <code>{"{{status}}"}</code>
+              </div>
+
+              <div className="grid-2 gap-8">
+                 {/* Job Created */}
+                 <div className="flex-col gap-3">
+                    <label className="form-label" style={{ fontWeight: 600 }}>1. Job Created Confirmation</label>
+                    <textarea 
+                       name="JOB_CREATED_EMAIL_TEMPLATE" 
+                       className="form-input" 
+                       style={{ minHeight: "120px", fontSize: "0.85rem" }} 
+                       value={settings.JOB_CREATED_EMAIL_TEMPLATE} 
+                       onChange={handleChange}
+                       placeholder="Email template..."
+                    />
+                    <textarea 
+                       name="JOB_CREATED_WHAPP_TEMPLATE" 
+                       className="form-input" 
+                       style={{ minHeight: "80px", fontSize: "0.85rem", background: "#dcf8c6" }} 
+                       value={settings.JOB_CREATED_WHAPP_TEMPLATE} 
+                       onChange={handleChange}
+                       placeholder="WhatsApp template..."
+                    />
+                 </div>
+
+                 {/* Status Updated */}
+                 <div className="flex-col gap-3">
+                    <label className="form-label" style={{ fontWeight: 600 }}>2. Status Update Notification</label>
+                    <textarea 
+                       name="STATUS_UPDATE_EMAIL_TEMPLATE" 
+                       className="form-input" 
+                       style={{ minHeight: "120px", fontSize: "0.85rem" }} 
+                       value={settings.STATUS_UPDATE_EMAIL_TEMPLATE} 
+                       onChange={handleChange}
+                       placeholder="Email template..."
+                    />
+                    <textarea 
+                       name="STATUS_UPDATE_WHAPP_TEMPLATE" 
+                       className="form-input" 
+                       style={{ minHeight: "80px", fontSize: "0.85rem", background: "#dcf8c6" }} 
+                       value={settings.STATUS_UPDATE_WHAPP_TEMPLATE} 
+                       onChange={handleChange}
+                       placeholder="WhatsApp template..."
+                    />
+                 </div>
+
+                 {/* AI Completed */}
+                 <div className="flex-col gap-3">
+                    <label className="form-label" style={{ fontWeight: 600 }}>3. AI Processing Completed</label>
+                    <textarea 
+                       name="AI_COMPLETED_EMAIL_TEMPLATE" 
+                       className="form-input" 
+                       style={{ minHeight: "120px", fontSize: "0.85rem" }} 
+                       value={settings.AI_COMPLETED_EMAIL_TEMPLATE} 
+                       onChange={handleChange}
+                       placeholder="Email template..."
+                    />
+                    <textarea 
+                       name="AI_COMPLETED_WHAPP_TEMPLATE" 
+                       className="form-input" 
+                       style={{ minHeight: "80px", fontSize: "0.85rem", background: "#dcf8c6" }} 
+                       value={settings.AI_COMPLETED_WHAPP_TEMPLATE} 
+                       onChange={handleChange}
+                       placeholder="WhatsApp template..."
+                    />
+                 </div>
+              </div>
+           </div>
         </div>
       </div>
     </div>

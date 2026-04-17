@@ -1,12 +1,15 @@
 import { generateText } from "ai";
-import { google } from "@ai-sdk/google";
 import { prisma } from "@/lib/prisma";
+import { getActiveAiModel } from "./factory";
 
 export async function processJobExecution(jobId: string) {
   try {
     const job = await prisma.job.findUnique({
       where: { id: jobId },
-      include: { service: true }
+      include: { 
+        service: true,
+        user: { select: { email: true, name: true, phone: true } }
+      }
     });
 
     if (!job) return { success: false, message: "Job not found" };
@@ -32,9 +35,11 @@ export async function processJobExecution(jobId: string) {
       Return your completed work in clean, structured formatting. Provide ONLY the final output the client requested, do not include preamble.
     `;
 
-    // Process using Gemini 1.5 Pro to handle complex creative/reasoning tasks
+    // Process using the active provider
+    const executionModel = await getActiveAiModel();
+
     const { text } = await generateText({
-      model: google("gemini-2.5-pro"),
+      model: executionModel,
       prompt: executionPrompt,
       system: "You are an expert AI Execution Agent completing professional digital services."
     });
@@ -52,6 +57,23 @@ export async function processJobExecution(jobId: string) {
         completedAt: newStatus === "COMPLETED" ? new Date() : null
       }
     });
+
+    // Send Notification
+    import("@/lib/notifications").then(n => {
+      n.sendNotification({
+        toEmail: job.user.email || undefined,
+        toPhone: job.user.phone || undefined,
+        subject: `Service Completed: ${job.title}`,
+        event: 'AI_COMPLETED',
+        data: {
+          job_id: job.id,
+          job_title: job.title,
+          customer_name: job.user.name || "Customer",
+          service_name: job.service.name,
+          status: newStatus
+        }
+      });
+    }).catch(e => console.error("Completion notification error:", e));
 
     return { 
       success: true, 
