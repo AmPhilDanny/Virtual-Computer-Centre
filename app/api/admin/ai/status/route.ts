@@ -1,38 +1,44 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { getAiModel, type AiProviderType } from "@/lib/ai/factory";
 import { generateText } from "ai";
 
-export async function POST() {
+export async function POST(req: Request) {
   try {
-    const settingsList = await prisma.siteSettings.findMany();
-    const settings = settingsList.reduce((acc, curr) => {
-      acc[curr.key] = curr.value;
-      return acc;
-    }, {} as Record<string, string>);
-
-    const apiKey = settings.geminiApiKey;
+    const body = await req.json();
+    const { provider, apiKey, model } = body as { provider: AiProviderType; apiKey: string; model?: string };
 
     if (!apiKey) {
-      return NextResponse.json({ status: "inactive", message: "API Key not found in settings." }, { status: 400 });
+      return NextResponse.json({ status: "error", message: "API Key is required to test." }, { status: 400 });
     }
 
-    // Create a provider instance with the dynamic API key
-    const google = createGoogleGenerativeAI({ apiKey });
+    // Prepare settings object for the factory
+    // We use the provided apiKey instead of what's in the DB to allow testing before saving
+    const tempSettings: Record<string, string> = {
+      [`${provider}ApiKey`]: apiKey,
+      [`${provider}Model`]: model || "",
+      // Map geminiApiKey for google provider
+      geminiApiKey: provider === 'google' ? apiKey : "",
+      geminiModel: provider === 'google' ? model || "" : "",
+    };
 
-    // Try a simple call to verify the key
     try {
+      const aiModel = getAiModel(provider, tempSettings);
+      
       await generateText({
-        model: google("gemini-1.5-flash"),
+        model: aiModel,
         prompt: "Hello",
       });
 
-      return NextResponse.json({ status: "active", message: "API Key is valid and AI is ready." });
+      return NextResponse.json({ 
+        status: "active", 
+        message: `${provider.toUpperCase()} AI is active and responding correctly.` 
+      });
     } catch (aiError: any) {
-      console.error("FULL AI ERROR:", aiError);
+      console.error("AI Check Error:", aiError);
       return NextResponse.json({ 
         status: "error", 
-        message: "API Key error: " + (aiError.message || "Unknown error") + ". Details: " + JSON.stringify(aiError)
+        message: `API Key error: ` + (aiError.message || "Unknown error")
       }, { status: 401 });
     }
 

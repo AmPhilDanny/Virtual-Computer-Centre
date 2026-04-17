@@ -15,7 +15,18 @@ export default function AdminSettingsPage() {
     logoUrl: "",
     faviconUrl: "",
     geminiApiKey: "",
-    aiModel: "gemini-2.5-pro",
+    geminiModel: "gemini-2.0-flash",
+    groqApiKey: "",
+    groqModel: "llama-3.3-70b-versatile",
+    mistralApiKey: "",
+    mistralModel: "mistral-large-latest",
+    togetherApiKey: "",
+    togetherModel: "meta-llama/Llama-Vision-Free",
+    fireworksApiKey: "",
+    fireworksModel: "accounts/fireworks/models/llama-v3p1-70b-instruct",
+    openRouterApiKey: "",
+    openRouterModel: "google/gemini-2.0-flash-001",
+    activeAiProvider: "google",
     aiAutonomy: "AI_PLUS_HUMAN"
   });
 
@@ -304,58 +315,244 @@ export default function AdminSettingsPage() {
             </h4>
 
             <div className="form-group">
-              <label className="form-label">Google Gemini API Key</label>
-              <div className="flex gap-2">
-                <input 
-                  type="password" 
-                  name="geminiApiKey"
-                  className="form-input" 
-                  placeholder="Enter your API key..."
-                  value={settings.geminiApiKey || ""} 
-                  onChange={handleChange}
-                  style={{ flex: 1 }}
-                />
-                <button 
-                  type="button" 
-                  className="btn btn-secondary btn-sm"
-                  onClick={async () => {
-                    const res = await fetch("/api/admin/ai/status", { method: "POST" });
-                    const data = await res.json();
-                    alert(data.message || (data.status === "active" ? "AI is active!" : "AI is inactive"));
-                  }}
-                >
-                   Check Status
-                </button>
+              <label className="form-label">Active AI Provider</label>
+              <select 
+                name="activeAiProvider" 
+                className="form-select" 
+                value={settings.activeAiProvider || "google"}
+                onChange={(e) => setSettings(prev => ({ ...prev, activeAiProvider: e.target.value }))}
+                style={{ border: "2px solid var(--brand-primary)" }}
+              >
+                <option value="google">Google Gemini (Default)</option>
+                <option value="groq">Groq (Llama 3 / Mixtral)</option>
+                <option value="mistral">Mistral AI</option>
+                <option value="togetherai">Together AI</option>
+                <option value="fireworks">Fireworks AI</option>
+                <option value="openrouter">OpenRouter (Universal)</option>
+              </select>
+              <p className="text-muted" style={{ fontSize: "0.75rem", marginTop: "var(--space-1)" }}>
+                This AI will be used for system-wide tasks like intake analysis and automated responses.
+              </p>
+            </div>
+
+            <div className="flex-col gap-6" style={{ background: "var(--bg-subtle)", padding: "var(--space-4)", borderRadius: "var(--radius-lg)", border: "1px solid var(--border-subtle)" }}>
+              {/* Google Gemini */}
+              <div className="form-group">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="form-label" style={{ margin: 0 }}>Google Gemini Configuration</label>
+                  <button 
+                    type="button" 
+                    className="btn btn-ghost btn-sm"
+                    onClick={async () => {
+                      const res = await fetch("/api/admin/ai/status", { 
+                        method: "POST",
+                        body: JSON.stringify({ provider: 'google', apiKey: settings.geminiApiKey, model: settings.geminiModel })
+                      });
+                      const data = await res.json();
+                      alert(data.message);
+                    }}
+                  >
+                    Check Gemini Status
+                  </button>
+                </div>
+                <div className="grid-2 gap-4">
+                  <input 
+                    type="password" 
+                    name="geminiApiKey"
+                    className="form-input" 
+                    placeholder="Gemini API Key..."
+                    value={settings.geminiApiKey || ""} 
+                    onChange={handleChange}
+                  />
+                  <select 
+                    name="geminiModel" 
+                    className="form-select" 
+                    value={settings.geminiModel || "gemini-2.0-flash"}
+                    onChange={(e) => setSettings(prev => ({ ...prev, geminiModel: e.target.value }))}
+                  >
+                    <option value="gemini-2.0-flash">Gemini 2.0 Flash (Recommended)</option>
+                    <option value="gemini-2.0-pro">Gemini 2.0 Pro</option>
+                    <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                    <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Groq */}
+              <div className="form-group">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="form-label" style={{ margin: 0 }}>Groq Configuration</label>
+                  <button 
+                    type="button" 
+                    className="btn btn-ghost btn-sm"
+                    onClick={async () => {
+                      const res = await fetch("/api/admin/ai/status", { 
+                        method: "POST",
+                        body: JSON.stringify({ provider: 'groq', apiKey: settings.groqApiKey, model: settings.groqModel })
+                      });
+                      const data = await res.json();
+                      alert(data.message);
+                    }}
+                  >
+                    Check Groq Status
+                  </button>
+                </div>
+                <div className="grid-2 gap-4">
+                  <input 
+                    type="password" 
+                    name="groqApiKey"
+                    className="form-input" 
+                    placeholder="Groq API Key..."
+                    value={settings.groqApiKey || ""} 
+                    onChange={handleChange}
+                  />
+                  <select 
+                    name="groqModel" 
+                    className="form-select" 
+                    value={settings.groqModel || "llama-3.3-70b-versatile"}
+                    onChange={(e) => setSettings(prev => ({ ...prev, groqModel: e.target.value }))}
+                  >
+                    <option value="llama-3.3-70b-versatile">Llama 3.3 70B</option>
+                    <option value="llama-3.1-8b-instant">Llama 3.1 8B</option>
+                    <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Mistral */}
+              <div className="form-group">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="form-label" style={{ margin: 0 }}>Mistral AI Configuration</label>
+                  <button 
+                    type="button" 
+                    className="btn btn-ghost btn-sm"
+                    onClick={async () => {
+                      const res = await fetch("/api/admin/ai/status", { 
+                        method: "POST",
+                        body: JSON.stringify({ provider: 'mistral', apiKey: settings.mistralApiKey, model: settings.mistralModel })
+                      });
+                      const data = await res.json();
+                      alert(data.message);
+                    }}
+                  >
+                    Check Mistral Status
+                  </button>
+                </div>
+                <div className="grid-2 gap-4">
+                  <input 
+                    type="password" 
+                    name="mistralApiKey"
+                    className="form-input" 
+                    placeholder="Mistral API Key..."
+                    value={settings.mistralApiKey || ""} 
+                    onChange={handleChange}
+                  />
+                  <select 
+                    name="mistralModel" 
+                    className="form-select" 
+                    value={settings.mistralModel || "mistral-large-latest"}
+                    onChange={(e) => setSettings(prev => ({ ...prev, mistralModel: e.target.value }))}
+                  >
+                    <option value="mistral-large-latest">Mistral Large</option>
+                    <option value="mistral-small-latest">Mistral Small</option>
+                    <option value="pixtral-12b-2409">Pixtral 12B</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Together AI */}
+              <div className="form-group">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="form-label" style={{ margin: 0 }}>Together AI Configuration</label>
+                  <button 
+                    type="button" 
+                    className="btn btn-ghost btn-sm"
+                    onClick={async () => {
+                      const res = await fetch("/api/admin/ai/status", { 
+                        method: "POST",
+                        body: JSON.stringify({ provider: 'togetherai', apiKey: settings.togetherApiKey, model: settings.togetherModel })
+                      });
+                      const data = await res.json();
+                      alert(data.message);
+                    }}
+                  >
+                    Check Together Status
+                  </button>
+                </div>
+                <div className="grid-2 gap-4">
+                  <input 
+                    type="password" 
+                    name="togetherApiKey"
+                    className="form-input" 
+                    placeholder="Together API Key..."
+                    value={settings.togetherApiKey || ""} 
+                    onChange={handleChange}
+                  />
+                   <input 
+                    type="text" 
+                    name="togetherModel"
+                    className="form-input" 
+                    placeholder="Model (e.g. meta-llama/Llama-Vision-Free)..."
+                    value={settings.togetherModel || ""} 
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+               {/* OpenRouter */}
+               <div className="form-group">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="form-label" style={{ margin: 0 }}>OpenRouter Configuration</label>
+                  <button 
+                    type="button" 
+                    className="btn btn-ghost btn-sm"
+                    onClick={async () => {
+                      const res = await fetch("/api/admin/ai/status", { 
+                        method: "POST",
+                        body: JSON.stringify({ provider: 'openrouter', apiKey: settings.openRouterApiKey, model: settings.openRouterModel })
+                      });
+                      const data = await res.json();
+                      alert(data.message);
+                    }}
+                  >
+                    Check OpenRouter Status
+                  </button>
+                </div>
+                <div className="grid-2 gap-4">
+                  <input 
+                    type="password" 
+                    name="openRouterApiKey"
+                    className="form-input" 
+                    placeholder="OpenRouter API Key..."
+                    value={settings.openRouterApiKey || ""} 
+                    onChange={handleChange}
+                  />
+                   <input 
+                    type="text" 
+                    name="openRouterModel"
+                    className="form-input" 
+                    placeholder="Model (e.g. google/gemini-2.0-flash-001)..."
+                    value={settings.openRouterModel || ""} 
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="grid-2 gap-4">
-              <div className="form-group">
-                <label className="form-label">Default AI Model</label>
-                <select 
-                  name="aiModel" 
-                  className="form-select" 
-                  value={settings.aiModel}
-                  onChange={(e) => setSettings(prev => ({ ...prev, aiModel: e.target.value }))}
-                >
-                  <option value="gemini-2.5-pro">Gemini 2.5 Pro (Precision)</option>
-                  <option value="gemini-2.5-flash">Gemini 2.5 Flash (Speed)</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Global AI Autonomy</label>
-                <select 
-                  name="aiAutonomy" 
-                  className="form-select" 
-                  value={settings.aiAutonomy}
-                  onChange={(e) => setSettings(prev => ({ ...prev, aiAutonomy: e.target.value }))}
-                >
-                   <option value="AI_ONLY">AI Only (Automatic)</option>
-                   <option value="AI_PLUS_HUMAN">AI + Human Review</option>
-                   <option value="HUMAN_ONLY">Human Only (Manual)</option>
-                </select>
-              </div>
+            <div className="form-group">
+              <label className="form-label">Global AI Autonomy</label>
+              <select 
+                name="aiAutonomy" 
+                className="form-select" 
+                value={settings.aiAutonomy}
+                onChange={(e) => setSettings(prev => ({ ...prev, aiAutonomy: e.target.value }))}
+              >
+                  <option value="AI_ONLY">AI Only (Automatic)</option>
+                  <option value="AI_PLUS_HUMAN">AI + Human Review</option>
+                  <option value="HUMAN_ONLY">Human Only (Manual)</option>
+              </select>
             </div>
+
 
            <div className="flex items-center gap-4 pt-4">
              <button 

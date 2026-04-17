@@ -1,5 +1,5 @@
 import { generateText } from "ai";
-import { google } from "@ai-sdk/google";
+import { getActiveAiModel } from "./factory";
 
 export async function analyzeJobIntake(
   serviceName: string, 
@@ -29,8 +29,10 @@ export async function analyzeJobIntake(
       }
     `;
 
+    const intakeModel = await getActiveAiModel();
+
     const { text } = await generateText({
-      model: google("gemini-1.5-flash"),
+      model: intakeModel,
       prompt: intakePrompt,
       system: "You are a precise JSON-only outputting intake agent."
     });
