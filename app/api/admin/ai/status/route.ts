@@ -25,7 +25,6 @@ export async function POST() {
       await generateText({
         model: google("gemini-1.5-flash"),
         prompt: "Hello",
-        maxTokens: 1,
       });
 
       return NextResponse.json({ status: "active", message: "API Key is valid and AI is ready." });
