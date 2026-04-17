@@ -22,7 +22,9 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
     notFound();
   }
 
-  const { subtotal, priorityFee, discount, total } = order;
+  const { amount, discount, total } = order;
+  const subtotal = order.job.service.basePrice;
+  const priorityFee = Math.max(0, amount - subtotal);
 
   return (
     <div className="bg-white min-h-screen text-black p-8 sm:p-20 font-sans">
