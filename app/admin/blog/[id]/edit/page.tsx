@@ -2,16 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import BlogPostEditor from "../../new/BlogPostEditor";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 
-export default function EditPostPage({ params }: { params: { id: string } }) {
+export default function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const router = useRouter();
   const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/admin/blog/posts/${params.id}`)
+    fetch(`/api/admin/blog/posts/${id}`)
       .then(res => res.json())
       .then(data => {
         setPost(data.post);
@@ -20,12 +21,12 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
       .catch(() => {
         setLoading(false);
       });
-  }, [params.id]);
+  }, [id]);
 
   const handleSave = async (data: any) => {
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/blog/posts/${params.id}`, {
+      const res = await fetch(`/api/admin/blog/posts/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)

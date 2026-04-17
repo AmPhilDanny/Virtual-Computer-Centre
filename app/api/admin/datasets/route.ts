@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { put } from "@vercel/blob";
-import pdf from "pdf-parse";
+const pdf = require("pdf-parse");
 import mammoth from "mammoth";
 import { auth } from "@/lib/auth";
 
