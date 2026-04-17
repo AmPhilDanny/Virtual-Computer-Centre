@@ -29,6 +29,8 @@ model User {
   sessions Session[]
   jobs     Job[]
   orders   Order[]
+  blogPosts BlogPost[] @relation("BlogAuthor")
+  blogComments BlogComment[]
 }
 
 model Account {
@@ -202,12 +204,38 @@ model BlogPost {
   id          String   @id @default(cuid())
   title       String
   slug        String   @unique
-  excerpt     String?
-  content     Json?
+  excerpt     String?  @db.Text
+  content     String?  @db.Text // Markdown content
   coverImage  String?  @db.Text
+  authorId    String
+  categoryId  String?
   isPublished Boolean  @default(false)
+  metaTitle   String?
+  metaDesc    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  author      User     @relation("BlogAuthor", fields: [authorId], references: [id])
+  category    BlogCategory? @relation(fields: [categoryId], references: [id])
+  comments    BlogComment[]
+}
+
+model BlogCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  posts       BlogPost[]
+}
+
+model BlogComment {
+  id          String   @id @default(cuid())
+  content     String   @db.Text
+  postId      String
+  userId      String
+  createdAt   DateTime @default(now())
+
+  post        BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AuditLog {
