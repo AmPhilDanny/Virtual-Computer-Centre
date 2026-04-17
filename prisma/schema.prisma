@@ -31,6 +31,8 @@ model User {
   orders   Order[]
   blogPosts BlogPost[] @relation("BlogAuthor")
   blogComments BlogComment[]
+  walletTransactions WalletTransaction[]
+  consents UserConsent[]
 }
 
 model Account {
@@ -246,6 +248,30 @@ model AuditLog {
   entityId  String?
   metadata  Json?
   createdAt DateTime @default(now())
+}
+
+model WalletTransaction {
+  id            String   @id @default(cuid())
+  userId        String
+  type          String   // CREDIT | DEBIT
+  amount        Float
+  balanceAfter  Float
+  reference     String   @unique // Paystack ref or Internal ref
+  description   String?
+  createdAt     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id])
+}
+
+model UserConsent {
+  id             String   @id @default(cuid())
+  userId         String?  // Null for guest sessions
+  ipAddress      String?
+  consentType    String   // PRIVACY_POLICY | TERMS_OF_SERVICE | ACADEMIC_INTEGRITY
+  browserAgent   String?
+  createdAt      DateTime @default(now())
+
+  user           User?    @relation(fields: [userId], references: [id])
 }
 
 // =========================================

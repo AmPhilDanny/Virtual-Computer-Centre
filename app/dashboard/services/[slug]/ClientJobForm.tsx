@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { upload } from "@vercel/blob/client";
-import { Upload, X, Paperclip, CheckCircle } from "lucide-react";
+import { Upload, X, Paperclip, CheckCircle, ShieldAlert } from "lucide-react";
 
 export default function ClientJobForm({ 
   serviceId, 
@@ -19,7 +19,10 @@ export default function ClientJobForm({
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const [formData, setFormData] = useState<Record<string, any>>({ priority: "NORMAL" });
+  const [formData, setFormData] = useState<Record<string, any>>({ 
+    priority: "NORMAL",
+    academicIntegrity: false 
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   
@@ -86,7 +89,6 @@ export default function ClientJobForm({
   const { subtotal, priorityFee, discount, total } = calculateTotals();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // ... (rest of old handleFileChange logic)
     if (e.target.files) {
       const selectedFiles = Array.from(e.target.files);
       const totalSize = selectedFiles.reduce((acc, file) => acc + file.size, 0);
@@ -105,6 +107,11 @@ export default function ClientJobForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.academicIntegrity) {
+      setError("Please confirm the Academic Integrity disclosure.");
+      return;
+    }
+    
     setLoading(true);
     setError("");
     setUploadProgress(0);
@@ -202,17 +209,21 @@ export default function ClientJobForm({
       </div>
 
       <div className="form-group">
-        <label className="form-label">Files & Attachments</label>
+        <label className="form-label font-bold text-sm flex items-center gap-2">
+          Files & Attachments 
+          <span className="text-secondary font-normal" style={{ fontSize: "0.7rem" }}>(Encrypted & Scanned)</span>
+        </label>
         <div className="file-upload-zone p-6 text-center border-2 border-dashed border-subtle rounded-xl cursor-pointer hover:bg-glass" onClick={() => fileInputRef.current?.click()}>
           <input type="file" ref={fileInputRef} onChange={handleFileChange} multiple style={{ display: "none" }} />
           <Upload size={24} className="text-primary mb-2 mx-auto" />
           <p className="text-sm">Click to select files (Max 50MB)</p>
+          <p className="text-xs text-muted mt-1">All uploads are scanned for security.</p>
         </div>
         
         {files.length > 0 && (
           <div className="flex-col gap-2 mt-3">
             {files.map((file, i) => (
-              <div key={i} className="flex items-center justify-between bg-subtle p-2 rounded-lg text-xs">
+              <div key={i} className="flex items-center justify-between bg-subtle p-2 rounded-lg text-xs border border-subtle">
                 <span className="font-medium truncate">{file.name}</span>
                 <button type="button" onClick={() => removeFile(i)} className="text-danger"><X size={14} /></button>
               </div>
@@ -273,17 +284,36 @@ export default function ClientJobForm({
         </div>
       </div>
 
+      {/* Compliance & Disclosure */}
+      <div className="bg-glass p-6 rounded-2xl border border-subtle flex-col gap-4">
+        <label className="flex items-start gap-4 cursor-pointer group">
+          <input 
+            type="checkbox" 
+            className="mt-1 w-5 h-5 accent-primary cursor-pointer"
+            checked={formData.academicIntegrity}
+            onChange={(e) => setFormData({...formData, academicIntegrity: e.target.checked})}
+            required
+          />
+          <div className="flex-col gap-1">
+            <span className="text-sm font-bold flex items-center gap-2">
+              <ShieldAlert size={14} className="text-primary" /> Academic Integrity & AI Disclosure
+            </span>
+            <span className="text-xs text-secondary leading-relaxed">
+              I certify that this request follows my institution's academic integrity policies. 
+              I understand that the AI Computer Centre provides **drafting and research assistance** 
+              and I am responsible for final verification. Data is processed securely and encrypted.
+            </span>
+          </div>
+        </label>
+      </div>
+
       <button 
         type="submit" 
-        className="btn btn-primary btn-lg mt-4 shadow-xl" 
-        disabled={loading || uploading}
+        className="btn btn-primary w-full py-5 text-xl font-bold shadow-2xl hover:translate-y-[-2px]"
+        disabled={loading || uploading || !formData.academicIntegrity}
       >
-        {loading ? "Processing Order..." : "Submit & Checkout"}
+        {loading ? "Processing Order..." : `Confirm & Pay ₦${total.toLocaleString()}`}
       </button>
     </form>
   );
 }
-    </form>
-  );
-}
-

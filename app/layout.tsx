@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { prisma } from "@/lib/prisma";
+import PrivacyModal from "@/components/modals/PrivacyModal";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settingsList = await prisma.siteSettings.findMany();
@@ -88,7 +89,10 @@ export default async function RootLayout({
         <style dangerouslySetInnerHTML={{ __html: brandStyles }} />
       </head>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <PrivacyModal />
+          {children}
+        </Providers>
       </body>
     </html>
   );

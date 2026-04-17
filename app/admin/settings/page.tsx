@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Settings, Database, Globe, Bell, Palette, Upload, Image as ImageIcon, CheckCircle2 } from "lucide-react";
+import { Settings, Database, Globe, Bell, Palette, Upload, Image as ImageIcon, CheckCircle2, ShieldAlert } from "lucide-react";
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Record<string, string>>({
@@ -42,6 +42,10 @@ export default function AdminSettingsPage() {
     AI_COMPLETED_WHAPP_TEMPLATE: "",
     pwaName: "Virtual Computer Centre",
     pwaSplashColor: "#6366f1",
+    paystackSecretKey: "",
+    flutterwaveSecretKey: "",
+    virusScannerApiKey: "",
+    walletFundingRate: "1", // 1 NGN = 1 Wallet Unit
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -609,6 +613,42 @@ export default function AdminSettingsPage() {
                   />
                 </div>
               </div>
+            </div>
+
+            <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
+
+            <h4 className="flex items-center gap-2" style={{ margin: 0 }}>
+              <Settings icon={18} style={{ color: "var(--brand-warning)" }} /> Payment & Monetization
+            </h4>
+
+            <div className="grid-2 gap-8">
+               <div className="flex-col gap-4">
+                  <h5 style={{ margin: 0, fontSize: "0.9rem", color: "var(--text-secondary)" }}>Paystack Configuration</h5>
+                  <div className="form-group">
+                     <label className="form-label">Paystack Secret Key</label>
+                     <input type="password" name="paystackSecretKey" className="form-input" value={settings.paystackSecretKey} onChange={handleChange} placeholder="sk_live_..." />
+                  </div>
+               </div>
+               <div className="flex-col gap-4">
+                  <h5 style={{ margin: 0, fontSize: "0.9rem", color: "var(--text-secondary)" }}>Flutterwave Configuration</h5>
+                  <div className="form-group">
+                     <label className="form-label">Flutterwave Secret Key</label>
+                     <input type="password" name="flutterwaveSecretKey" className="form-input" value={settings.flutterwaveSecretKey} onChange={handleChange} placeholder="FLWSECK-..." />
+                  </div>
+               </div>
+            </div>
+
+            <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
+
+            <h4 className="flex items-center gap-2" style={{ margin: 0 }}>
+              <ShieldAlert size={18} style={{ color: "var(--brand-danger)" }} /> Advanced Security Scanning
+            </h4>
+            <div className="form-group">
+               <label className="form-label">Virus Scanning API Key (Cloudmersive)</label>
+               <input type="password" name="virusScannerApiKey" className="form-input" value={settings.virusScannerApiKey} onChange={handleChange} placeholder="API_KEY_..." />
+               <p className="text-muted" style={{ fontSize: "0.7rem", marginTop: "var(--space-1)" }}>
+                  Used to automatically scan user-uploaded files for malware and threats.
+               </p>
             </div>
 
 
