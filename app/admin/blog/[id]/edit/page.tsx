@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import BlogPostEditor from "../new/BlogPostEditor";
+import BlogPostEditor from "../../new/BlogPostEditor";
 import { useState, useEffect } from "react";
 
 export default function EditPostPage({ params }: { params: { id: string } }) {
