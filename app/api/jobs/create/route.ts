@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { analyzeJobIntake } from "@/lib/ai/intakeAgent";
+import { calculateOrderTotal } from "@/lib/pricing";
+import { sendNotification } from "@/lib/notifications";
 
 export async function POST(req: Request) {
   try {
@@ -30,7 +32,7 @@ export async function POST(req: Request) {
     }
 
     const priority = formData.priority === "EXPRESS" ? "EXPRESS" : "NORMAL";
-    import { calculateOrderTotal } from "@/lib/pricing";
+    
     const pricing = calculateOrderTotal({
       basePrice: service.basePrice,
       priority,
@@ -88,22 +90,20 @@ export async function POST(req: Request) {
       return { job, order };
     });
 
-    // 4. Send Notifications
-    import("@/lib/notifications").then(n => {
-      n.sendNotification({
-        toEmail: result.job.user.email || undefined,
-        toPhone: result.job.user.phone || undefined,
-        subject: `Order Received: ${result.job.title}`,
-        event: 'JOB_CREATED',
-        data: {
-          job_id: result.job.id,
-          job_title: result.job.title,
-          customer_name: result.job.user.name || "Customer",
-          service_name: result.job.service.name,
-          status: "SUBMITTED",
-          total_price: `₦${result.order.total.toLocaleString()}`
-        }
-      });
+    // 4. Send Notifications (Fire and forget)
+    sendNotification({
+      toEmail: result.job.user.email || undefined,
+      toPhone: result.job.user.phone || undefined,
+      subject: `Order Received: ${result.job.title}`,
+      event: 'JOB_CREATED',
+      data: {
+        job_id: result.job.id,
+        job_title: result.job.title,
+        customer_name: result.job.user.name || "Customer",
+        service_name: result.job.service.name,
+        status: "SUBMITTED",
+        total_price: `₦${result.order.total.toLocaleString()}`
+      }
     }).catch(e => console.error("Notification trigger error:", e));
 
     return NextResponse.json({ 
