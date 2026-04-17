@@ -12,7 +12,7 @@ export async function POST(req: Request) {
 
     const userId = session.user.id;
     const body = await req.json();
-    const { serviceId, title, formData, description } = body;
+    const { serviceId, title, formData, description, attachments } = body;
 
     if (!serviceId) {
       return NextResponse.json({ message: "Service ID required" }, { status: 400 });
@@ -35,6 +35,7 @@ export async function POST(req: Request) {
         formData,
         status: "SUBMITTED",
         priority: formData.priority === "EXPRESS" ? "EXPRESS" : "NORMAL",
+        attachments: attachments || [],
         complexity: aiAnalysis.complexity,
         adminNotes: aiAnalysis.notesForAdmin
       }

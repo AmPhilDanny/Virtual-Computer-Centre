@@ -138,6 +138,10 @@
   }
 
   .badge-primary { background: rgba(108, 71, 255, 0.1); color: #5B21B6; border: 1px solid rgba(108, 71, 255, 0.2); }
+
+  .navbar-nav a {
+    color: var(--text-primary);
+  }
 }
 
 /* ==========================================
@@ -475,7 +479,8 @@ a:hover { color: var(--brand-secondary); }
 .navbar-logo-icon {
   width: 36px;
   height: 36px;
-  background: var(--grad-primary);
+  background: #FFFFFF;
+  color: #000;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
