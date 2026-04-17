@@ -26,7 +26,7 @@ export function getAiModel(provider: AiProviderType, settings: Record<string, st
       const google = createGoogleGenerativeAI({
         apiKey: settings.geminiApiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
       });
-      return google(settings.geminiModel || "gemini-2.0-flash");
+      return google(settings.geminiModel || "gemini-2.0-flash-exp");
     }
     case 'groq': {
       const groq = createGroq({

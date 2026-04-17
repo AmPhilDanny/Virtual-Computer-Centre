@@ -15,7 +15,7 @@ export default function AdminSettingsPage() {
     logoUrl: "",
     faviconUrl: "",
     geminiApiKey: "",
-    geminiModel: "gemini-2.0-flash",
+    geminiModel: "gemini-2.0-flash-exp",
     groqApiKey: "",
     groqModel: "llama-3.3-70b-versatile",
     mistralApiKey: "",
@@ -367,13 +367,13 @@ export default function AdminSettingsPage() {
                   <select 
                     name="geminiModel" 
                     className="form-select" 
-                    value={settings.geminiModel || "gemini-2.0-flash"}
+                    value={settings.geminiModel || "gemini-2.0-flash-exp"}
                     onChange={(e) => setSettings(prev => ({ ...prev, geminiModel: e.target.value }))}
                   >
-                    <option value="gemini-2.0-flash">Gemini 2.0 Flash (Recommended)</option>
-                    <option value="gemini-2.0-pro">Gemini 2.0 Pro</option>
-                    <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-                    <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                    <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash (Experimental 2.5 Preview)</option>
+                    <option value="gemini-2.0-pro-exp">Gemini 2.0 Pro (Experimental)</option>
+                    <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro (Precision)</option>
+                    <option value="gemini-1.5-flash-latest">Gemini 1.5 Flash (Speed)</option>
                   </select>
                 </div>
               </div>
