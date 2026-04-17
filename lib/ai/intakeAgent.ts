@@ -1,5 +1,6 @@
 import { generateText } from "ai";
 import { getActiveAiModel } from "./factory";
+import { prisma } from "@/lib/prisma";
 
 export async function analyzeJobIntake(
   serviceName: string, 
@@ -7,10 +8,30 @@ export async function analyzeJobIntake(
   clientFormData: Record<string, any>
 ) {
   try {
+    // Fetch relevant knowledge base datasets (Global or Service-Specific)
+    const datasets = await prisma.dataset.findMany({
+      where: {
+        OR: [
+          { serviceId: null }, // Global knowledge
+          { serviceId: (await prisma.service.findFirst({ where: { name: serviceName } }))?.id }
+        ]
+      },
+      select: { content: true }
+    });
+
+    const knowledgeContext = datasets
+      .map(d => d.content)
+      .filter(Boolean)
+      .join("\n\n---\n\n")
+      .slice(0, 15000); // 15k char truncation for context window safety
+
     const intakePrompt = `
       You are the Intake Agent for an online Computer Centre.
       A client has requested the service: "${serviceName}".
       
+      REFERENCE KNOWLEDGE (Use this to guide your assessment):
+      ${knowledgeContext || "No supplementary knowledge available."}
+
       Service specific rules/instructions defined by admin:
       ${servicePrompt || "No specific rules defined. Proceed with standard analysis."}
 
