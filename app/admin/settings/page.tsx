@@ -13,7 +13,10 @@ export default function AdminSettingsPage() {
     brandSecondary: "#7928ca",
     brandAccent: "#ff0080",
     logoUrl: "",
-    faviconUrl: ""
+    faviconUrl: "",
+    geminiApiKey: "",
+    aiModel: "gemini-2.5-pro",
+    aiAutonomy: "AI_PLUS_HUMAN"
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -293,6 +296,66 @@ export default function AdminSettingsPage() {
                 </div>
               </div>
            </div>
+
+            <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
+
+            <h4 className="flex items-center gap-2" style={{ margin: 0 }}>
+              <Database size={18} /> AI Configuration
+            </h4>
+
+            <div className="form-group">
+              <label className="form-label">Google Gemini API Key</label>
+              <div className="flex gap-2">
+                <input 
+                  type="password" 
+                  name="geminiApiKey"
+                  className="form-input" 
+                  placeholder="Enter your API key..."
+                  value={settings.geminiApiKey || ""} 
+                  onChange={handleChange}
+                  style={{ flex: 1 }}
+                />
+                <button 
+                  type="button" 
+                  className="btn btn-secondary btn-sm"
+                  onClick={async () => {
+                    const res = await fetch("/api/admin/ai/status", { method: "POST" });
+                    const data = await res.json();
+                    alert(data.message || (data.status === "active" ? "AI is active!" : "AI is inactive"));
+                  }}
+                >
+                   Check Status
+                </button>
+              </div>
+            </div>
+
+            <div className="grid-2 gap-4">
+              <div className="form-group">
+                <label className="form-label">Default AI Model</label>
+                <select 
+                  name="aiModel" 
+                  className="form-select" 
+                  value={settings.aiModel}
+                  onChange={(e) => setSettings(prev => ({ ...prev, aiModel: e.target.value }))}
+                >
+                  <option value="gemini-2.5-pro">Gemini 2.5 Pro (Precision)</option>
+                  <option value="gemini-2.5-flash">Gemini 2.5 Flash (Speed)</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Global AI Autonomy</label>
+                <select 
+                  name="aiAutonomy" 
+                  className="form-select" 
+                  value={settings.aiAutonomy}
+                  onChange={(e) => setSettings(prev => ({ ...prev, aiAutonomy: e.target.value }))}
+                >
+                   <option value="AI_ONLY">AI Only (Automatic)</option>
+                   <option value="AI_PLUS_HUMAN">AI + Human Review</option>
+                   <option value="HUMAN_ONLY">Human Only (Manual)</option>
+                </select>
+              </div>
+            </div>
 
            <div className="flex items-center gap-4 pt-4">
              <button 

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { writeFile } from "fs/promises";
-import path from "path";
 
 export async function GET() {
   try {
@@ -25,16 +23,12 @@ export async function POST(req: NextRequest) {
 
     for (const [key, value] of formData.entries()) {
       if (value instanceof File) {
-        // Handle file upload
+        // Convert File to Base64 for database storage (Neon/Vercel persistence)
         const bytes = await value.arrayBuffer();
         const buffer = Buffer.from(bytes);
-
-        // Sanitize filename
-        const filename = `${Date.now()}-${value.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase()}`;
-        const uploadPath = path.join(process.cwd(), "public", "uploads", filename);
-        
-        await writeFile(uploadPath, buffer);
-        updates[key] = `/uploads/${filename}`;
+        const mimeType = value.type || "image/png";
+        const base64 = buffer.toString("base64");
+        updates[key] = `data:${mimeType};base64,${base64}`;
       } else if (typeof value === "string") {
         updates[key] = value;
       }

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useSettings } from "./SettingsProvider";
 import { useTheme } from "./ThemeProvider";
-import { Sun, Moon } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -17,6 +17,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const settings = useSettings();
   const { theme, toggleTheme } = useTheme();
+  const { data: session, status } = useSession();
 
   return (
     <nav className="navbar">
@@ -54,12 +55,29 @@ export default function Navbar() {
           >
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
-          <Link href="/auth/login" className="btn btn-secondary btn-sm">
-            Sign In
-          </Link>
-          <Link href="/auth/register" className="btn btn-primary btn-sm">
-            Get Started
-          </Link>
+          
+          {status === "authenticated" ? (
+            <>
+              <Link href="/dashboard" className="btn btn-ghost btn-sm flex items-center gap-2">
+                <UserIcon size={18} /> Dashboard
+              </Link>
+              <button 
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="btn btn-secondary btn-sm flex items-center gap-2"
+              >
+                <LogOut size={18} /> Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/auth/login" className="btn btn-secondary btn-sm">
+                Sign In
+              </Link>
+              <Link href="/auth/register" className="btn btn-primary btn-sm">
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Hamburger */}
@@ -122,12 +140,29 @@ export default function Navbar() {
             >
               {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <Link href="/auth/login" className="btn btn-secondary btn-sm" style={{ flex: 1 }}>
-              Sign In
-            </Link>
-            <Link href="/auth/register" className="btn btn-primary btn-sm" style={{ flex: 1 }}>
-              Get Started
-            </Link>
+            {status === "authenticated" ? (
+              <>
+                <Link href="/dashboard" className="btn btn-ghost btn-sm" style={{ flex: 1 }} onClick={() => setMenuOpen(false)}>
+                   Dashboard
+                </Link>
+                <button 
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="btn btn-secondary btn-sm" 
+                  style={{ flex: 1 }}
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login" className="btn btn-secondary btn-sm" style={{ flex: 1 }} onClick={() => setMenuOpen(false)}>
+                  Sign In
+                </Link>
+                <Link href="/auth/register" className="btn btn-primary btn-sm" style={{ flex: 1 }} onClick={() => setMenuOpen(false)}>
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
