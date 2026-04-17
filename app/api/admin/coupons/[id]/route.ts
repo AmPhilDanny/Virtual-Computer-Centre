@@ -4,9 +4,10 @@ import { auth } from "@/lib/auth";
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (session?.user?.role !== "ADMIN" && session?.user?.role !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
@@ -16,7 +17,7 @@ export async function PATCH(
     const { isActive } = body;
 
     const coupon = await prisma.coupon.update({
-      where: { id: params.id },
+      where: { id },
       data: { isActive }
     });
 
@@ -28,16 +29,17 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (session?.user?.role !== "ADMIN" && session?.user?.role !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     await prisma.coupon.delete({
-      where: { id: params.id }
+      where: { id }
     });
 
     return NextResponse.json({ success: true });
