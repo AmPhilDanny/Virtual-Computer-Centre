@@ -18,7 +18,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
     }
   });
 
-  if (!order || (order.userId !== (session.user as any).id && session.user.role !== "ADMIN")) {
+  if (!order || (order.userId !== (session.user as any).id && (session.user as any).role !== "ADMIN")) {
     notFound();
   }
 
