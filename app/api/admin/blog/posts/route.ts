@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         content,
         excerpt,
         coverImage,
-        authorId: (session.user as any).id,
+        authorId: (session!.user as any).id,
         categoryId: categoryId || null,
         isPublished: isPublished || false,
         metaTitle,
