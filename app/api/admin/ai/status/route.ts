@@ -29,10 +29,10 @@ export async function POST() {
 
       return NextResponse.json({ status: "active", message: "API Key is valid and AI is ready." });
     } catch (aiError: any) {
-      console.error("AI Check Error:", aiError);
+      console.error("FULL AI ERROR:", aiError);
       return NextResponse.json({ 
         status: "error", 
-        message: "API Key invalid or quota exceeded: " + (aiError.message || "Unknown AI error") 
+        message: "API Key error: " + (aiError.message || "Unknown error") + ". Details: " + JSON.stringify(aiError)
       }, { status: 401 });
     }
 

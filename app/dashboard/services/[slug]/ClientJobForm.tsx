@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { upload } from "@vercel/blob";
+import { upload } from "@vercel/blob/client";
 import { Upload, X, Paperclip, CheckCircle } from "lucide-react";
 
 export default function ClientJobForm({ serviceId, schema }: { serviceId: string, schema: any[] }) {
