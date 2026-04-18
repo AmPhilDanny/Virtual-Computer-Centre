@@ -122,14 +122,25 @@ export default function ClientJobForm({
       // 1. Upload files first
       if (files.length > 0) {
         setUploading(true);
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          const newBlob = await upload(file.name, file, {
-            access: 'public',
-            handleUploadUrl: '/api/jobs/upload',
-          });
-          uploadedUrls.push(newBlob.url);
-          setUploadProgress(Math.round(((i + 1) / files.length) * 100));
+        try {
+          for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const newBlob = await upload(file.name, file, {
+              access: 'public',
+              handleUploadUrl: '/api/jobs/upload',
+            });
+            uploadedUrls.push(newBlob.url);
+            setUploadProgress(Math.round(((i + 1) / files.length) * 100));
+          }
+        } catch (uploadErr: any) {
+          setUploading(false);
+          setLoading(false);
+          setError(
+            uploadErr?.message?.includes('BLOB_READ_WRITE_TOKEN')
+              ? 'File upload service is not configured yet. Please submit without attachments or contact support.'
+              : `File upload failed: ${uploadErr?.message || 'Unknown error'}. Please try again or remove the file.`
+          );
+          return;
         }
         setUploading(false);
       }
@@ -312,7 +323,11 @@ export default function ClientJobForm({
         className="btn btn-primary w-full py-5 text-xl font-bold shadow-2xl hover:translate-y-[-2px]"
         disabled={loading || uploading || !formData.academicIntegrity}
       >
-        {loading ? "Processing Order..." : `Confirm & Pay ₦${total.toLocaleString()}`}
+        {uploading
+          ? `Uploading files... ${uploadProgress}%`
+          : loading
+          ? "Submitting Order..."
+          : `Submit Order — ₦${total.toLocaleString()}`}
       </button>
     </form>
   );
