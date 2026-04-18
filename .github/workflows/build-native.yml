@@ -2,59 +2,54 @@ name: Build Native Apps
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
-  # ─────────────────────────────────────────────────────────────
-  # ANDROID — Produces a debug APK (Live Wrapper → Vercel)
-  # ─────────────────────────────────────────────────────────────
   build-android:
     name: Build Android APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Node 20 LTS — Capacitor officially supports 18 & 20 only
-      - name: Set up Node.js 20 LTS
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install npm dependencies
-        run: npm ci
-
-      # Java 17 is required by Gradle / Android build tools
-      - name: Set up Java 17
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
           distribution: 'temurin'
+          java-version: '17'
 
-      # Explicitly install Android SDK so ANDROID_HOME is always set
-      - name: Set up Android SDK
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # local.properties is gitignored but Gradle REQUIRES it to find the SDK.
-      # We generate it here pointing at the SDK the runner just installed.
+      - name: Install dependencies
+        run: npm ci
+
+      # Generate the Android native project fresh (same pattern as Cordova sample)
+      # This avoids stale committed configs, missing local.properties, etc.
+      - name: Add Android Platform
+        run: npx cap add android
+
+      # Generate local.properties with the SDK path the runner just set up
       - name: Generate local.properties
         run: echo "sdk.dir=$ANDROID_HOME" > android/local.properties
 
-      # cap sync: copies config + installs native plugins + updates Gradle deps
-      # This is needed even for live-wrapper apps to wire Capacitor plugins.
-      - name: Capacitor Sync Android
+      # Sync Capacitor config, plugins and web assets into the fresh Android project
+      - name: Capacitor Sync
         run: npx cap sync android
 
       - name: Make Gradle wrapper executable
         run: chmod +x android/gradlew
 
-      # --no-daemon   → prevents memory leaks on CI
-      # --stacktrace  → shows full error if build fails
-      # -Xmx2g        → caps JVM at 2 GB (GitHub runner limit is ~6 GB but safe)
-      - name: Build debug APK
+      - name: Build Debug APK
         working-directory: android
         run: |
           ./gradlew assembleDebug \
@@ -62,7 +57,7 @@ jobs:
             --stacktrace \
             -Dorg.gradle.jvmargs="-Xmx2g"
 
-      - name: Upload APK artifact
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-app-debug
@@ -70,21 +65,11 @@ jobs:
           retention-days: 30
 
   # ─────────────────────────────────────────────────────────────
-  # iOS — DISABLED: the ios/ project folder has not been
-  # committed to this repository yet.
-  #
-  # To enable iOS builds:
-  #   1. Run locally:  npx cap add ios
-  #   2. Run locally:  npx cap sync ios
-  #   3. Commit the ios/ folder:
-  #        git add ios
-  #        git commit -m "Add iOS native project"
-  #        git push
-  #   4. Uncomment the job below.
-  #
-  # NOTE: A signed .ipa (real device install) also requires:
-  #   - Apple Developer account ($99/yr)
-  #   - Certificate + provisioning profile as GitHub Secrets
+  # iOS — Enable when ready:
+  #   1. Uncomment this job
+  #   2. Add Apple signing secrets to GitHub repo secrets
+  #      (APPLE_CERTIFICATE_BASE64, APPLE_CERTIFICATE_PASSWORD,
+  #       APPLE_PROVISIONING_PROFILE, APPLE_TEAM_ID)
   # ─────────────────────────────────────────────────────────────
   #
   # build-ios:
@@ -97,6 +82,7 @@ jobs:
   #         node-version: '20'
   #         cache: 'npm'
   #     - run: npm ci
+  #     - run: npx cap add ios
   #     - run: npx cap sync ios
   #     - run: |
   #         xcodebuild \

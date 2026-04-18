@@ -41,3 +41,8 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+
+# Native platform folders — generated fresh on CI by Capacitor
+# Do NOT commit these. Run `npx cap add android` / `npx cap add ios` locally only.
+/android
+/ios
