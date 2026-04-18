@@ -1,78 +1,100 @@
 name: Build Native Apps
 
+# Triggers: on every push to main, or manually from GitHub Actions tab
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # silence Node.js 20 deprecation warnings
+
 jobs:
+  # ─────────────────────────────────────────────────────────────
+  # ANDROID — Produces a debug APK (Live Wrapper pointing to Vercel)
+  # ─────────────────────────────────────────────────────────────
   build-android:
     name: Build Android APK
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up Node.js
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: '22'
           cache: 'npm'
-          
-      - name: Install Dependencies
-        run: npm install
-        
-      - name: Set up Java
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Set up Java 17 (required by Gradle)
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Capacitor Sync
-        run: npx cap sync android
-        
-      - name: Build Android APK
-        run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug
-          
-      - name: Upload APK
+      # Since this is a Live Wrapper (server.url points to Vercel),
+      # we do NOT need to run `next build`. We just copy the capacitor
+      # config into the android project so it knows the live URL.
+      - name: Capacitor Copy (sync config to Android project, no web build needed)
+        run: npx cap copy android
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x android/gradlew
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-app-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
 
-  build-ios:
-    name: Build iOS Simulator
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: 'npm'
-          
-      - name: Install Dependencies
-        run: npm install
-        
-      - name: Capacitor Sync
-        run: npx cap sync ios
-        
-      - name: Build iOS (Simulator)
-        run: |
-          npx cap open ios
-          # We build for simulator because real device requires signing certificates
-          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -sdk iphonesimulator -configuration Debug -derivedDataPath build
-          
-      - name: Zip iOS App
-        run: |
-          cd build/Build/Products/Debug-iphonesimulator
-          zip -r ../../../AI-Centre-iOS.zip App.app
-          
-      - name: Upload iOS Zip
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-app-simulator
-          path: AI-Centre-iOS.zip
+  # ─────────────────────────────────────────────────────────────
+  # iOS — Skipped until ios/ project is initialized in the repo.
+  #
+  # To enable iOS builds:
+  #   1. Run locally:  npx cap add ios
+  #   2. Run locally:  npx cap copy ios
+  #   3. Commit the generated ios/ folder to the repository
+  #   4. Uncomment this job
+  #
+  # NOTE: A real .ipa (device install) also requires:
+  #   - An Apple Developer account ($99/yr)
+  #   - A signing certificate and provisioning profile stored as
+  #     GitHub Secrets (APPLE_CERTIFICATE_BASE64, etc.)
+  # ─────────────────────────────────────────────────────────────
+  #
+  # build-ios:
+  #   name: Build iOS Simulator
+  #   runs-on: macos-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '22'
+  #         cache: 'npm'
+  #     - run: npm ci
+  #     - run: npx cap copy ios
+  #     - run: |
+  #         xcodebuild \
+  #           -workspace ios/App/App.xcworkspace \
+  #           -scheme App \
+  #           -sdk iphonesimulator \
+  #           -configuration Debug \
+  #           -derivedDataPath build \
+  #           CODE_SIGNING_ALLOWED=NO
+  #     - run: |
+  #         cd build/Build/Products/Debug-iphonesimulator
+  #         zip -r ../../../../AI-Centre-iOS-Simulator.zip App.app
+  #     - uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ios-simulator-app
+  #         path: AI-Centre-iOS-Simulator.zip
+  #         retention-days: 30
