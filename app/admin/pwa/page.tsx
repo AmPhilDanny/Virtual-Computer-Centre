@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle2, Globe, Smartphone, DownloadCloud, Zap, Github, Cpu, ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { CheckCircle2, Globe, Smartphone, DownloadCloud, Zap, GitBranch, Cpu, ExternalLink } from "lucide-react";
 
 export default function AdminPWAPage() {
   const [settings, setSettings] = useState<Record<string, string>>({
@@ -230,7 +231,7 @@ export default function AdminPWAPage() {
           <div className="flex justify-between items-center">
             <div>
               <h3 className="flex items-center gap-2" style={{ fontSize: "1.5rem", margin: 0 }}>
-                <Github size={24} /> Native Mobile Releases (APK/IPA)
+                <GitBranch size={24} /> Native Mobile Releases (APK/IPA)
               </h3>
               <p className="text-secondary" style={{ marginTop: "var(--space-2)" }}>Download the latest compiled versions of your native apps.</p>
             </div>
