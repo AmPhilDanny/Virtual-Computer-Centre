@@ -1,17 +1,13 @@
 name: Build Native Apps
 
-# Triggers: on every push to main, or manually from GitHub Actions tab
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # silence Node.js 20 deprecation warnings
-
 jobs:
   # ─────────────────────────────────────────────────────────────
-  # ANDROID — Produces a debug APK (Live Wrapper pointing to Vercel)
+  # ANDROID — Produces a debug APK (Live Wrapper → Vercel)
   # ─────────────────────────────────────────────────────────────
   build-android:
     name: Build Android APK
@@ -21,33 +17,50 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 22
+      # Node 20 LTS — Capacitor officially supports 18 & 20 only
+      - name: Set up Node.js 20 LTS
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install npm dependencies
         run: npm ci
 
-      - name: Set up Java 17 (required by Gradle)
+      # Java 17 is required by Gradle / Android build tools
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # Since this is a Live Wrapper (server.url points to Vercel),
-      # we do NOT need to run `next build`. We just copy the capacitor
-      # config into the android project so it knows the live URL.
-      - name: Capacitor Copy (sync config to Android project, no web build needed)
-        run: npx cap copy android
+      # Explicitly install Android SDK so ANDROID_HOME is always set
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      # local.properties is gitignored but Gradle REQUIRES it to find the SDK.
+      # We generate it here pointing at the SDK the runner just installed.
+      - name: Generate local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+
+      # cap sync: copies config + installs native plugins + updates Gradle deps
+      # This is needed even for live-wrapper apps to wire Capacitor plugins.
+      - name: Capacitor Sync Android
+        run: npx cap sync android
 
       - name: Make Gradle wrapper executable
         run: chmod +x android/gradlew
 
+      # --no-daemon   → prevents memory leaks on CI
+      # --stacktrace  → shows full error if build fails
+      # -Xmx2g        → caps JVM at 2 GB (GitHub runner limit is ~6 GB but safe)
       - name: Build debug APK
         working-directory: android
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        run: |
+          ./gradlew assembleDebug \
+            --no-daemon \
+            --stacktrace \
+            -Dorg.gradle.jvmargs="-Xmx2g"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -57,18 +70,21 @@ jobs:
           retention-days: 30
 
   # ─────────────────────────────────────────────────────────────
-  # iOS — Skipped until ios/ project is initialized in the repo.
+  # iOS — DISABLED: the ios/ project folder has not been
+  # committed to this repository yet.
   #
   # To enable iOS builds:
   #   1. Run locally:  npx cap add ios
-  #   2. Run locally:  npx cap copy ios
-  #   3. Commit the generated ios/ folder to the repository
-  #   4. Uncomment this job
+  #   2. Run locally:  npx cap sync ios
+  #   3. Commit the ios/ folder:
+  #        git add ios
+  #        git commit -m "Add iOS native project"
+  #        git push
+  #   4. Uncomment the job below.
   #
-  # NOTE: A real .ipa (device install) also requires:
-  #   - An Apple Developer account ($99/yr)
-  #   - A signing certificate and provisioning profile stored as
-  #     GitHub Secrets (APPLE_CERTIFICATE_BASE64, etc.)
+  # NOTE: A signed .ipa (real device install) also requires:
+  #   - Apple Developer account ($99/yr)
+  #   - Certificate + provisioning profile as GitHub Secrets
   # ─────────────────────────────────────────────────────────────
   #
   # build-ios:
@@ -78,10 +94,10 @@ jobs:
   #     - uses: actions/checkout@v4
   #     - uses: actions/setup-node@v4
   #       with:
-  #         node-version: '22'
+  #         node-version: '20'
   #         cache: 'npm'
   #     - run: npm ci
-  #     - run: npx cap copy ios
+  #     - run: npx cap sync ios
   #     - run: |
   #         xcodebuild \
   #           -workspace ios/App/App.xcworkspace \
