@@ -100,7 +100,7 @@ export default async function PublicServicePage({ params }: { params: Promise<{ 
             </div>
 
             {/* Right: CTA Card */}
-            <div className="glass-card" style={{ padding: "var(--space-8)", position: "sticky", top: "100px", borderColor: "var(--brand-primary)", borderWeight: "2px" }}>
+            <div className="glass-card" style={{ padding: "var(--space-8)", position: "sticky", top: "100px", borderColor: "var(--brand-primary)", borderWidth: "2px" }}>
               <div style={{ textAlign: "center", marginBottom: "var(--space-8)" }}>
                 <div style={{ fontSize: "2.5rem", marginBottom: "var(--space-4)" }}>🤖</div>
                 <h2 style={{ fontSize: "1.5rem", marginBottom: "var(--space-3)" }}>Ready to Start?</h2>
