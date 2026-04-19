@@ -18,6 +18,7 @@ export async function POST(request: Request) {
         }
         
         return {
+          addRandomSuffix: true,
           tokenPayload: JSON.stringify({ userId: (session.user as any).id }),
         };
       },
