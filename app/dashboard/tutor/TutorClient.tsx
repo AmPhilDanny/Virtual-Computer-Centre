@@ -1,5 +1,7 @@
 "use client";
 
+import { upload } from '@vercel/blob/client';
+
 import { useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
@@ -70,14 +72,23 @@ export default function TutorClient({ materials: initialMaterials, subscription,
     if (!file) return;
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("title", file.name);
 
     try {
+      // 1. Direct secure upload to Vercel Blob from Browser
+      const newBlob = await upload(file.name, file, {
+        access: 'public',
+        handleUploadUrl: '/api/tutor/upload/token',
+      });
+
+      // 2. Instruct backend to fetch this blob and extract text
       const res = await fetch("/api/tutor/upload", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: newBlob.url,
+          title: file.name,
+          type: "READING"
+        }),
       });
 
       if (res.ok) {
@@ -92,6 +103,7 @@ export default function TutorClient({ materials: initialMaterials, subscription,
       }
     } catch (error) {
       console.error(error);
+      alert("Failed to upload: " + (error as Error).message);
     } finally {
       setUploading(false);
     }

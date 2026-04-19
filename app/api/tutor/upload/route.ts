@@ -22,30 +22,30 @@ export async function POST(req: Request) {
       return new NextResponse("Document limit reached (Maximum 12 files).", { status: 400 });
     }
 
-    const formData = await req.formData();
-    const file = formData.get("file") as File;
-    const title = formData.get("title") as string || file.name;
-    const type = formData.get("type") as string || "READING"; // TEXTBOOK | CURRICULUM | READING
+    const { url, title, type = "READING" } = await req.json();
 
-    if (!file) {
-      return new NextResponse("No file provided", { status: 400 });
+    if (!url) {
+      return new NextResponse("No file URL provided", { status: 400 });
     }
 
-    // 1. Upload to Vercel Blob
-    const blob = await put(`tutor/${userId}/${Date.now()}-${file.name}`, file, {
-      access: "public",
-    });
-
+    // 1. Fetch the file buffer from Vercel Blob into memory
+    const blobRes = await fetch(url);
+    const buffer = Buffer.from(await blobRes.arrayBuffer());
+    
     // 2. Extract Text for AI Knowledge
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const textContent = await extractText(buffer, file.type);
+    const fileType = url.split('.').pop() || "pdf"; // Naive type extraction based on extension
+    const mimeType = fileType.toLowerCase() === "pdf" ? "application/pdf" : 
+                     fileType.toLowerCase() === "docx" ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : 
+                     "text/plain";
+
+    const textContent = await extractText(buffer, mimeType);
 
     // 3. Save to database
     const material = await prisma.studyMaterial.create({
       data: {
         userId,
         title,
-        fileUrl: blob.url,
+        fileUrl: url,
         fileType: type,
         extractedText: textContent
       }

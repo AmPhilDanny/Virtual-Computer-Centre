@@ -2,7 +2,7 @@
 
 import { redirect, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { LogOut, Home, FileText, PlusCircle, CreditCard, User, Menu, X } from "lucide-react";
 
@@ -14,6 +14,20 @@ export default function DashboardLayout({
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (session?.user) {
+      fetch("/api/wallet")
+        .then(res => res.json())
+        .then(data => {
+          if (data && typeof data.balance === "number") {
+            setWalletBalance(data.balance);
+          }
+        })
+        .catch(err => console.error("Failed to fetch wallet", err));
+    }
+  }, [session]);
 
   if (status === "loading") return null;
 
@@ -129,7 +143,7 @@ export default function DashboardLayout({
           </div>
           <div className="flex items-center gap-4">
              <div className="badge badge-primary">
-               Wallet: ₦{(session.user as any).walletBalance?.toLocaleString() || "0.00"}
+               Wallet: ₦{walletBalance !== null ? walletBalance.toLocaleString() : ((session.user as any)?.walletBalance?.toLocaleString() || "0.00")}
              </div>
              <div 
                style={{ 
