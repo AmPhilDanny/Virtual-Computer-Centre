@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSettings } from "./SettingsProvider";
 import { useTheme } from "./ThemeProvider";
 import { useSession, signOut } from "next-auth/react";
-import { Sun, Moon, LogOut, User as UserIcon } from "lucide-react";
+import { Sun, Moon, LogOut, User as UserIcon, LogIn } from "lucide-react";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -72,11 +72,8 @@ export default function Navbar() {
             </>
           ) : (
             <div className="flex gap-2">
-              <Link href="/auth/login" className="btn btn-secondary btn-sm" style={{ padding: "0 var(--space-3)", fontSize: "0.8rem" }}>
-                Login
-              </Link>
-              <Link href="/auth/register" className="btn btn-primary btn-sm" style={{ padding: "0 var(--space-4)", fontSize: "0.8rem" }}>
-                Join
+              <Link href="/auth/login" className="btn btn-secondary btn-sm flex items-center gap-2" style={{ padding: "0 var(--space-3)", fontSize: "0.8rem" }}>
+                <LogIn size={16} /> <span className="hide-on-xs">Login</span>
               </Link>
             </div>
           )}

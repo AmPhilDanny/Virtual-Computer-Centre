@@ -151,7 +151,7 @@ export default function HomePage() {
       {/* ======= AI AGENTS SECTION ======= */}
       <section className="section" style={{ background: "var(--bg-surface)" }}>
         <div className="container">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-16)", alignItems: "center" }}>
+          <div className="grid-2" style={{ gap: "var(--space-16)", alignItems: "center" }}>
             <div>
               <div className="eyebrow" style={{ fontSize: "0.8125rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--brand-primary)", marginBottom: "var(--space-3)" }}>
                 AI-First Architecture
