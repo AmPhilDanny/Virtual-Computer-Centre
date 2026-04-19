@@ -1,8 +1,8 @@
-import { streamText } from "ai";
+import { streamText, CoreMessage } from "ai";
 import { getActiveAiModel } from "./factory";
 
 export async function generateTutorResponse(
-  messages: any[],
+  messages: CoreMessage[],
   studentProfile: any,
   knowledgeBase: string,
   learningPatterns: any

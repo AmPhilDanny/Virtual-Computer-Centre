@@ -1,4 +1,4 @@
-import pdf from "pdf-parse";
+import * as pdf from "pdf-parse";
 import mammoth from "mammoth";
 
 export async function extractText(buffer: Buffer, mimeType: string): Promise<string> {

@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     // 3. Get or Create Session
     const sessionData = user?.tutorSessions[0] || { learningPatterns: {} };
 
-    // 4. Generate AI Stream
+    // 4. Return Data Stream Response with persistence
     const result = await generateTutorResponse(
       messages,
       { name: user?.name, ...((user?.studentProfile as any) || {}) },
@@ -52,10 +52,33 @@ export async function POST(req: Request) {
       sessionData.learningPatterns
     );
 
-    // 5. Background: Update session history/patterns (not blocking stream)
-    // In a real prod app, we'd do this via a separate worker or after stream finished
-    
-    return result.toDataStreamResponse();
+    return result.toDataStreamResponse({
+      onFinish: async ({ text }) => {
+        // Save the exchange to TutorSession
+        const updatedMessages = [
+          ...messages,
+          { role: "assistant", content: text }
+        ];
+
+        if (user?.tutorSessions[0]) {
+          await prisma.tutorSession.update({
+            where: { id: user.tutorSessions[0].id },
+            data: { 
+              messages: updatedMessages as any,
+              lastActivity: new Date()
+            }
+          });
+        } else {
+          await prisma.tutorSession.create({
+            data: {
+              userId,
+              messages: updatedMessages as any,
+              learningPatterns: {}
+            }
+          });
+        }
+      }
+    });
   } catch (error) {
     console.error("[TUTOR_CHAT]", error);
     return new NextResponse("Internal Server Error", { status: 500 });

@@ -34,11 +34,18 @@ export default async function TutorPage() {
     orderBy: { createdAt: "desc" }
   });
 
+  // 4. Fetch Session
+  const tutorSession = await prisma.tutorSession.findFirst({
+    where: { userId },
+    orderBy: { updatedAt: "desc" }
+  });
+
   return (
     <TutorClient 
       materials={materials} 
       subscription={subscription} 
       user={user} 
+      initialMessages={(tutorSession?.messages as any) || []}
     />
   );
 }

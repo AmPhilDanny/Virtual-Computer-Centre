@@ -176,18 +176,23 @@ export default function DatasetsPage() {
 
         {/* Upload Form */}
         <div className="glass-card flex-col gap-6" style={{ padding: "var(--space-6)" }}>
-          <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Upload New Document</h3>
-          <p className="text-secondary" style={{ fontSize: "0.9rem" }}>
-            The system will automatically extract text from your files and use it as AI context.
-          </p>
+          <div className="flex items-center gap-3">
+             <div className="icon-box bg-secondary-subtle text-secondary p-3 rounded-xl">
+                <Upload size={24} />
+             </div>
+             <div>
+                <h3 style={{ margin: 0, fontSize: "1.25rem" }}>Train AI Agents</h3>
+                <p className="text-secondary text-sm">Upload context for service-specific or global intelligence.</p>
+             </div>
+          </div>
 
-          <form onSubmit={handleUpload} className="flex-col gap-5">
+          <form onSubmit={handleUpload} className="flex-col gap-5 bg-subtle/20 p-6 rounded-2xl border border-subtle">
             <div className="form-group">
-              <label className="form-label">Dataset Name</label>
+              <label className="form-label">Dataset / Context Name</label>
               <input 
                 type="text" 
                 className="form-input" 
-                placeholder="e.g. Terms of Service v2, Visa Guide 2024"
+                placeholder="e.g. Terms of Service, Business Visa Requirements"
                 value={uploadName}
                 onChange={(e) => setUploadName(e.target.value)}
                 required
@@ -195,28 +200,30 @@ export default function DatasetsPage() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Scope / Service</label>
+              <label className="form-label">Assigned Scope</label>
               <select 
                 className="form-select"
                 value={selectedService}
                 onChange={(e) => setSelectedService(e.target.value)}
               >
-                <option value="global">Global (All Services)</option>
+                <option value="global">Global Intelligence (Default)</option>
                 {services.map(s => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
+                  <option key={s.id} value={s.id}>{s.name} (Service Specific)</option>
                 ))}
               </select>
             </div>
 
             <div className="form-group">
-              <label className="form-label">File (PDF, DOCX, TXT)</label>
+              <label className="form-label">Source File</label>
               <div 
-                className="file-dropzone flex-col items-center justify-center p-8 border-2 border-dashed border-subtle rounded-xl cursor-pointer hover:bg-glass"
+                className="file-dropzone flex-col items-center justify-center p-10 border-2 border-dashed border-primary/20 bg-primary/5 rounded-2xl cursor-pointer hover:bg-primary/10 transition-all group"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <Upload size={32} className="text-primary mb-3" />
-                <span className="text-sm font-medium">Click to select file</span>
-                <span className="text-xs text-secondary mt-1">PDF, DOCX, or TXT (Max 50MB)</span>
+                <div className="p-4 bg-white rounded-full shadow-lg group-hover:scale-110 transition-transform mb-4">
+                  <Upload size={32} className="text-primary" />
+                </div>
+                <span className="text-sm font-bold text-primary">Click to Choose File</span>
+                <span className="text-xs text-secondary mt-1 opacity-70">PDF, DOCX, TXT or CSV (Max 50MB)</span>
                 <input 
                   type="file" 
                   ref={fileInputRef} 
@@ -228,17 +235,17 @@ export default function DatasetsPage() {
 
             <button 
               type="submit" 
-              className="btn btn-primary w-full py-3"
+              className="btn btn-primary btn-xl w-full"
               disabled={isUploading}
             >
-              {isUploading ? "Extracting & Uploading..." : "Add to Knowledge Base"}
+              {isUploading ? "Extracting Intelligence..." : "Add to Knowledge Base"}
             </button>
           </form>
 
-          <div className="bg-info-subtle p-4 rounded-xl flex gap-3">
-            <Info size={20} className="text-info shrink-0" />
-            <div className="text-xs text-info leading-relaxed">
-              <strong>Tip:</strong> Keep documents focused. Instead of one massive PDF, upload separate smaller datasets for better AI precision.
+          <div className="bg-info-subtle p-5 rounded-2xl flex gap-4 border border-info/10">
+            <Info size={24} className="text-info shrink-0" />
+            <div className="text-sm text-info leading-relaxed">
+              <strong>Data Extraction Logic:</strong> Our AI agents use advanced OCR and text parsing to convert your private documents into vectorized knowledge context.
             </div>
           </div>
         </div>
