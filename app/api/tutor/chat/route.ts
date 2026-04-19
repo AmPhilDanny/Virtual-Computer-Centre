@@ -43,6 +43,7 @@ export async function POST(req: Request) {
 
     // 3. Get or Create Session
     const sessionData = user?.tutorSessions[0] || { learningPatterns: {} };
+    const sessionId = user?.tutorSessions[0]?.id;
 
     // 4. Return Data Stream Response with persistence
     const result = await generateTutorResponse(
@@ -52,21 +53,21 @@ export async function POST(req: Request) {
       sessionData.learningPatterns
     );
 
-    return result.toDataStreamResponse({
-      onFinish: async ({ text }) => {
-        // Save the exchange to TutorSession
+    // Save to DB on finish
+    return result.toUIMessageStreamResponse({
+      onFinish: async ({ responseMessage }) => {
         const updatedMessages = [
           ...messages,
-          { role: "assistant", content: text }
+          responseMessage
         ];
-
-        if (user?.tutorSessions[0]) {
+        
+        if (sessionId) {
           await prisma.tutorSession.update({
-            where: { id: user.tutorSessions[0].id },
-            data: { 
+            where: { id: sessionId },
+            data: {
               messages: updatedMessages as any,
               lastActivity: new Date()
-            }
+            },
           });
         } else {
           await prisma.tutorSession.create({

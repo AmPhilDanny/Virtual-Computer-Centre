@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import { 
   BookOpen, Upload, Send, Bot, User, 
   FileText, Plus, AlertCircle, CheckCircle2, 
@@ -23,11 +24,23 @@ export default function TutorClient({ materials: initialMaterials, subscription,
 
   const [subscribing, setSubscribing] = useState(false);
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error, reload } = useChat({
-    api: "/api/tutor/chat",
-    body: { materialId: selectedMaterial?.id },
-    initialMessages,
+  const [input, setInput] = useState("");
+  const { messages, sendMessage, status, error, regenerate } = useChat({
+    transport: new DefaultChatTransport({ 
+      api: "/api/tutor/chat",
+      body: { materialId: selectedMaterial?.id }
+    }),
+    messages: initialMessages,
   });
+
+  const isLoading = status === "submitted" || status === "streaming";
+
+  const handleSend = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!input.trim() || isLoading) return;
+    sendMessage({ text: input });
+    setInput("");
+  };
 
   const onSubscribe = async () => {
     setSubscribing(true);
@@ -220,7 +233,7 @@ export default function TutorClient({ materials: initialMaterials, subscription,
                   <AlertCircle size={18} /> Connection Lost
                </div>
                <p className="text-secondary text-sm text-center">Failed to get a response from the AI. Check your internet or try reloading.</p>
-               <button onClick={() => reload()} className="btn btn-ghost btn-sm text-primary">Try Again</button>
+               <button onClick={() => regenerate()} className="btn btn-ghost btn-sm text-primary">Try Again</button>
             </div>
           )}
 
@@ -241,23 +254,26 @@ export default function TutorClient({ materials: initialMaterials, subscription,
         </div>
 
         {/* Chat Input */}
-        <form onSubmit={handleSubmit} className="p-4 bg-glass" style={{ borderTop: "1px solid var(--border-subtle)" }}>
+        <form onSubmit={handleSend} className="p-4 bg-glass" style={{ borderTop: "1px solid var(--border-subtle)" }}>
            <div className="flex gap-3 items-center">
               <input
                 className="form-input"
                 style={{ borderRadius: "14px", background: "var(--bg-subtle)", padding: "var(--space-4) var(--space-6)" }}
                 value={input}
-                onChange={handleInputChange}
-                disabled={isLoading || !selectedMaterial}
-                placeholder={selectedMaterial ? `Ask about ${selectedMaterial.title}...` : "Select a material to begin"}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={selectedMaterial ? `Ask about "${selectedMaterial.title}"...` : "Select a material to chat..."}
+                disabled={!selectedMaterial || isLoading}
               />
               <button 
                 type="submit" 
-                disabled={!selectedMaterial || !input || isLoading}
-                className="btn btn-primary" 
-                style={{ width: "52px", height: "52px", padding: 0, borderRadius: "14px", flexShrink: 0, boxShadow: "0 4px 14px rgba(108,71,255,0.4)" }}
+                className={`btn btn-primary p-3 rounded-xl shadow-lg transition-all ${!input.trim() || isLoading ? "opacity-50" : "hover:scale-105"}`}
+                disabled={!input.trim() || isLoading}
               >
-                 <Send size={20} />
+                 {isLoading ? (
+                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                 ) : (
+                   <Send size={20} />
+                 )}
               </button>
            </div>
         </form>
