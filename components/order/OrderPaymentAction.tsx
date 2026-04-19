@@ -19,6 +19,8 @@ export default function OrderPaymentAction({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [receipt, setReceipt] = useState<File | null>(null);
+  const [showManualInfo, setShowManualInfo] = useState(false);
+  const [bankDetails, setBankDetails] = useState<{ bankName: string; accountName: string; accountNumber: string } | null>(null);
 
   const fetchBankDetails = async () => {
     try {
