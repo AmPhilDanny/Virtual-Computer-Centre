@@ -41,44 +41,119 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
     }
 
-    // Fetch Paystack Secret Key from Settings
-    const settings = await prisma.siteSettings.findMany({
-      where: { key: "paystackSecretKey" }
+    // Fetch site settings for payment configurations
+    const siteSettings = await prisma.siteSettings.findMany({
+      where: { 
+        key: { in: ["paystackSecretKey", "flutterwaveSecretKey", "bankName", "accountName", "accountNumber"] } 
+      }
     });
-    const paystackKey = settings[0]?.value;
 
-    if (!paystackKey && gateway === "paystack") {
-      return NextResponse.json({ error: "Payment gateway not configured" }, { status: 500 });
-    }
+    const settingsMap = siteSettings.reduce((acc, curr) => {
+      acc[curr.key] = curr.value;
+      return acc;
+    }, {} as Record<string, string>);
 
-    // Initiate Paystack Transaction
-    const response = await fetch("https://api.paystack.co/transaction/initialize", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${paystackKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: session.user.email,
-        amount: amount * 100, // Paystack uses Kobo
-        callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/wallet?status=success`,
-        metadata: {
+    if (gateway === "manual") {
+      // Create a PENDING transaction for manual verification
+      const transaction = await prisma.walletTransaction.create({
+        data: {
           userId: (session.user as any).id,
-          type: "WALLET_FUNDING"
+          amount: amount,
+          balanceAfter: (session.user as any).walletBalance || 0, // Doesn't change yet
+          type: "CREDIT",
+          status: "PENDING",
+          reference: `MAN-${Date.now()}`,
+          description: `Manual Wallet Funding (Pending Verification)`
         }
-      }),
-    });
-
-    const data = await response.json();
-
-    if (data.status) {
-      return NextResponse.json({ 
-        authorization_url: data.data.authorization_url,
-        reference: data.data.reference
       });
-    } else {
-      return NextResponse.json({ error: data.message || "Paystack initialization failed" }, { status: 400 });
+
+      return NextResponse.json({ 
+        success: true, 
+        message: "Funding request submitted. Please complete the transfer and wait for admin verification.",
+        transaction
+      });
     }
+
+    if (gateway === "paystack") {
+      const paystackKey = settingsMap.paystackSecretKey;
+      if (!paystackKey) {
+        return NextResponse.json({ error: "Paystack is not configured" }, { status: 500 });
+      }
+
+      const response = await fetch("https://api.paystack.co/transaction/initialize", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${paystackKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: session.user.email,
+          amount: Math.round(amount * 100), // Kobo
+          callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/wallet?status=success`,
+          metadata: {
+            userId: (session.user as any).id,
+            type: "WALLET_FUNDING",
+            gateway: "paystack"
+          }
+        }),
+      });
+
+      const data = await response.json();
+      if (data.status) {
+        return NextResponse.json({ 
+          authorization_url: data.data.authorization_url,
+          reference: data.data.reference
+        });
+      } else {
+        return NextResponse.json({ error: data.message || "Paystack initialization failed" }, { status: 400 });
+      }
+    }
+
+    if (gateway === "flutterwave") {
+      const flwKey = settingsMap.flutterwaveSecretKey;
+      if (!flwKey) {
+        return NextResponse.json({ error: "Flutterwave is not configured" }, { status: 500 });
+      }
+
+      const response = await fetch("https://api.flutterwave.com/v3/payments", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${flwKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tx_ref: `WLT-FLW-${Date.now()}`,
+          amount: amount,
+          currency: "NGN",
+          redirect_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/wallet?status=success`,
+          customer: {
+            email: session.user.email,
+            name: session.user.name || "Client",
+          },
+          meta: {
+            userId: (session.user as any).id,
+            type: "WALLET_FUNDING",
+            gateway: "flutterwave"
+          },
+          customizations: {
+            title: "Wallet Funding",
+            description: `Funding wallet with ₦${amount}`,
+          }
+        }),
+      });
+
+      const data = await response.json();
+      if (data.status === "success") {
+        return NextResponse.json({ 
+          authorization_url: data.data.link,
+          reference: data.data.tx_ref
+        });
+      } else {
+        return NextResponse.json({ error: data.message || "Flutterwave initialization failed" }, { status: 400 });
+      }
+    }
+
+    return NextResponse.json({ error: "Invalid payment gateway" }, { status: 400 });
 
   } catch (error) {
     console.error("Wallet topup error:", error);

@@ -10,6 +10,9 @@ export default function AdminPaymentsPage() {
     bankName: "",
     accountName: "",
     accountNumber: "",
+    enablePaystack: "true",
+    enableFlutterwave: "true",
+    enableManual: "true",
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -33,7 +36,7 @@ export default function AdminPaymentsPage() {
     fetchSettings();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setSettings(prev => ({ ...prev, [name]: value }));
   };
@@ -46,8 +49,8 @@ export default function AdminPaymentsPage() {
     try {
       const formData = new FormData();
       Object.entries(settings).forEach(([key, value]) => {
-        if (value && typeof value === "string") {
-          formData.append(key, value);
+        if (value !== undefined && value !== null) {
+          formData.append(key, value.toString());
         }
       });
 
@@ -57,8 +60,6 @@ export default function AdminPaymentsPage() {
       });
 
       if (res.ok) {
-        const data = await res.json();
-        setSettings(prev => ({ ...prev, ...data.updates }));
         setSaveStatus("success");
         setTimeout(() => setSaveStatus("idle"), 3000);
       } else {
@@ -89,9 +90,23 @@ export default function AdminPaymentsPage() {
         <p className="text-secondary">Configure automated gateways and manual bank transfer methods.</p>
 
         <form onSubmit={handleSubmit} className="flex-col gap-6">
-            <h4 className="flex items-center gap-2" style={{ margin: 0, color: "var(--brand-warning)" }}>
-              <ShieldCheck size={18} /> API Gateways
-            </h4>
+            <div className="flex justify-between items-center">
+                <h4 className="flex items-center gap-2" style={{ margin: 0, color: "var(--brand-warning)" }}>
+                    <ShieldCheck size={18} /> API Gateways
+                </h4>
+                <div className="flex gap-4">
+                    <label className="flex items-center gap-2 text-xs">
+                        <input type="checkbox" name="enablePaystack" checked={settings.enablePaystack === "true"} 
+                          onChange={(e) => setSettings({...settings, enablePaystack: e.target.checked ? "true" : "false"})} />
+                        Paystack
+                    </label>
+                    <label className="flex items-center gap-2 text-xs">
+                        <input type="checkbox" name="enableFlutterwave" checked={settings.enableFlutterwave === "true"} 
+                        onChange={(e) => setSettings({...settings, enableFlutterwave: e.target.checked ? "true" : "false"})} />
+                        Flutterwave
+                    </label>
+                </div>
+            </div>
 
             <div className="grid-2 gap-8">
                <div className="flex-col gap-4">
@@ -112,9 +127,16 @@ export default function AdminPaymentsPage() {
 
             <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
 
-            <h4 className="flex items-center gap-2" style={{ margin: 0, color: "var(--brand-success)" }}>
-              <Landmark size={18} /> Manual Bank Transfer Method
-            </h4>
+            <div className="flex justify-between items-center">
+                <h4 className="flex items-center gap-2" style={{ margin: 0, color: "var(--brand-success)" }}>
+                    <Landmark size={18} /> Manual Bank Transfer
+                </h4>
+                <label className="flex items-center gap-2 text-xs">
+                    <input type="checkbox" name="enableManual" checked={settings.enableManual === "true"} 
+                    onChange={(e) => setSettings({...settings, enableManual: e.target.checked ? "true" : "false"})} />
+                    Enable
+                </label>
+            </div>
             
             <div className="flex-col gap-4">
                 <div className="form-group">
@@ -148,13 +170,16 @@ export default function AdminPaymentsPage() {
       </div>
 
       <div className="flex-col gap-8">
-        <div className="glass-card flex-col gap-4" style={{ padding: "var(--space-6)" }}>
+        <div className="glass-card flex-col gap-4" style={{ padding: "var(--space-8)" }}>
            <h4 className="flex items-center gap-2" style={{ margin: 0 }}>
              <Landmark size={18} style={{ color: "var(--brand-primary)" }} /> Transfer Verification
            </h4>
-           <div className="text-xs text-muted leading-relaxed">
-             Clients opting for Bank Transfer will be prompted to upload a receipt/proof. Orders will remain in PENDING status until an administrator manually verifies and overrides the Order Status from the dashboard.
-           </div>
+           <p className="text-secondary text-sm leading-relaxed">
+             Clients opting for Bank Transfer will be prompted to upload a receipt/proof. Orders will remain in PENDING status until an administrator manually verifies the transfer.
+           </p>
+           <a href="/admin/payments/verifications" className="btn btn-secondary w-full py-4 mt-2">
+               Open Verification Portal
+           </a>
         </div>
       </div>
     </div>

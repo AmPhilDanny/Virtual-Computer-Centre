@@ -187,6 +187,7 @@ model Order {
   reference  String?     @unique
   couponId   String?
   metadata   Json?
+  proofUrl   String?     // For manual payments
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
@@ -304,6 +305,8 @@ model WalletTransaction {
   balanceAfter  Float
   reference     String   @unique // Paystack ref or Internal ref
   description   String?
+  status        WalletTransactionStatus @default(SUCCESS)
+  proofUrl      String?     // For manual funding
   createdAt     DateTime @default(now())
 
   user          User     @relation(fields: [userId], references: [id])
@@ -371,4 +374,10 @@ enum AiAutonomy {
   AI_ONLY
   AI_PLUS_HUMAN
   HUMAN_ONLY
+}
+
+enum WalletTransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
 }
