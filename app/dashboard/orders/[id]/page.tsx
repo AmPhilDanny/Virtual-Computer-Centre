@@ -25,7 +25,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
     where: { id },
     include: {
       service: { select: { name: true, description: true } },
-      order: { select: { total: true, status: true, createdAt: true } },
+      order: { select: { id: true, total: true, status: true, createdAt: true } },
       revisions: { orderBy: { createdAt: "desc" } },
     },
   });
