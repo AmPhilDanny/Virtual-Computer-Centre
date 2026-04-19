@@ -2,8 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Download, CheckCircle, Clock, RefreshCw, AlertTriangle, Paperclip, CreditCard } from "lucide-react";
+import { ArrowLeft, CheckCircle, Clock, RefreshCw, AlertTriangle, Paperclip, CreditCard } from "lucide-react";
 import OrderPaymentAction from "@/components/order/OrderPaymentAction";
+import DeliverableDownloads from "@/components/order/DeliverableDownloads";
 import ReceiptUploadButton from "@/components/order/ReceiptUploadButton";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -31,10 +32,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
     },
   });
 
-  // Security: ensure the job belongs to this user
   if (!job || job.userId !== userId) notFound();
 
-  // Fetch wallet balance for payment options
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { walletBalance: true }
@@ -51,138 +50,68 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   const walletBalance = user?.walletBalance || 0;
 
   return (
-    <div className="flex-col gap-6">
+    <div className="flex-col gap-6" style={{ maxWidth: "1200px", margin: "0 auto" }}>
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link href="/dashboard/orders" className="btn btn-ghost btn-sm">
-          <ArrowLeft size={16} /> Back to Orders
+          <ArrowLeft size={16} /> Back
         </Link>
         <div style={{ flex: 1 }}>
-          <h2 style={{ fontSize: "1.25rem", margin: 0 }}>{job.title}</h2>
-          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontFamily: "monospace" }}>
-            Order #{job.id.slice(-10).toUpperCase()}
+          <h2 style={{ fontSize: "1.25rem", margin: 0, fontWeight: 700 }}>{job.title}</h2>
+          <span className="text-muted" style={{ fontSize: "0.75rem", fontFamily: "monospace" }}>
+            Order ID: {job.id.slice(-12).toUpperCase()}
           </span>
         </div>
-        <span className={`badge badge-${STATUS_COLORS[job.status] || "info"}`} style={{ fontSize: "0.875rem", padding: "8px 14px" }}>
+        <span className={`badge badge-${STATUS_COLORS[job.status] || "info"}`} style={{ fontSize: "0.8rem", padding: "6px 12px" }}>
           {job.status.replace(/_/g, " ")}
         </span>
       </div>
 
-      {/* Status Banner */}
-      {job.status === "COMPLETED" && isPaid && (
-        <div style={{
-          padding: "var(--space-4) var(--space-5)",
-          background: "rgba(0,200,83,0.08)",
-          border: "1px solid var(--brand-success)",
-          borderRadius: "var(--radius-md)",
-          color: "var(--brand-success)",
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--space-3)"
-        }}>
-          <CheckCircle size={20} />
-          <span style={{ fontWeight: 600 }}>Your order is complete! Your deliverable is ready below.</span>
-        </div>
-      )}
+      {/* Status Banners - Tightened */}
+      <div className="flex-col gap-3">
+        {job.status === "COMPLETED" && isPaid && (
+          <StatusBanner type="success" icon={<CheckCircle size={18} />}>
+            Your order is complete! Your files are ready for download below.
+          </StatusBanner>
+        )}
 
-      {isPendingManual && (
-        <div style={{
-          padding: "var(--space-4) var(--space-5)",
-          background: "rgba(99,102,241,0.08)",
-          border: "1px solid var(--brand-primary)",
-          borderRadius: "var(--radius-md)",
-          color: "var(--brand-primary)",
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--space-3)"
-        }}>
-          <RefreshCw size={20} className="animate-spin" />
-          <span style={{ fontWeight: 600 }}>
-             Payment Pending Verification. {job.order?.proofUrl ? "We have received your receipt and are reviewing it." : "Please upload your transfer receipt below to speed up the process."}
-          </span>
-        </div>
-      )}
+        {isPendingManual && (
+          <StatusBanner type="primary" icon={<RefreshCw size={18} className="animate-spin" />}>
+            Payment Verification Pending. {job.order?.proofUrl ? "We're reviewing your receipt." : "Please upload your transfer receipt to proceed."}
+          </StatusBanner>
+        )}
 
-      {job.status === "COMPLETED" && !isPaid && !isPendingManual && (
-        <div style={{
-          padding: "var(--space-4) var(--space-5)",
-          background: "rgba(255,193,7,0.08)",
-          border: "1px solid var(--brand-warning)",
-          borderRadius: "var(--radius-md)",
-          color: "var(--brand-warning)",
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--space-3)"
-        }}>
-          <AlertTriangle size={20} />
-          <span style={{ fontWeight: 600 }}>Order completed, but payment is pending. Please settle your standing order to download the results.</span>
-        </div>
-      )}
+        {job.status === "COMPLETED" && !isPaid && !isPendingManual && (
+          <StatusBanner type="warning" icon={<AlertTriangle size={18} />}>
+            Work finished! Please settle the balance below to unlock your downloads.
+          </StatusBanner>
+        )}
 
-      {job.status === "SUBMITTED" && (
-        <div style={{
-          padding: "var(--space-4) var(--space-5)",
-          background: "rgba(255,193,7,0.08)",
-          border: "1px solid var(--brand-warning)",
-          borderRadius: "var(--radius-md)",
-          color: "var(--brand-warning)",
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--space-3)"
-        }}>
-          <Clock size={20} />
-          <span>Your order has been received and is in queue for processing. We'll notify you when it's ready.</span>
-        </div>
-      )}
+        {job.status === "SUBMITTED" && (
+          <StatusBanner type="info" icon={<Clock size={18} />}>
+            Your order is in the queue. We'll notify you as soon as we start working on it.
+          </StatusBanner>
+        )}
+      </div>
 
-      {/* ... (IN_PROGRESS and REVIEW banners remain same) */}
-      {job.status === "IN_PROGRESS" && (
-        <div style={{
-          padding: "var(--space-4) var(--space-5)",
-          background: "rgba(99,102,241,0.08)",
-          border: "1px solid var(--brand-primary)",
-          borderRadius: "var(--radius-md)",
-          color: "var(--brand-primary)",
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--space-3)"
-        }}>
-          <RefreshCw size={20} />
-          <span>Our team is actively working on your order. You'll be notified on completion.</span>
-        </div>
-      )}
-
-      {job.status === "REVIEW" && (
-        <div style={{
-          padding: "var(--space-4) var(--space-5)",
-          background: "rgba(99,102,241,0.08)",
-          border: "1px solid var(--brand-primary)",
-          borderRadius: "var(--radius-md)",
-          color: "var(--brand-primary)",
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--space-3)"
-        }}>
-          <AlertTriangle size={20} />
-          <span>Your order is under final review. Almost done!</span>
-        </div>
-      )}
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: "var(--space-6)", alignItems: "start" }}>
-        {/* LEFT: Order Info */}
-        <div className="flex-col gap-5">
-           {/* Payment Trigger if Pending */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: "24px", alignItems: "start" }}>
+        {/* LEFT COLUMN */}
+        <div className="flex-col gap-6">
+           {/* Payment / Manual Verification Info */}
            {!isPaid && job.order && (
                isPendingManual ? (
-                   <div className="glass-card flex-col gap-4" style={{ padding: "var(--space-6)", border: "1px solid var(--brand-primary)" }}>
-                       <h4 style={{ margin: 0, fontSize: "1rem" }} className="flex items-center gap-2">
-                           <CreditCard size={18} className="text-primary" /> Manual Payment Details
+                   <div className="glass-card" style={{ padding: "24px", border: "1px solid var(--brand-primary)" }}>
+                       <h4 style={{ margin: "0 0 12px", fontSize: "0.95rem", fontWeight: 700 }} className="flex items-center gap-2">
+                           <CreditCard size={18} className="text-primary" /> Verification Status
                        </h4>
-                       <p className="text-sm text-secondary">
-                           You've notified us of a bank transfer for this order. Status: <strong>AWAITING VERIFICATION</strong>.
+                       <p className="text-sm text-secondary" style={{ marginBottom: 16 }}>
+                           We're awaiting verification of your bank transfer. 
                        </p>
                        {!job.order.proofUrl && (
-                           <ReceiptUploadButton type="ORDER" id={job.order.id} />
+                           <div style={{ marginTop: 8 }}>
+                               <p className="text-xs text-muted mb-3">Upload your receipt to speed up approval:</p>
+                               <ReceiptUploadButton type="ORDER" id={job.order.id} />
+                           </div>
                        )}
                    </div>
                ) : (
@@ -195,56 +124,33 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                )
            )}
 
-          <div className="glass-card" style={{ padding: "var(--space-6)" }}>
-            <h3 style={{ fontSize: "1rem", marginBottom: "var(--space-4)" }}>Order Summary</h3>
-            <div className="flex-col gap-3" style={{ fontSize: "0.875rem" }}>
-              <div className="flex justify-between" style={{ borderBottom: "1px solid var(--border-subtle)", paddingBottom: "var(--space-2)" }}>
-                <span className="text-muted">Service</span>
-                <span style={{ fontWeight: 600 }}>{job.service.name}</span>
-              </div>
-              <div className="flex justify-between" style={{ borderBottom: "1px solid var(--border-subtle)", paddingBottom: "var(--space-2)" }}>
-                <span className="text-muted">Status</span>
-                <span className={`badge badge-${isPaid ? 'success' : 'warning'}`}>{isPaid ? 'PAID' : 'PENDING'}</span>
-              </div>
-              <div className="flex justify-between" style={{ borderBottom: "1px solid var(--border-subtle)", paddingBottom: "var(--space-2)" }}>
-                <span className="text-muted">Priority</span>
-                <span style={{ fontWeight: 600, color: job.priority === "EXPRESS" ? "var(--brand-danger)" : "inherit" }}>
-                  {job.priority === "EXPRESS" ? "⚡ Express" : "Normal"}
-                </span>
-              </div>
-              <div className="flex justify-between" style={{ borderBottom: "1px solid var(--border-subtle)", paddingBottom: "var(--space-2)" }}>
-                <span className="text-muted">Submitted</span>
-                <span>{new Date(job.createdAt).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted">Amount</span>
-                <span style={{ fontWeight: 700, fontSize: "1rem", color: "var(--brand-primary)" }}>
+          {/* Order Summary - Tightly Closed */}
+          <div className="glass-card" style={{ padding: "24px" }}>
+            <h3 style={{ fontSize: "0.95rem", fontWeight: 700, margin: "0 0 16px" }}>Order Detail</h3>
+            <div className="flex-col gap-3">
+              <SummaryItem label="Service" value={job.service.name} />
+              <SummaryItem label="Payment" value={isPaid ? "Paid" : "Pending"} badge={isPaid ? "success" : "warning"} />
+              <SummaryItem label="Priority" value={job.priority === "EXPRESS" ? "⚡ Express" : "Normal"} />
+              <SummaryItem label="Date" value={new Date(job.createdAt).toLocaleDateString()} />
+              <div className="flex justify-between items-center pt-3 mt-1" style={{ borderTop: "1px solid var(--border-subtle)" }}>
+                <span style={{ fontSize: "0.85rem", color: "var(--text-muted)", fontWeight: 600 }}>Total Cost</span>
+                <span style={{ fontWeight: 800, fontSize: "1.1rem", color: "var(--brand-primary)" }}>
                   ₦{job.order?.total?.toLocaleString() || "—"}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Submitted Files */}
+          {/* Submitted Request Files */}
           {job.attachments?.length > 0 && (
-            <div className="glass-card" style={{ padding: "var(--space-6)" }}>
-              <h3 style={{ fontSize: "1rem", marginBottom: "var(--space-4)" }} className="flex items-center gap-2">
-                <Paperclip size={16} /> Your Uploaded Files
+            <div className="glass-card" style={{ padding: "24px" }}>
+              <h3 style={{ fontSize: "0.95rem", fontWeight: 700, margin: "0 0 16px" }} className="flex items-center gap-2">
+                <Paperclip size={16} /> Reference Files
               </h3>
               <div className="flex-col gap-2">
                 {job.attachments.map((url: string, i: number) => (
-                  <a
-                    key={i}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-ghost btn-sm"
-                    style={{ justifyContent: "flex-start", width: "100%" }}
-                  >
-                    <Paperclip size={14} />
-                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {url.split("/").pop() || `File ${i + 1}`}
-                    </span>
+                  <a key={i} href={url} target="_blank" className="text-xs text-primary hover:underline flex items-center gap-2 truncate">
+                    <Paperclip size={12} /> {url.split("/").pop()}
                   </a>
                 ))}
               </div>
@@ -252,148 +158,49 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           )}
         </div>
 
-        {/* RIGHT: Deliverable */}
-        <div className="flex-col gap-5">
+        {/* RIGHT COLUMN: Deliverables */}
+        <div className="flex-col gap-6">
           {job.status === "COMPLETED" ? (
              isPaid ? (
-                <div className="glass-card" style={{ padding: "var(--space-6)" }}>
-                  <div className="flex justify-between items-center" style={{ marginBottom: "var(--space-5)" }}>
-                    <h3 style={{ fontSize: "1rem", margin: 0 }} className="flex items-center gap-2">
-                      <CheckCircle size={16} style={{ color: "var(--brand-success)" }} /> Your Completed Work
-                    </h3>
-                  </div>
-                  
-                  {/* Delivery Content */}
-                  {job.aiOutput && (
-                    <div style={{ marginBottom: "var(--space-6)" }}>
-                      <div className="flex justify-between items-center" style={{ marginBottom: "var(--space-3)" }}>
-                         <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600 }}>TEXT CONTENT</span>
-                         <div className="flex gap-2">
-                            <button
-                              onClick={() => {
-                                 const blob = new Blob([job.aiOutput || ""], { type: "text/plain" });
-                                 const url = URL.createObjectURL(blob);
-                                 const a = document.createElement("a");
-                                 a.href = url;
-                                 a.download = `${job.title.replace(/\s+/g, "_")}.txt`;
-                                 a.click();
-                              }}
-                              className="btn btn-ghost btn-xs"
-                              style={{ fontSize: "0.7rem", padding: "4px 8px" }}
-                            >
-                               TXT
-                            </button>
-                            <button
-                              onClick={async () => {
-                                 const { jsPDF } = await import("jspdf");
-                                 const doc = new jsPDF();
-                                 const lines = doc.splitTextToSize(job.aiOutput || "", 180);
-                                 doc.text(lines, 15, 15);
-                                 doc.save(`${job.title.replace(/\s+/g, "_")}.pdf`);
-                              }}
-                              className="btn btn-ghost btn-xs"
-                              style={{ fontSize: "0.7rem", padding: "4px 8px" }}
-                            >
-                               PDF
-                            </button>
-                            <button
-                              onClick={() => {
-                                 const content = `<html><body>${(job.aiOutput || "").replace(/\n/g, "<br>")}</body></html>`;
-                                 const blob = new Blob([content], { type: "application/msword" });
-                                 const url = URL.createObjectURL(blob);
-                                 const a = document.createElement("a");
-                                 a.href = url;
-                                 a.download = `${job.title.replace(/\s+/g, "_")}.doc`;
-                                 a.click();
-                              }}
-                              className="btn btn-ghost btn-xs"
-                              style={{ fontSize: "0.7rem", padding: "4px 8px" }}
-                            >
-                               WORD
-                            </button>
-                         </div>
-                      </div>
-                      <div
-                        style={{
-                          background: "var(--bg-elevated)",
-                          border: "1px solid var(--border-medium)",
-                          borderRadius: "var(--radius-md)",
-                          padding: "var(--space-5)",
-                          fontSize: "0.9rem",
-                          lineHeight: 1.7,
-                          whiteSpace: "pre-wrap",
-                          maxHeight: "40vh",
-                          overflowY: "auto",
-                          fontFamily: "inherit"
-                        }}
-                      >
-                        {job.aiOutput}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Manual File Deliverables */}
-                  {job.attachments?.length > 0 && (
-                    <div className="flex-col gap-3">
-                      <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>Attached Documents</span>
-                      <div className="flex-col gap-2">
-                        {job.attachments.map((url: string, i: number) => {
-                          const fileName = url.split("/").pop() || `Deliverable_${i+1}`;
-                          const isLikelyDeliverable = i >= (formData.original_attachment_count || 0); // Logic helper
-                          
-                          return (
-                            <a
-                              key={i}
-                              href={url}
-                              target="_blank"
-                              download={fileName}
-                              className="btn btn-primary w-full justify-between"
-                              style={{ background: "rgba(108, 71, 255, 0.1)", color: "var(--brand-primary)", border: "1px solid var(--border-medium)" }}
-                            >
-                              <div className="flex items-center gap-3">
-                                 <Download size={18} />
-                                 <span style={{ fontSize: "0.875rem", fontWeight: 600 }}>{fileName}</span>
-                              </div>
-                              <span style={{ fontSize: "0.7rem", opacity: 0.6 }}>DOWNLOAD</span>
-                            </a>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
+                <div className="glass-card" style={{ padding: "24px" }}>
+                   <DeliverableDownloads 
+                     aiOutput={job.aiOutput} 
+                     title={job.title} 
+                     attachments={job.attachments} 
+                   />
                 </div>
              ) : (
-                <div className="glass-card text-center" style={{ padding: "var(--space-12) var(--space-6)", borderColor: "var(--brand-warning)" }}>
-                  <CreditCard size={48} style={{ color: "var(--brand-warning)", margin: "0 auto var(--space-4)", opacity: 0.5 }} />
-                  <h3 style={{ fontSize: "1.1rem", marginBottom: "var(--space-2)" }}>Download Locked</h3>
-                  <p className="text-muted" style={{ fontSize: "0.875rem" }}>
-                    Your job is ready! Please pay the order total to unlock and download your finished files.
+                <div className="glass-card text-center" style={{ padding: "48px 24px", borderColor: "var(--brand-warning)" }}>
+                  <CreditCard size={40} className="text-warning" style={{ margin: "0 auto 16px", opacity: 0.6 }} />
+                  <h3 style={{ fontSize: "1.1rem", margin: "0 0 8px", fontWeight: 700 }}>Unlock Your Deliverable</h3>
+                  <p className="text-muted text-sm">
+                    Complete your payment to access and download your finished files.
                   </p>
                 </div>
              )
           ) : (
-            <div className="glass-card text-center" style={{ padding: "var(--space-12) var(--space-6)" }}>
-              <Clock size={48} style={{ opacity: 0.2, margin: "0 auto var(--space-4)" }} />
-              <h3 style={{ fontSize: "1.1rem", marginBottom: "var(--space-2)" }}>Work In Progress</h3>
-              <p className="text-muted" style={{ fontSize: "0.875rem" }}>
-                Your deliverable will appear here once the job is completed. You'll receive an email or SMS notification when it's ready.
+            <div className="glass-card text-center" style={{ padding: "48px 24px" }}>
+              <Clock size={40} style={{ opacity: 0.15, margin: "0 auto 16px" }} />
+              <h3 style={{ fontSize: "1.1rem", margin: "0 0 8px", fontWeight: 700 }}>Processing Your Request</h3>
+              <p className="text-muted text-sm">
+                We're currently working on your order. You'll be notified as soon as it's ready.
               </p>
             </div>
           )}
 
-          {/* Your original request summary */}
+          {/* Form Data Recap */}
           {Object.keys(formData).length > 0 && (
-            <div className="glass-card" style={{ padding: "var(--space-6)" }}>
-              <h3 style={{ fontSize: "1rem", marginBottom: "var(--space-4)" }}>Your Submitted Request</h3>
-              <div className="flex-col gap-3">
+            <div className="glass-card" style={{ padding: "24px" }}>
+              <h3 style={{ fontSize: "0.95rem", fontWeight: 700, margin: "0 0 16px" }}>Project Brief</h3>
+              <div className="grid-1 gap-4">
                 {Object.entries(formData)
-                  .filter(([key]) => !["priority", "academicIntegrity"].includes(key))
+                  .filter(([key]) => !["priority", "academicIntegrity", "original_attachment_count"].includes(key))
                   .map(([key, value]) => (
-                  <div key={key} style={{ borderBottom: "1px solid var(--border-subtle)", paddingBottom: "var(--space-2)" }}>
-                    <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>
+                  <div key={key}>
+                    <div className="text-muted" style={{ fontSize: "0.7rem", textTransform: "uppercase", fontWeight: 700, marginBottom: 4 }}>
                       {key.replace(/_/g, " ")}
                     </div>
-                    <div style={{ fontSize: "0.875rem" }}>{String(value)}</div>
+                    <div style={{ fontSize: "0.875rem", lineHeight: 1.5 }}>{String(value)}</div>
                   </div>
                 ))}
               </div>
@@ -401,6 +208,39 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function StatusBanner({ type, icon, children }: { type: string, icon: React.ReactNode, children: React.ReactNode }) {
+  return (
+    <div style={{
+      padding: "12px 16px",
+      background: `var(--brand-${type}-subtle)`,
+      border: `1px solid var(--brand-${type})`,
+      borderRadius: "12px",
+      color: `var(--brand-${type})`,
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      fontSize: "0.875rem",
+      fontWeight: 600
+    }}>
+      {icon}
+      <span>{children}</span>
+    </div>
+  );
+}
+
+function SummaryItem({ label, value, badge }: { label: string, value: string, badge?: string }) {
+  return (
+    <div className="flex justify-between items-center text-sm">
+      <span className="text-muted">{label}</span>
+      {badge ? (
+        <span className={`badge badge-${badge}`} style={{ fontSize: "0.7rem" }}>{value}</span>
+      ) : (
+        <span style={{ fontWeight: 600 }}>{value}</span>
+      )}
     </div>
   );
 }
