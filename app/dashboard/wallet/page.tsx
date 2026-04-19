@@ -138,8 +138,6 @@ export default function WalletPage() {
            </div>
          )}
       </div>
-    </div>
-
       <FundWalletModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
