@@ -155,28 +155,28 @@ export default function AdminSettingsPage() {
                onChange={handleChange}
              />
            </div>
-           <div className="grid-2 gap-4">
-             <div className="form-group">
-               <label className="form-label">Support Email</label>
-               <input 
-                 type="email" 
-                 name="supportEmail"
-                 className="form-input" 
-                 value={settings.supportEmail} 
-                 onChange={handleChange}
-               />
+             <div className="grid-2 gap-4">
+               <div className="form-group">
+                 <label className="form-label">Support Email</label>
+                 <input 
+                   type="email" 
+                   name="supportEmail"
+                   className="form-input" 
+                   value={settings.supportEmail} 
+                   onChange={handleChange}
+                 />
+               </div>
+               <div className="form-group">
+                 <label className="form-label">Tutor Monthly Price (NGN)</label>
+                 <input 
+                   type="number" 
+                   name="TUTOR_MONTHLY_PRICE"
+                   className="form-input" 
+                   value={settings.TUTOR_MONTHLY_PRICE || "5000"} 
+                   onChange={handleChange}
+                 />
+               </div>
              </div>
-             <div className="form-group">
-               <label className="form-label">Contact Number</label>
-               <input 
-                 type="text" 
-                 name="contactNumber"
-                 className="form-input" 
-                 value={settings.contactNumber} 
-                 onChange={handleChange}
-               />
-             </div>
-           </div>
 
            <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
 

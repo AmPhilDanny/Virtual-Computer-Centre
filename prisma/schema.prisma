@@ -33,6 +33,52 @@ model User {
   blogComments BlogComment[]
   walletTransactions WalletTransaction[]
   consents UserConsent[]
+  
+  // AI Tutor Extensions
+  studentProfile Json?        // { academicLevel, learningStyle, interests, bio, occupation }
+  subscriptions  Subscription[]
+  studyMaterials StudyMaterial[]
+  tutorSessions  TutorSession[]
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  userId    String
+  planType  String   @default("Tutor_Monthly")
+  status    String   @default("ACTIVE") // ACTIVE, CANCELLED, EXPIRED
+  amount    Float
+  reference String   @unique // Paystack subscription reference
+  startsAt  DateTime @default(now())
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model StudyMaterial {
+  id           String   @id @default(cuid())
+  userId       String
+  title        String
+  fileUrl      String   @db.Text
+  fileType     String   // TEXTBOOK | CURRICULUM | READING
+  extractedText String? @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TutorSession {
+  id               String   @id @default(cuid())
+  userId           String
+  messages         Json     // Array of chat messages
+  learningPatterns Json?    // AI insights into student behavior
+  lastActivity     DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {

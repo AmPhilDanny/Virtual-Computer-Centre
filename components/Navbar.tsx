@@ -8,8 +8,8 @@ import { Sun, Moon, LogOut, User as UserIcon, LogIn } from "lucide-react";
 
 const navLinks = [
   { label: "Home", href: "/" },
-  { label: "Services", href: "/services" },
-  { label: "About", href: "/about" },
+  { label: "Services", href: "/#services" },
+  { label: "AI Tutor", href: "/dashboard/tutor" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ];
