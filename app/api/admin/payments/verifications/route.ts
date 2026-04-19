@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const adminEmail = session.user.email || "system@admin";
     const { type, id, action } = await req.json(); // type: 'WALLET' or 'ORDER', action: 'APPROVE' or 'REJECT'
 
     if (action === "APPROVE") {
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
           // Audit log
           await tx.auditLog.create({
             data: {
-              actor: session.user.email!,
+              actor: adminEmail,
               action: "APPROVE_WALLET_FUNDING",
               entity: "WalletTransaction",
               entityId: id,
@@ -126,7 +127,7 @@ export async function POST(req: NextRequest) {
           // Audit log
           await tx.auditLog.create({
             data: {
-              actor: session.user.email!,
+              actor: adminEmail,
               action: "APPROVE_ORDER_PAYMENT",
               entity: "Order",
               entityId: id,
