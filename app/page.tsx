@@ -3,14 +3,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 const services = [
-  { icon: "⌨️", title: "Typing Services", desc: "Fast, accurate document typing from handwritten notes, PDFs or audio recordings.", price: "From ₦500", href: "/services/typing", category: "Core" },
-  { icon: "🎓", title: "Academic Assistance", desc: "Essays, assignments, thesis formatting, research papers, and project writing.", price: "From ₦1,500", href: "/services/academic", category: "Academic" },
-  { icon: "📋", title: "CV & Resume", desc: "ATS-optimized CV writing, LinkedIn profile, and cover letter packages.", price: "From ₦2,000", href: "/services/cv-resume", category: "Professional" },
-  { icon: "🏛️", title: "Government Forms", desc: "JAMB, NYSC, BVN, FRSC, Immigration, NIN issue resolution & more.", price: "From ₦1,000", href: "/services/government", category: "Government" },
-  { icon: "🤖", title: "AI Document Summarizer", desc: "Upload any document and receive an intelligent, accurate summary in minutes.", price: "From ₦300", href: "/services/ai-enhanced", category: "AI" },
+  { icon: "⌨️", title: "Typing Services", desc: "Fast, accurate document typing from handwritten notes, PDFs or audio recordings.", price: "From ₦500", href: "/services/document-typing", category: "Core" },
+  { icon: "🎓", title: "Academic Assistance", desc: "Essays, assignments, thesis formatting, research papers, and project writing.", price: "From ₦1,500", href: "/services/assignment-writing", category: "Academic" },
+  { icon: "📋", title: "CV & Resume", desc: "ATS-optimized CV writing, LinkedIn profile, and cover letter packages.", price: "From ₦2,000", href: "/services/cv-resume-writing", category: "Professional" },
+  { icon: "🏛️", title: "Government Forms", desc: "JAMB, NYSC, BVN, FRSC, Immigration, NIN issue resolution & more.", price: "From ₦1,000", href: "/services/nin-assistance", category: "Government" },
+  { icon: "🤖", title: "AI Document Summarizer", desc: "Upload any document and receive an intelligent, accurate summary in minutes.", price: "From ₦300", href: "/services/document-summarization", category: "AI" },
   { icon: "📊", title: "Data Entry & Excel", desc: "Professional data entry, spreadsheet formatting, and database management.", price: "From ₦800", href: "/services/data-entry", category: "Business" },
   { icon: "🎤", title: "Transcription", desc: "Convert audio and video recordings to accurate, well-formatted text.", price: "From ₦700", href: "/services/transcription", category: "AI" },
-  { icon: "📝", title: "Grant & NGO Applications", desc: "Professional grant writing, scholarship applications, and SOP drafting.", price: "From ₦3,000", href: "/services/grants", category: "Professional" },
+  { icon: "📝", title: "Grant & NGO Applications", desc: "Professional grant writing, scholarship applications, and SOP drafting.", price: "From ₦3,000", href: "/services/ngo-grant-application", category: "Professional" },
 ];
 
 const steps = [
