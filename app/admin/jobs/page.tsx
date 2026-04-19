@@ -2,7 +2,11 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { Eye, Play, Search, RefreshCw, AlertTriangle, Clock, CheckCircle, XCircle } from "lucide-react";
+import { 
+  Eye, Play, Search, RefreshCw, AlertTriangle, 
+  Clock, CheckCircle, XCircle, User, Briefcase, 
+  Layers, ChevronRight, Filter
+} from "lucide-react";
 
 const STATUS_COLORS: Record<string, string> = {
   SUBMITTED: "warning",
@@ -63,121 +67,140 @@ export default function AdminJobsPage() {
   return (
     <div className="flex-col gap-6">
       <div className="flex justify-between items-center">
-        <h2 style={{ fontSize: "1.25rem", margin: 0 }}>Job Management</h2>
-        <button onClick={fetchJobs} className="btn btn-ghost btn-sm" disabled={loading}>
-          <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
+        <div>
+          <h2 style={{ fontSize: "1.5rem", fontWeight: 800, margin: "0 0 4px" }}>Manage Orders</h2>
+          <p className="text-secondary" style={{ fontSize: "0.875rem", margin: 0 }}>Review, track, and process client requests.</p>
+        </div>
+        <button onClick={fetchJobs} className="btn btn-ghost btn-sm gap-2" disabled={loading}>
+          <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh List
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="glass-card" style={{ padding: "var(--space-4)" }}>
-        <div className="flex gap-3" style={{ flexWrap: "wrap" }}>
-          <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
-            <Search size={14} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
+      {/* Filters - Tightened */}
+      <div className="glass-card" style={{ padding: "16px 20px" }}>
+        <div className="flex gap-4 items-center" style={{ flexWrap: "wrap" }}>
+          <div style={{ position: "relative", flex: 1, minWidth: 280 }}>
+            <Search size={16} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", opacity: 0.6 }} />
             <input
               type="text"
               className="form-input"
-              placeholder="Search by title, client name or email..."
+              placeholder="Search client name, email or job title..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && fetchJobs()}
-              style={{ paddingLeft: "2rem" }}
+              style={{ paddingLeft: "2.5rem", borderRadius: 10, fontSize: '0.875rem' }}
             />
           </div>
-          <select
-            className="form-select"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            style={{ width: "auto", minWidth: 160 }}
-          >
-            <option value="">All Statuses</option>
-            <option value="SUBMITTED">Submitted</option>
-            <option value="IN_PROGRESS">In Progress</option>
-            <option value="REVIEW">Review</option>
-            <option value="REVISION_REQUESTED">Revision Requested</option>
-            <option value="COMPLETED">Completed</option>
-            <option value="CANCELLED">Cancelled</option>
-          </select>
-          <button onClick={fetchJobs} className="btn btn-primary btn-sm">Search</button>
+          <div className="flex items-center gap-3">
+              <Filter size={16} className="text-muted" />
+              <select
+                className="form-select"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                style={{ width: "auto", minWidth: 180, borderRadius: 10, fontSize: '0.875rem' }}
+              >
+                <option value="">All Statuses</option>
+                <option value="SUBMITTED">Submitted</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="REVIEW">Review</option>
+                <option value="REVISION_REQUESTED">Revision Requested</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+          </div>
+          <button onClick={fetchJobs} className="btn btn-primary btn-sm px-6">Search</button>
         </div>
       </div>
 
-      {/* Table */}
+      {/* Table - Tightly Closed */}
       <div className="glass-card" style={{ padding: 0, overflow: "hidden" }}>
-        <div className="table-container">
-          <table className="table">
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr>
-                <th>Client</th>
-                <th>Job Title</th>
-                <th>Service</th>
-                <th>Status</th>
-                <th>Complexity</th>
-                <th>Priority</th>
-                <th>Amount</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
+              <tr style={{ background: "var(--bg-subtle)", textAlign: "left" }}>
+                <th style={{ padding: "14px 24px", color: "var(--text-muted)", fontWeight: 700, fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Client</th>
+                <th style={{ padding: "14px 24px", color: "var(--text-muted)", fontWeight: 700, fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Project / Service</th>
+                <th style={{ padding: "14px 24px", color: "var(--text-muted)", fontWeight: 700, fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Status</th>
+                <th style={{ padding: "14px 24px", color: "var(--text-muted)", fontWeight: 700, fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Brief Info</th>
+                <th style={{ padding: "14px 24px", color: "var(--text-muted)", fontWeight: 700, fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Payment</th>
+                <th style={{ padding: "14px 24px", textAlign: "right" }}></th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="text-center" style={{ padding: "var(--space-12)" }}>
-                    <RefreshCw size={20} className="animate-spin" style={{ margin: "0 auto", opacity: 0.4 }} />
+                  <td colSpan={6} className="text-center" style={{ padding: "64px" }}>
+                    <RefreshCw size={24} className="animate-spin text-primary" style={{ margin: "0 auto", opacity: 0.5 }} />
                   </td>
                 </tr>
               ) : jobs.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center text-muted" style={{ padding: "var(--space-12)" }}>
-                    No jobs found.
+                  <td colSpan={6} className="text-center py-20">
+                     <Briefcase size={40} style={{ opacity: 0.1, margin: '0 auto 12px' }} />
+                     <p className="text-muted text-sm">No jobs match your criteria.</p>
                   </td>
                 </tr>
               ) : (
                 jobs.map((job) => (
-                  <tr key={job.id}>
-                    <td>
-                      <div style={{ fontWeight: 600 }}>{job.user?.name || "Unknown"}</div>
-                      <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>{job.user?.email}</div>
+                  <tr key={job.id} className="hover-row" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+                    <td style={{ padding: "16px 24px" }}>
+                      <div className="flex items-center gap-3">
+                        <div style={{ padding: 8, borderRadius: 8, background: "var(--bg-elevated)", color: "var(--brand-primary)" }}>
+                            <User size={16} />
+                        </div>
+                        <div className="flex-col">
+                            <span style={{ fontWeight: 700, fontSize: "0.9rem" }}>{job.user?.name || "Unknown"}</span>
+                            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>{job.user?.email}</span>
+                        </div>
+                      </div>
                     </td>
-                    <td>
-                      <div style={{ fontWeight: 500 }}>{job.title}</div>
-                      <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontFamily: "monospace" }}>#{job.id.slice(-8)}</div>
+                    <td style={{ padding: "16px 24px" }}>
+                      <div className="flex-col">
+                        <span style={{ fontWeight: 700, fontSize: "0.9rem" }}>{job.title}</span>
+                        <span className="text-muted" style={{ fontSize: "0.75rem" }}>{job.service?.name}</span>
+                      </div>
                     </td>
-                    <td style={{ fontSize: "0.875rem" }}>{job.service?.name}</td>
-                    <td>
-                      <span className={`badge badge-${STATUS_COLORS[job.status] || "info"}`}>
+                    <td style={{ padding: "16px 24px" }}>
+                      <span className={`badge badge-${STATUS_COLORS[job.status] || "info"}`} style={{ fontSize: '0.7rem' }}>
                         {job.status.replace(/_/g, " ")}
                       </span>
                     </td>
-                    <td>
-                      <span style={{ fontWeight: 700, fontSize: "0.8rem", color: COMPLEXITY_COLORS[job.complexity] || "inherit" }}>
-                        {job.complexity}
+                    <td style={{ padding: "16px 24px" }}>
+                      <div className="flex-col gap-1">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                             <span style={{ fontSize: '0.65rem', fontWeight: 800, color: COMPLEXITY_COLORS[job.complexity] || "inherit" }}>
+                                {job.complexity}
+                             </span>
+                             {job.priority === "EXPRESS" && (
+                                <span style={{ color: "var(--brand-danger)", fontWeight: 800, fontSize: "0.65rem", background: 'rgba(239, 68, 68, 0.1)', padding: '2px 6px', borderRadius: 4 }}>
+                                    EXPRESS
+                                </span>
+                             )}
+                          </div>
+                          <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontFamily: "monospace" }}>#{job.id.slice(-8).toUpperCase()}</span>
+                      </div>
+                    </td>
+                    <td style={{ padding: "16px 24px" }}>
+                      <div style={{ fontWeight: 800, fontSize: "0.9rem" }}>
+                        {job.order ? `₦${job.order.total?.toLocaleString()}` : "—"}
+                      </div>
+                      <span style={{ fontSize: '0.65rem' }} className={`text-${job.order?.status === 'PAID' ? 'success' : 'warning'} font-bold`}>
+                         {job.order?.status || 'UNSET'}
                       </span>
                     </td>
-                    <td>
-                      {job.priority === "EXPRESS" ? (
-                        <span style={{ color: "var(--brand-danger)", fontWeight: 700, fontSize: "0.8rem" }}>
-                          <AlertTriangle size={12} style={{ display: "inline", verticalAlign: "middle" }} /> EXPRESS
-                        </span>
-                      ) : (
-                        <span style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>Normal</span>
-                      )}
-                    </td>
-                    <td style={{ fontSize: "0.875rem", fontWeight: 600 }}>
-                      {job.order ? `₦${job.order.total?.toLocaleString()}` : "—"}
-                    </td>
-                    <td style={{ textAlign: "right" }}>
+                    <td style={{ padding: "16px 24px", textAlign: "right" }}>
                       <div className="flex gap-2" style={{ justifyContent: "flex-end" }}>
-                        <Link href={`/admin/jobs/${job.id}`} className="btn btn-ghost btn-sm">
-                          <Eye size={14} /> View
+                        <Link href={`/admin/jobs/${job.id}`} className="btn btn-ghost btn-xs" style={{ borderRadius: 6 }}>
+                          <Eye size={14} /> Detail
                         </Link>
                         {job.status !== "COMPLETED" && job.status !== "CANCELLED" && job.service?.autonomyLevel !== "HUMAN_ONLY" && (
                           <button
                             onClick={() => triggerExecution(job.id)}
-                            className="btn btn-primary btn-sm"
+                            className="bg-primary hover:bg-primary-dark text-white p-1.5 rounded-lg transition-all"
                             disabled={processingId === job.id}
+                            title="Run AI Core"
                           >
-                            <Play size={14} />
-                            {processingId === job.id ? "Running..." : "Run AI"}
+                            {processingId === job.id ? <RefreshCw size={14} className="animate-spin" /> : <Play size={14} fill="currentColor" />}
                           </button>
                         )}
                       </div>
@@ -190,9 +213,16 @@ export default function AdminJobsPage() {
         </div>
       </div>
 
-      <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center" }}>
-        Total: {jobs.length} job(s) found
-      </p>
+      <div style={{ display: 'flex', justifyContent: 'center', padding: 8 }}>
+        <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>
+            Showing {jobs.length} total orders
+        </p>
+      </div>
+
+      <style>{`
+        .hover-row:hover { background: rgba(0,0,0,0.02); }
+        [data-theme='dark'] .hover-row:hover { background: rgba(255,255,255,0.02); }
+      `}</style>
     </div>
   );
 }
