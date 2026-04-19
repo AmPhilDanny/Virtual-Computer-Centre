@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Download, CheckCircle, Clock, RefreshCw, AlertTriangle, Paperclip } from "lucide-react";
+import OrderPaymentAction from "@/components/order/OrderPaymentAction";
 
 const STATUS_COLORS: Record<string, string> = {
   SUBMITTED: "warning",
