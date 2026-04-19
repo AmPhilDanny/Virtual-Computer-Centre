@@ -5,7 +5,8 @@ import { auth } from "@/lib/auth";
 export async function GET() {
   try {
     const session = await auth();
-    if (!session?.user || (session.user as any).role !== "ADMIN") {
+    const role = (session?.user as any)?.role;
+    if (!session?.user || (role !== "ADMIN" && role !== "SUPER_ADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -29,10 +30,10 @@ export async function GET() {
       orderBy: { createdAt: "desc" }
     });
 
-    // Filter for Manual orders (Case-insensitive)
+    // Filter for Manual orders only (case-insensitive, no empty gateway)
     const manualOrders = allPendingOrders.filter(order => {
         const gateway = (order.gateway || "").toUpperCase();
-        return gateway === "MANUAL" || gateway === ""; // Allow empty gateway for legacy manual notifications
+        return gateway === "MANUAL";
     });
 
     console.log(`[ADMIN_VERIFY] Found ${walletPending.length} wallet requests and ${manualOrders.length} manual orders.`);
@@ -50,7 +51,8 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
-    if (!session?.user || (session.user as any).role !== "ADMIN") {
+    const role = (session?.user as any)?.role;
+    if (!session?.user || (role !== "ADMIN" && role !== "SUPER_ADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

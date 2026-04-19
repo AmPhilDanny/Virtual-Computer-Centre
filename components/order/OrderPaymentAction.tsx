@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, Wallet, Loader2, ArrowRight, ShieldCheck, CheckCircle } from "lucide-react";
+import { 
+  CreditCard, Wallet, Loader2, ArrowRight, ShieldCheck, 
+  CheckCircle, Building2, Landmark, AlertCircle
+} from "lucide-react";
 
 interface OrderPaymentActionProps {
   jobId: string;
@@ -25,13 +28,13 @@ export default function OrderPaymentAction({
 
   const fetchBankDetails = async () => {
     try {
-        const res = await fetch("/api/admin/settings");
-        const data = await res.json();
-        setBankDetails({
-            bankName: data.bankName || "Pending",
-            accountName: data.accountName || "Virtual Computer Centre",
-            accountNumber: data.accountNumber || "0000000000"
-        });
+      const res = await fetch("/api/admin/settings");
+      const data = await res.json();
+      setBankDetails({
+        bankName: data.bankName || "Pending",
+        accountName: data.accountName || "Virtual Computer Centre",
+        accountNumber: data.accountNumber || "0000000000"
+      });
     } catch {}
   };
 
@@ -43,18 +46,14 @@ export default function OrderPaymentAction({
 
     let walletAmount = 0;
     if (method === "MIXED") {
-        walletAmount = Math.min(walletBalance, totalAmount - 1);
+      walletAmount = Math.min(walletBalance, totalAmount - 1);
     }
 
     try {
       const res = await fetch(`/api/jobs/${jobId}/pay`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-            paymentMethod: method,
-            walletAmount,
-            gateway
-        })
+        body: JSON.stringify({ paymentMethod: method, walletAmount, gateway })
       });
 
       const data = await res.json();
@@ -62,24 +61,18 @@ export default function OrderPaymentAction({
       if (data.authorization_url) {
         window.location.href = data.authorization_url;
       } else if (data.success) {
-        // If manual and has receipt, upload it now
         if (method === "MANUAL" && receipt) {
-            const formData = new FormData();
-            formData.append("type", "ORDER");
-            formData.append("id", orderId);
-            formData.append("receipt", receipt);
-            
-            await fetch("/api/payments/upload-receipt", {
-                method: "POST",
-                body: formData
-            });
+          const formData = new FormData();
+          formData.append("type", "ORDER");
+          formData.append("id", orderId);
+          formData.append("receipt", receipt);
+          await fetch("/api/payments/upload-receipt", { method: "POST", body: formData });
         }
-
         if (method === "MANUAL") {
-            setSuccess(data.message || "Payment notification sent. Please wait for admin verification.");
-            setLoading(false);
+          setSuccess(data.message || "Payment notification sent. Admin will verify shortly.");
+          setLoading(false);
         } else {
-            window.location.reload(); 
+          window.location.reload();
         }
       } else {
         throw new Error(data.error || "Payment failed");
@@ -90,154 +83,244 @@ export default function OrderPaymentAction({
     }
   };
 
-  const netTotal = Math.max(0, totalAmount - (walletBalance > 0 && totalAmount > walletBalance ? walletBalance : 0));
-  const walletDeduction = totalAmount > walletBalance ? walletBalance : totalAmount;
+  const walletCoversAll = walletBalance >= totalAmount;
+  const hasPartialWallet = walletBalance > 0 && walletBalance < totalAmount;
+  const walletDeduction = walletCoversAll ? totalAmount : walletBalance;
+  const netToPay = walletCoversAll ? 0 : totalAmount - (hasPartialWallet ? walletBalance : 0);
 
   return (
-    <div className="glass-card flex-col gap-8" style={{ padding: "var(--space-8)", border: "1px solid var(--brand-primary)" }}>
-      {/* Invoice Breakdown */}
-      <div className="flex-col gap-4 bg-surface rounded-2xl p-6 border-subtle">
-          <div className="flex justify-between items-center pb-2 border-b-subtle">
-              <span className="text-secondary font-medium">Service Subtotal</span>
-              <span className="font-bold">₦{totalAmount.toLocaleString()}</span>
-          </div>
-          
-          {(walletBalance > 0) && (
-              <div className="flex justify-between items-center text-sm">
-                  <span className="text-secondary">Wallet Contribution</span>
-                  <span className="text-success font-medium">-₦{walletDeduction.toLocaleString()}</span>
-              </div>
-          )}
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
 
-          <div className="flex justify-between items-center pt-2">
-              <span className="text-primary font-bold" style={{ fontSize: "1.1rem" }}>Total to Pay</span>
-              <span className="text-primary font-bold" style={{ fontSize: "1.25rem" }}>
-                ₦{ (walletBalance >= totalAmount ? 0 : netTotal).toLocaleString() }
+      {/* Invoice Summary Card */}
+      <div className="glass-card" style={{ padding: "28px 28px 20px" }}>
+        <h3 style={{ margin: "0 0 18px", fontSize: "1rem", fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
+          <CreditCard size={18} className="text-primary" /> Invoice Summary
+        </h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 12, borderBottom: "1px solid var(--border-subtle)" }}>
+            <span className="text-secondary" style={{ fontSize: "0.9rem" }}>Service Subtotal</span>
+            <span style={{ fontWeight: 700, fontSize: "1.1rem" }}>₦{totalAmount.toLocaleString()}</span>
+          </div>
+          {walletBalance > 0 && (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span className="text-secondary" style={{ fontSize: "0.875rem" }}>
+                Wallet Balance Available
               </span>
+              <span style={{ color: "var(--brand-success)", fontWeight: 600, fontSize: "0.9rem" }}>
+                ₦{walletBalance.toLocaleString()}
+              </span>
+            </div>
+          )}
+          {hasPartialWallet && (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span className="text-secondary" style={{ fontSize: "0.875rem" }}>Wallet Deduction</span>
+              <span style={{ color: "var(--brand-success)", fontWeight: 600 }}>−₦{walletDeduction.toLocaleString()}</span>
+            </div>
+          )}
+          <div style={{ 
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            paddingTop: 14, borderTop: "1px solid var(--border-subtle)"
+          }}>
+            <span style={{ fontWeight: 800, fontSize: "1rem" }}>Total to Pay</span>
+            <span style={{ fontWeight: 900, fontSize: "1.5rem", color: "var(--brand-primary)" }}>
+              ₦{netToPay.toLocaleString()}
+            </span>
           </div>
+        </div>
       </div>
 
-      <div className="flex-col gap-2">
-          <h3 style={{ fontSize: "1.25rem", margin: 0 }} className="flex items-center gap-2">
-            <CreditCard size={22} className="text-primary" /> 
-            Payment Gateway
-          </h3>
-          <p className="text-muted" style={{ fontSize: "0.85rem" }}>
-            Select your preferred method to complete this order. 
-          </p>
-      </div>
-
+      {/* Status Messages */}
       {error && (
         <div style={{ 
-          padding: "var(--space-3)", background: "rgba(255,71,87,0.1)", 
-          border: "1px solid var(--brand-danger)", borderRadius: "var(--radius-md)",
+          display: "flex", alignItems: "flex-start", gap: 10,
+          padding: "14px 18px", background: "var(--brand-danger-subtle)", 
+          border: "1px solid var(--brand-danger)", borderRadius: 12,
           color: "var(--brand-danger)", fontSize: "0.875rem"
         }}>
+          <AlertCircle size={18} style={{ flexShrink: 0, marginTop: 1 }} />
           {error}
         </div>
       )}
 
       {success && (
         <div style={{ 
-          padding: "var(--space-4)", background: "rgba(0,200,83,0.1)", 
-          border: "1px solid var(--brand-success)", borderRadius: "var(--radius-md)",
-          color: "var(--brand-success)", fontSize: "0.875rem", textAlign: "center"
-        }} className="flex-col gap-2">
-            <CheckCircle size={24} className="mx-auto" />
-            <span style={{ fontWeight: 600 }}>{success}</span>
+          display: "flex", flexDirection: "column", alignItems: "center", gap: 10,
+          padding: "20px", background: "var(--brand-success-subtle)", 
+          border: "1px solid var(--brand-success)", borderRadius: 12,
+          color: "var(--brand-success)", textAlign: "center"
+        }}>
+          <CheckCircle size={28} />
+          <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>{success}</span>
+          <span style={{ fontSize: "0.8rem", opacity: 0.8 }}>You can track the status from your order page.</span>
         </div>
       )}
 
-      <div className="flex-col gap-5">
-        {/* Wallet Options */}
-        {walletBalance >= totalAmount && (
-          <button className="btn btn-primary w-full justify-between py-6" onClick={() => handlePay("WALLET")} disabled={loading}>
-            <div className="flex items-center gap-4 text-left">
-               <Wallet size={24} />
-               <div className="flex-col">
-                 <span style={{ fontWeight: 600 }}>Pay with Wallet</span>
-                 <span style={{ fontSize: "0.75rem", opacity: 0.8 }}>Balance: ₦{walletBalance.toLocaleString()}</span>
-               </div>
-            </div>
-            <ArrowRight size={20} />
-          </button>
-        )}
+      {/* Payment Gateway Selection */}
+      {!success && (
+        <div className="glass-card" style={{ padding: "28px" }}>
+          <div style={{ marginBottom: 20 }}>
+            <h3 style={{ margin: "0 0 4px", fontSize: "1rem", fontWeight: 700 }}>Choose Payment Method</h3>
+            <p className="text-muted" style={{ fontSize: "0.825rem", margin: 0 }}>
+              Select how you'd like to complete this order.
+            </p>
+          </div>
 
-        {walletBalance > 0 && walletBalance < totalAmount && (
-          <button className="btn btn-ghost w-full justify-between py-6 border-primary" onClick={() => handlePay("MIXED", "paystack")} disabled={loading}>
-             <div className="flex items-center gap-4 text-left">
-               <ShieldCheck size={24} className="text-primary" />
-               <div className="flex-col text-primary">
-                 <span style={{ fontWeight: 600 }}>Mixed Payment</span>
-                 <span style={{ fontSize: "0.75rem", opacity: 0.8 }}>
-                   Wallet (₦{walletBalance.toLocaleString()}) + Card (₦{netTotal.toLocaleString()})
-                 </span>
-               </div>
-            </div>
-            <ArrowRight size={20} />
-          </button>
-        )}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* Wallet Full Payment */}
+            {walletCoversAll && (
+              <button 
+                className="btn btn-primary"
+                style={{ justifyContent: "space-between", padding: "18px 20px", width: "100%" }}
+                onClick={() => handlePay("WALLET")} 
+                disabled={loading}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <Wallet size={22} />
+                  <div style={{ textAlign: "left" }}>
+                    <div style={{ fontWeight: 700 }}>Pay with Wallet</div>
+                    <div style={{ fontSize: "0.75rem", opacity: 0.8 }}>Balance: ₦{walletBalance.toLocaleString()}</div>
+                  </div>
+                </div>
+                <ArrowRight size={20} />
+              </button>
+            )}
 
-        <div className="grid-2 gap-3">
-            <button className="btn btn-secondary w-full py-5 flex-col items-center gap-2" onClick={() => handlePay("DIRECT", "paystack")} disabled={loading}>
-                <CreditCard size={20} />
-                <span style={{ fontSize: "0.85rem" }}>Paystack</span>
+            {/* Mixed Payment */}
+            {hasPartialWallet && (
+              <button 
+                className="btn btn-ghost"
+                style={{ 
+                  justifyContent: "space-between", padding: "18px 20px", width: "100%",
+                  borderColor: "var(--brand-primary)", color: "var(--brand-primary)"
+                }}
+                onClick={() => handlePay("MIXED", "paystack")} 
+                disabled={loading}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <ShieldCheck size={22} />
+                  <div style={{ textAlign: "left" }}>
+                    <div style={{ fontWeight: 700 }}>Mixed Payment</div>
+                    <div style={{ fontSize: "0.75rem", opacity: 0.8 }}>
+                      Wallet (₦{walletBalance.toLocaleString()}) + Card (₦{netToPay.toLocaleString()})
+                    </div>
+                  </div>
+                </div>
+                <ArrowRight size={20} />
+              </button>
+            )}
+
+            {/* Online Gateways */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <button 
+                className="btn btn-secondary"
+                style={{ 
+                  flexDirection: "column", alignItems: "center", gap: 6,
+                  padding: "18px 12px", width: "100%"
+                }}
+                onClick={() => handlePay("DIRECT", "paystack")} 
+                disabled={loading}
+              >
+                <CreditCard size={22} />
+                <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>Paystack</span>
+                <span style={{ fontSize: "0.7rem", opacity: 0.7 }}>Card / Transfer</span>
+              </button>
+              <button 
+                className="btn btn-secondary"
+                style={{ 
+                  flexDirection: "column", alignItems: "center", gap: 6,
+                  padding: "18px 12px", width: "100%"
+                }}
+                onClick={() => handlePay("DIRECT", "flutterwave")} 
+                disabled={loading}
+              >
+                <ShieldCheck size={22} />
+                <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>Flutterwave</span>
+                <span style={{ fontSize: "0.7rem", opacity: 0.7 }}>Card / Mobile</span>
+              </button>
+            </div>
+
+            {/* Manual Transfer Toggle */}
+            <button 
+              className="btn btn-ghost"
+              style={{ padding: "10px", fontSize: "0.8rem", justifyContent: "center", gap: 6 }}
+              onClick={() => { setShowManualInfo(!showManualInfo); if (!bankDetails) fetchBankDetails(); }}
+            >
+              <Landmark size={14} />
+              {showManualInfo ? "Hide Bank Transfer Details" : "Pay via Manual Bank Transfer"}
             </button>
-            <button className="btn btn-secondary w-full py-5 flex-col items-center gap-2" onClick={() => handlePay("DIRECT", "flutterwave")} disabled={loading}>
-                <ShieldCheck size={20} />
-                <span style={{ fontSize: "0.85rem" }}>Flutterwave</span>
-            </button>
+
+            {/* Manual Transfer Panel */}
+            {showManualInfo && (
+              <div style={{
+                padding: "20px 22px", borderRadius: 14,
+                background: "var(--bg-info-subtle)", border: "1px solid var(--border-info)",
+                display: "flex", flexDirection: "column", gap: 18
+              }}>
+                {!bankDetails ? (
+                  <div className="flex items-center justify-center gap-2 text-muted">
+                    <Loader2 size={16} className="animate-spin" /> Loading bank details...
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                      <Building2 size={18} className="text-primary" />
+                      <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>Bank Transfer Details</span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {[
+                        { label: "Bank Name", value: bankDetails.bankName },
+                        { label: "Account Name", value: bankDetails.accountName },
+                        { label: "Account Number", value: bankDetails.accountNumber },
+                        { label: "Amount", value: `₦${totalAmount.toLocaleString()}` },
+                      ].map(({ label, value }) => (
+                        <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span className="text-muted" style={{ fontSize: "0.825rem" }}>{label}</span>
+                          <span style={{ 
+                            fontWeight: label === "Account Number" || label === "Amount" ? 800 : 600,
+                            fontSize: label === "Account Number" || label === "Amount" ? "1.05rem" : "0.9rem",
+                            color: label === "Account Number" || label === "Amount" ? "var(--brand-primary)" : "inherit"
+                          }}>
+                            {value}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div style={{ borderTop: "1px dashed var(--border-subtle)", paddingTop: 16 }}>
+                      <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)", display: "block", marginBottom: 8 }}>
+                        Upload Payment Receipt <span style={{ fontWeight: 400, opacity: 0.7 }}>(optional — you can do this later)</span>
+                      </label>
+                      <input 
+                        type="file" 
+                        accept="image/*,application/pdf" 
+                        onChange={(e) => setReceipt(e.target.files?.[0] || null)}
+                        className="form-input"
+                        style={{ padding: "10px", fontSize: "0.8rem" }}
+                      />
+                    </div>
+
+                    <button 
+                      className="btn btn-primary gap-2" 
+                      style={{ width: "100%", padding: "14px", justifyContent: "center" }}
+                      onClick={() => handlePay("MANUAL")} 
+                      disabled={loading}
+                    >
+                      {loading ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
+                      I've Made the Transfer — Notify Admin
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+
+            {loading && !showManualInfo && (
+              <div className="flex items-center justify-center gap-2 text-primary" style={{ padding: "10px", fontWeight: 600 }}>
+                <Loader2 size={18} className="animate-spin" /> Processing...
+              </div>
+            )}
+          </div>
         </div>
-
-        {/* Manual Option */}
-        <button className="btn btn-ghost w-full py-2 text-xs" onClick={() => { setShowManualInfo(!showManualInfo); if (!bankDetails) fetchBankDetails(); }}>
-            {showManualInfo ? "Hide Bank Details" : "Show Manual Bank Transfer Options"}
-        </button>
-
-        {showManualInfo && bankDetails && (
-            <div className="bg-info-subtle border border-info p-6 rounded-2xl flex-col gap-6 animate-in fade-in slide-in-from-top-2">
-                <div className="flex-col gap-3 text-sm">
-                    <div className="flex justify-between">
-                        <span className="text-muted">Bank Name:</span>
-                        <span style={{ fontWeight: 600 }}>{bankDetails.bankName}</span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span className="text-muted">Account Name:</span>
-                        <span style={{ fontWeight: 600 }}>{bankDetails.accountName}</span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span className="text-muted">Account Number:</span>
-                        <span style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--brand-primary)" }}>{bankDetails.accountNumber}</span>
-                    </div>
-                </div>
-
-                <hr style={{ border: "none", borderTop: "1px dashed var(--border-subtle)" }} />
-                
-                <div className="flex-col gap-2">
-                    <label className="text-xs font-semibold text-secondary">Upload Payment Receipt (Optional)</label>
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      onChange={(e) => setReceipt(e.target.files?.[0] || null)}
-                      className="form-input text-xs"
-                      style={{ padding: "8px" }}
-                    />
-                    <p className="text-[0.7rem] text-muted">You can also upload this later from your dashboard.</p>
-                </div>
-
-                <button className="btn btn-primary w-full py-4 text-sm gap-2" onClick={() => handlePay("MANUAL")} disabled={loading}>
-                    {loading ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
-                    Notify Admin of Transfer
-                </button>
-            </div>
-        )}
-
-        {loading && !showManualInfo && (
-           <div className="flex items-center justify-center gap-2 text-primary font-semibold mt-2">
-              <Loader2 size={18} className="animate-spin" /> Processing request...
-           </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }

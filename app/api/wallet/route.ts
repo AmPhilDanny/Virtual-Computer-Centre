@@ -35,7 +35,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { amount, gateway } = await req.json();
+    const body = await req.json();
+    const { amount } = body;
+    const gateway = (body.gateway || "").toUpperCase();
 
     if (!amount || amount <= 0) {
       return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
@@ -93,7 +95,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    if (gateway === "paystack") {
+    if (gateway === "PAYSTACK") {
       const paystackKey = settingsMap.paystackSecretKey;
       if (!paystackKey) {
         return NextResponse.json({ error: "Paystack is not configured" }, { status: 500 });
@@ -128,7 +130,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (gateway === "flutterwave") {
+    if (gateway === "FLUTTERWAVE") {
       const flwKey = settingsMap.flutterwaveSecretKey;
       if (!flwKey) {
         return NextResponse.json({ error: "Flutterwave is not configured" }, { status: 500 });

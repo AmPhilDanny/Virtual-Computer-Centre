@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Landmark, Check, X, User, Calendar, ExternalLink, ShieldCheck, Wallet, Loader2, AlertCircle } from "lucide-react";
+import { 
+  Landmark, Check, X, User, Calendar, ExternalLink, ShieldCheck, 
+  Wallet, Loader2, AlertCircle, RefreshCw, Clock, FileImage 
+} from "lucide-react";
 
 export default function VerificationsPage() {
   const [data, setData] = useState<any>({ walletPending: [], manualOrders: [] });
@@ -9,10 +12,12 @@ export default function VerificationsPage() {
   const [processingId, setProcessingId] = useState<string | null>(null);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const res = await fetch("/api/admin/payments/verifications");
       if (res.ok) {
-        setData(await res.json());
+        const json = await res.json();
+        setData(json);
       }
     } catch (error) {
       console.error("Failed to fetch verifications:", error);
@@ -49,151 +54,276 @@ export default function VerificationsPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center p-20">
-        <Loader2 className="animate-spin text-primary" size={32} />
-      </div>
-    );
-  }
-
-  const hasPending = data.walletPending.length > 0 || data.manualOrders.length > 0;
+  const totalPending = (data.walletPending?.length || 0) + (data.manualOrders?.length || 0);
 
   return (
     <div className="flex-col gap-8">
-      <div className="flex justify-between items-center">
-        <div className="flex-col gap-1">
-          <h2 style={{ fontSize: "1.5rem", margin: 0 }} className="flex items-center gap-2">
-            <ShieldCheck className="text-primary" /> Manual Payment Verifications
+      {/* Header */}
+      <div className="flex justify-between items-center flex-wrap gap-4">
+        <div className="flex-col gap-2">
+          <h2 style={{ fontSize: "1.75rem", margin: 0, fontWeight: 800 }} className="flex items-center gap-3">
+            <span className="p-2 bg-primary-subtle rounded-xl">
+              <ShieldCheck className="text-primary" size={24} />
+            </span>
+            Manual Payment Verifications
           </h2>
-          <p className="text-secondary text-sm">Review and approve bank transfer notifications from clients.</p>
+          <p className="text-secondary text-sm">
+            Review and approve bank transfer notifications from clients.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          {totalPending > 0 && (
+            <span className="badge badge-warning" style={{ fontSize: "0.9rem", padding: "6px 14px" }}>
+              {totalPending} Pending
+            </span>
+          )}
+          <button 
+            className="btn btn-ghost gap-2"
+            onClick={fetchData}
+            disabled={loading}
+          >
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+            Refresh
+          </button>
         </div>
       </div>
 
-      {!hasPending && (
-          <div className="glass-card flex-col items-center justify-center p-20 gap-4" style={{ minHeight: "300px" }}>
-              <div className="bg-success-subtle p-6 rounded-full">
-                  <Check size={40} className="text-success" />
-              </div>
-              <p className="text-secondary">No pending verifications found. All clear!</p>
-          </div>
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center p-20">
+          <Loader2 className="animate-spin text-primary" size={32} />
+        </div>
       )}
 
-      {data.walletPending.length > 0 && (
-          <div className="flex-col gap-4">
-              <h3 className="flex items-center gap-2" style={{ fontSize: "1.1rem", margin: 0 }}>
-                  <Wallet size={18} className="text-primary" /> Wallet Funding Requests
-              </h3>
-              <div className="grid-1 gap-4">
-                  {data.walletPending.map((tx: any) => (
-                      <VerificationCard 
-                        key={tx.id} 
-                        item={tx} 
-                        type="WALLET" 
-                        onAction={handleAction} 
-                        processing={processingId === tx.id}
-                      />
-                  ))}
-              </div>
+      {/* Empty State */}
+      {!loading && totalPending === 0 && (
+        <div className="glass-card flex-col items-center justify-center gap-6 text-center" 
+          style={{ padding: "80px 40px", minHeight: "300px" }}>
+          <div style={{ 
+            width: 80, height: 80, borderRadius: "50%",
+            background: "var(--brand-success-subtle)",
+            display: "flex", alignItems: "center", justifyContent: "center"
+          }}>
+            <Check size={40} className="text-success" />
           </div>
+          <div className="flex-col gap-2">
+            <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700 }}>All Clear!</h3>
+            <p className="text-secondary text-sm">No pending payment verifications at this time.</p>
+          </div>
+        </div>
       )}
 
-      {data.manualOrders.length > 0 && (
-          <div className="flex-col gap-4">
-              <h3 className="flex items-center gap-2" style={{ fontSize: "1.1rem", margin: 0 }}>
-                  <Landmark size={18} className="text-primary" /> Direct Order Payments
-              </h3>
-              <div className="grid-1 gap-4">
-                  {data.manualOrders.map((order: any) => (
-                      <VerificationCard 
-                        key={order.id} 
-                        item={order} 
-                        type="ORDER" 
-                        onAction={handleAction}
-                        processing={processingId === order.id}
-                      />
-                  ))}
-              </div>
+      {/* Wallet Funding Requests */}
+      {!loading && data.walletPending?.length > 0 && (
+        <div className="flex-col gap-5">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 p-2 bg-primary-subtle rounded-lg">
+              <Wallet size={18} className="text-primary" />
+            </div>
+            <div>
+              <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700 }}>Wallet Funding Requests</h3>
+              <p className="text-muted text-xs">{data.walletPending.length} request{data.walletPending.length > 1 ? "s" : ""} pending review</p>
+            </div>
           </div>
+          <div className="flex-col gap-4">
+            {data.walletPending.map((tx: any) => (
+              <VerificationCard 
+                key={tx.id} 
+                item={tx} 
+                type="WALLET" 
+                onAction={handleAction} 
+                processing={processingId === tx.id}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Manual Order Payments */}
+      {!loading && data.manualOrders?.length > 0 && (
+        <div className="flex-col gap-5">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 p-2 rounded-lg" style={{ background: "rgba(99,102,241,0.12)" }}>
+              <Landmark size={18} style={{ color: "rgb(99,102,241)" }} />
+            </div>
+            <div>
+              <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700 }}>Direct Order Payments</h3>
+              <p className="text-muted text-xs">{data.manualOrders.length} order{data.manualOrders.length > 1 ? "s" : ""} awaiting verification</p>
+            </div>
+          </div>
+          <div className="flex-col gap-4">
+            {data.manualOrders.map((order: any) => (
+              <VerificationCard 
+                key={order.id} 
+                item={order} 
+                type="ORDER" 
+                onAction={handleAction}
+                processing={processingId === order.id}
+              />
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
 }
 
 function VerificationCard({ item, type, onAction, processing }: any) {
-    const isOrder = type === "ORDER";
-    const amount = item.amount || item.total;
-    const title = isOrder ? `Order #${item.id.slice(-6).toUpperCase()}` : "Wallet Funding";
-    const user = item.user;
+  const isOrder = type === "ORDER";
+  const amount = item.total || item.amount;
+  const title = isOrder 
+    ? `Order #${item.id.slice(-8).toUpperCase()}` 
+    : "Wallet Funding Request";
+  const user = item.user;
+  const dateStr = new Date(item.createdAt).toLocaleString("en-NG", {
+    dateStyle: "medium", timeStyle: "short"
+  });
 
-    return (
-        <div className="glass-card flex items-center justify-between p-6 gap-6 hover-lift border-subtle" style={{ minHeight: "120px" }}>
-            <div className="flex items-center gap-6 flex-1">
-                <div className={`p-4 rounded-full ${isOrder ? 'bg-indigo-subtle text-indigo' : 'bg-primary-subtle text-primary'}`}>
-                    {isOrder ? <Landmark size={24} /> : <Wallet size={24} />}
-                </div>
-                
-                <div className="flex-col gap-2 flex-1">
-                    <div className="flex items-center gap-3">
-                        <span style={{ fontWeight: 800, fontSize: "1.1rem" }}>{title}</span>
-                        <span className="badge badge-warning" style={{ fontSize: "0.7rem" }}>PENDING</span>
-                        {!item.proofUrl && (
-                            <span className="flex items-center gap-1 text-[0.65rem] font-bold text-danger bg-danger-subtle px-2 py-0.5 rounded-full uppercase">
-                                <AlertCircle size={10} /> No Proof Yet
-                            </span>
-                        )}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-secondary">
-                        <span className="flex items-center gap-1"><User size={14} className="text-muted" /> <strong className="text-primary">{user.name}</strong> ({user.email})</span>
-                        <span className="flex items-center gap-1"><Calendar size={14} className="text-muted" /> {new Date(item.createdAt).toLocaleString()}</span>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 mt-1">
-                        {isOrder && (
-                            <span className="text-xs bg-surface-elevated px-2 py-1 rounded text-secondary border border-subtle">
-                                <strong className="text-primary">Job:</strong> {item.job?.title}
-                            </span>
-                        )}
-                        {item.proofUrl ? (
-                            <a 
-                              href={item.proofUrl} 
-                              target="_blank" 
-                              className="flex items-center gap-1.5 text-xs text-primary font-bold hover:underline"
-                            >
-                                <ExternalLink size={14} /> View Payment Receipt
-                            </a>
-                        ) : (
-                            <span className="text-xs text-muted italic">Waiting for client to upload receipt...</span>
-                        )}
-                    </div>
-                </div>
-
-                <div className="flex-col items-end gap-1 px-6 border-l border-subtle">
-                    <span className="text-xs text-muted uppercase font-bold tracking-wider">Amount</span>
-                    <span style={{ fontSize: "1.5rem", fontWeight: 900, color: "var(--brand-primary)" }}>
-                        ₦{amount.toLocaleString()}
-                    </span>
-                </div>
-            </div>
-
-            <div className="flex gap-2">
-                <button 
-                  className="btn btn-ghost text-danger border-danger hover:bg-danger hover:text-white px-4"
-                  onClick={() => onAction(type, item.id, 'REJECT')}
-                  title="Reject Payment"
-                  disabled={processing}
-                >
-                    <X size={20} />
-                </button>
-                <button 
-                  className="btn btn-primary px-6 gap-2"
-                  onClick={() => onAction(type, item.id, 'APPROVE')}
-                  disabled={processing}
-                >
-                    {processing ? <Loader2 className="animate-spin" size={18} /> : <Check size={18} />}
-                    Approve
-                </button>
-            </div>
+  return (
+    <div className="glass-card hover-lift" style={{ 
+      padding: "0", overflow: "hidden",
+      border: "1px solid var(--border-subtle)"
+    }}>
+      {/* Card Top Band */}
+      <div style={{ 
+        padding: "16px 24px",
+        borderBottom: "1px solid var(--border-subtle)",
+        background: "var(--surface-elevated)",
+        display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px"
+      }}>
+        <div className="flex items-center gap-3">
+          <div style={{ 
+            width: 40, height: 40, borderRadius: "10px", flexShrink: 0,
+            background: isOrder ? "rgba(99,102,241,0.12)" : "var(--brand-primary-subtle)",
+            display: "flex", alignItems: "center", justifyContent: "center"
+          }}>
+            {isOrder 
+              ? <Landmark size={20} style={{ color: "rgb(99,102,241)" }} /> 
+              : <Wallet size={20} className="text-primary" />
+            }
+          </div>
+          <div className="flex-col gap-0.5">
+            <span style={{ fontWeight: 800, fontSize: "1.05rem" }}>{title}</span>
+            {isOrder && item.job?.title && (
+              <span className="text-muted text-xs">{item.job.title}</span>
+            )}
+          </div>
         </div>
-    );
+        <div className="flex items-center gap-3">
+          <span className="badge badge-warning" style={{ fontSize: "0.7rem" }}>
+            <Clock size={10} style={{ marginRight: 4 }} />
+            PENDING
+          </span>
+          {!item.proofUrl && (
+            <span style={{ 
+              display: "flex", alignItems: "center", gap: 4,
+              fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase",
+              color: "var(--brand-danger)", background: "var(--brand-danger-subtle)",
+              padding: "3px 8px", borderRadius: 20, border: "1px solid var(--brand-danger)"
+            }}>
+              <AlertCircle size={10} /> No Receipt
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Card Body */}
+      <div style={{ padding: "20px 24px", display: "flex", gap: "24px", alignItems: "flex-start", flexWrap: "wrap" }}>
+        {/* Client Info */}
+        <div className="flex-col gap-3" style={{ flex: 1, minWidth: 220 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ 
+              width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
+              background: "var(--surface-elevated)", border: "1px solid var(--border-subtle)",
+              display: "flex", alignItems: "center", justifyContent: "center"
+            }}>
+              <User size={16} className="text-muted" />
+            </div>
+            <div className="flex-col gap-0.5">
+              <span style={{ fontWeight: 700, fontSize: "0.9rem" }}>{user?.name || "Unknown User"}</span>
+              <span className="text-muted text-xs">{user?.email}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 text-muted text-xs">
+            <Calendar size={12} />
+            <span>{dateStr}</span>
+          </div>
+          {item.proofUrl ? (
+            <a 
+              href={item.proofUrl} 
+              target="_blank" 
+              style={{ 
+                display: "inline-flex", alignItems: "center", gap: 6,
+                fontSize: "0.8rem", fontWeight: 600,
+                color: "var(--brand-primary)", textDecoration: "none"
+              }}
+              className="hover:underline"
+            >
+              <FileImage size={14} />
+              View Payment Receipt
+              <ExternalLink size={12} />
+            </a>
+          ) : (
+            <span style={{ 
+              display: "flex", alignItems: "center", gap: 6,
+              fontSize: "0.75rem", color: "var(--text-muted)", fontStyle: "italic"
+            }}>
+              <FileImage size={13} />
+              Awaiting receipt upload from client
+            </span>
+          )}
+        </div>
+
+        {/* Amount */}
+        <div style={{ 
+          padding: "16px 24px", borderRadius: 12,
+          background: "var(--surface-elevated)", border: "1px solid var(--border-subtle)",
+          display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+          minWidth: 140, flexShrink: 0
+        }}>
+          <span style={{ fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-muted)" }}>
+            Amount
+          </span>
+          <span style={{ fontSize: "1.6rem", fontWeight: 900, color: "var(--brand-primary)", lineHeight: 1.1 }}>
+            ₦{(amount || 0).toLocaleString()}
+          </span>
+          <span style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>NGN</span>
+        </div>
+      </div>
+
+      {/* Card Footer - Actions */}
+      <div style={{ 
+        padding: "14px 24px",
+        borderTop: "1px solid var(--border-subtle)",
+        background: "var(--surface-elevated)",
+        display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "10px"
+      }}>
+        <button 
+          className="btn btn-ghost gap-2"
+          style={{ 
+            color: "var(--brand-danger)", 
+            border: "1px solid var(--brand-danger)",
+            padding: "8px 20px"
+          }}
+          onClick={() => onAction(type, item.id, 'REJECT')}
+          disabled={processing}
+        >
+          <X size={16} />
+          Reject
+        </button>
+        <button 
+          className="btn btn-primary gap-2"
+          style={{ padding: "8px 24px" }}
+          onClick={() => onAction(type, item.id, 'APPROVE')}
+          disabled={processing}
+        >
+          {processing 
+            ? <Loader2 className="animate-spin" size={16} /> 
+            : <Check size={16} />
+          }
+          Approve Payment
+        </button>
+      </div>
+    </div>
+  );
 }
