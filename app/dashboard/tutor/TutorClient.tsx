@@ -75,7 +75,7 @@ export default function TutorClient({ materials: initialMaterials, subscription,
 
     try {
       // 1. Direct secure upload to Vercel Blob from Browser
-      const newBlob = await upload(file.name, file, {
+      const newBlob = await upload(`${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`, file, {
         access: 'public',
         handleUploadUrl: '/api/tutor/upload/token',
       });
