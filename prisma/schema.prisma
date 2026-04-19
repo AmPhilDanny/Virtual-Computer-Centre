@@ -306,6 +306,7 @@ model WalletTransaction {
   reference     String   @unique // Paystack ref or Internal ref
   description   String?
   status        WalletTransactionStatus @default(SUCCESS)
+  gateway       String?     // paystack | flutterwave | manual
   proofUrl      String?     // For manual funding
   createdAt     DateTime @default(now())
 
