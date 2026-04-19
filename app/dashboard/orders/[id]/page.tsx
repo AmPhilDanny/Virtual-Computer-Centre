@@ -4,6 +4,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Download, CheckCircle, Clock, RefreshCw, AlertTriangle, Paperclip, CreditCard } from "lucide-react";
 import OrderPaymentAction from "@/components/order/OrderPaymentAction";
+import ReceiptUploadButton from "@/components/order/ReceiptUploadButton";
 
 const STATUS_COLORS: Record<string, string> = {
   SUBMITTED: "warning",
@@ -25,7 +26,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
     where: { id },
     include: {
       service: { select: { name: true, description: true } },
-      order: { select: { id: true, total: true, status: true, createdAt: true } },
+      order: { select: { id: true, total: true, status: true, gateway: true, proofUrl: true, createdAt: true } },
       revisions: { orderBy: { createdAt: "desc" } },
     },
   });
@@ -46,6 +47,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
     : {};
 
   const isPaid = job.order?.status === "PAID";
+  const isPendingManual = job.order?.status === "PENDING" && job.order?.gateway === "MANUAL";
   const walletBalance = user?.walletBalance || 0;
 
   return (
@@ -83,7 +85,25 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         </div>
       )}
 
-      {job.status === "COMPLETED" && !isPaid && (
+      {isPendingManual && (
+        <div style={{
+          padding: "var(--space-4) var(--space-5)",
+          background: "rgba(99,102,241,0.08)",
+          border: "1px solid var(--brand-primary)",
+          borderRadius: "var(--radius-md)",
+          color: "var(--brand-primary)",
+          display: "flex",
+          alignItems: "center",
+          gap: "var(--space-3)"
+        }}>
+          <RefreshCw size={20} className="animate-spin" />
+          <span style={{ fontWeight: 600 }}>
+             Payment Pending Verification. {job.order?.proofUrl ? "We have received your receipt and are reviewing it." : "Please upload your transfer receipt below to speed up the process."}
+          </span>
+        </div>
+      )}
+
+      {job.status === "COMPLETED" && !isPaid && !isPendingManual && (
         <div style={{
           padding: "var(--space-4) var(--space-5)",
           background: "rgba(255,193,7,0.08)",
@@ -153,12 +173,26 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <div className="flex-col gap-5">
            {/* Payment Trigger if Pending */}
            {!isPaid && job.order && (
-              <OrderPaymentAction 
-                jobId={job.id}
-                orderId={job.order.id}
-                totalAmount={job.order.total}
-                walletBalance={walletBalance}
-              />
+               isPendingManual ? (
+                   <div className="glass-card flex-col gap-4" style={{ padding: "var(--space-6)", border: "1px solid var(--brand-primary)" }}>
+                       <h4 style={{ margin: 0, fontSize: "1rem" }} className="flex items-center gap-2">
+                           <CreditCard size={18} className="text-primary" /> Manual Payment Details
+                       </h4>
+                       <p className="text-sm text-secondary">
+                           You've notified us of a bank transfer for this order. Status: <strong>AWAITING VERIFICATION</strong>.
+                       </p>
+                       {!job.order.proofUrl && (
+                           <ReceiptUploadButton type="ORDER" id={job.order.id} />
+                       )}
+                   </div>
+               ) : (
+                <OrderPaymentAction 
+                    jobId={job.id}
+                    orderId={job.order.id}
+                    totalAmount={job.order.total}
+                    walletBalance={walletBalance}
+                />
+               )
            )}
 
           <div className="glass-card" style={{ padding: "var(--space-6)" }}>

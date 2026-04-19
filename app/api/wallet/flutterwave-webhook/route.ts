@@ -23,6 +23,15 @@ export async function POST(req: NextRequest) {
       const paidAmount = amount;
 
       if (meta.type === "WALLET_FUNDING") {
+        // Idempotency check
+        const existingTx = await prisma.walletTransaction.findUnique({
+            where: { reference: tx_ref }
+        });
+
+        if (existingTx && existingTx.status === "SUCCESS") {
+            return NextResponse.json({ received: true, message: "Duplicate transaction" });
+        }
+
         await prisma.$transaction(async (tx) => {
           const user = await tx.user.update({
             where: { id: userId },
@@ -43,6 +52,15 @@ export async function POST(req: NextRequest) {
         });
       } else if (meta.type === "order_payment") {
         const { orderId, walletDeducted } = meta;
+
+        // Idempotency check
+        const existingOrder = await prisma.order.findUnique({
+            where: { id: orderId }
+        });
+
+        if (existingOrder && existingOrder.status === "PAID") {
+            return NextResponse.json({ received: true, message: "Order already paid" });
+        }
 
         await prisma.$transaction(async (tx) => {
           // 1. Deduct from wallet if mixed

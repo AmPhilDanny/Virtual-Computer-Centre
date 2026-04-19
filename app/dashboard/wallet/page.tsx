@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { CreditCard, ArrowUpRight, ArrowDownLeft, PlusCircle, RefreshCw, History } from "lucide-react";
 import FundWalletModal from "@/components/modals/FundWalletModal";
+import ReceiptUploadButton from "@/components/order/ReceiptUploadButton";
 
 export default function WalletPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,8 +29,7 @@ export default function WalletPage() {
     // Check for success status in URL after Paystack redirect
     const params = new URLSearchParams(window.location.search);
     if (params.get("status") === "success") {
-       // Optional: show a toast or refresh data
-       setTimeout(fetchWalletData, 2000); // Wait a bit for webhook to process
+       setTimeout(fetchWalletData, 2000); 
     }
   }, []);
 
@@ -90,25 +90,47 @@ export default function WalletPage() {
                  <tr>
                    <th>Date</th>
                    <th>Description</th>
-                   <th>Type</th>
+                   <th>Status</th>
                    <th>Amount</th>
-                   <th>Balance After</th>
+                   <th>Action / Info</th>
                  </tr>
                </thead>
                <tbody>
                  {transactions.map((t: any) => (
                    <tr key={t.id}>
                      <td>{new Date(t.createdAt).toLocaleDateString()}</td>
-                     <td>{t.description || "N/A"}</td>
-                     <td>
-                        <span className={`badge badge-${t.type === 'CREDIT' ? 'success' : 'danger'}`}>
-                          {t.type}
-                        </span>
+                     <td style={{ maxWidth: "240px" }}>
+                        <div className="flex-col">
+                            <span className="font-medium">{t.description || "N/A"}</span>
+                            {t.gateway && <span className="text-[0.65rem] text-muted uppercase font-bold">{t.gateway}</span>}
+                        </div>
                      </td>
-                     <td style={{ fontWeight: 600, color: t.type === 'CREDIT' ? 'var(--brand-success)' : 'var(--brand-danger)' }}>
+                     <td>
+                        <div className="flex-col gap-1 items-start">
+                             <span className={`badge badge-${
+                                t.status === 'SUCCESS' ? 'success' : 
+                                t.status === 'PENDING' ? 'warning' : 'danger'
+                             }`}>
+                                {t.status}
+                             </span>
+                        </div>
+                     </td>
+                     <td style={{ fontWeight: 800, color: t.type === 'CREDIT' ? 'var(--brand-success)' : 'var(--brand-danger)' }}>
                         {t.type === 'CREDIT' ? '+' : '-'} ₦{t.amount.toLocaleString()}
                      </td>
-                     <td>₦{t.balanceAfter.toLocaleString()}</td>
+                     <td>
+                        {t.status === 'PENDING' && t.gateway === 'MANUAL' ? (
+                            t.proofUrl ? (
+                                <span className="text-xs text-success font-bold flex items-center gap-1">
+                                   <RefreshCw size={12} className="animate-spin" /> Verifying...
+                                </span>
+                            ) : (
+                                <ReceiptUploadButton type="WALLET" id={t.id} onSuccess={fetchWalletData} />
+                            )
+                        ) : (
+                            <span className="text-xs text-muted">₦{t.balanceAfter.toLocaleString()} (Bal)</span>
+                        )}
+                     </td>
                    </tr>
                  ))}
                </tbody>
@@ -116,6 +138,7 @@ export default function WalletPage() {
            </div>
          )}
       </div>
+    </div>
 
       <FundWalletModal 
         isOpen={isModalOpen} 

@@ -127,34 +127,52 @@ function VerificationCard({ item, type, onAction, processing }: any) {
     const user = item.user;
 
     return (
-        <div className="glass-card flex items-center justify-between p-6 gap-6 hover-lift border-subtle">
+        <div className="glass-card flex items-center justify-between p-6 gap-6 hover-lift border-subtle" style={{ minHeight: "120px" }}>
             <div className="flex items-center gap-6 flex-1">
-                <div className={`p-4 rounded-2xl ${isOrder ? 'bg-indigo-subtle' : 'bg-primary-subtle'}`}>
-                    {isOrder ? <Landmark size={24} className="text-indigo" /> : <Wallet size={24} className="text-primary" />}
+                <div className={`p-4 rounded-full ${isOrder ? 'bg-indigo-subtle text-indigo' : 'bg-primary-subtle text-primary'}`}>
+                    {isOrder ? <Landmark size={24} /> : <Wallet size={24} />}
                 </div>
                 
-                <div className="flex-col gap-1 flex-1">
-                    <div className="flex items-center gap-2">
-                        <span style={{ fontWeight: 700, fontSize: "1rem" }}>{title}</span>
-                        <span className="badge badge-warning">PENDING</span>
+                <div className="flex-col gap-2 flex-1">
+                    <div className="flex items-center gap-3">
+                        <span style={{ fontWeight: 800, fontSize: "1.1rem" }}>{title}</span>
+                        <span className="badge badge-warning" style={{ fontSize: "0.7rem" }}>PENDING</span>
+                        {!item.proofUrl && (
+                            <span className="flex items-center gap-1 text-[0.65rem] font-bold text-danger bg-danger-subtle px-2 py-0.5 rounded-full uppercase">
+                                <AlertCircle size={10} /> No Proof Yet
+                            </span>
+                        )}
                     </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-secondary">
-                        <span className="flex items-center gap-1"><User size={14} /> {user.name} ({user.email})</span>
-                        <span className="flex items-center gap-1"><Calendar size={14} /> {new Date(item.createdAt).toLocaleString()}</span>
-                        {isOrder && <span className="text-indigo">Job: {item.job?.title}</span>}
+                        <span className="flex items-center gap-1"><User size={14} className="text-muted" /> <strong className="text-primary">{user.name}</strong> ({user.email})</span>
+                        <span className="flex items-center gap-1"><Calendar size={14} className="text-muted" /> {new Date(item.createdAt).toLocaleString()}</span>
                     </div>
-                    {item.proofUrl && (
-                        <a href={item.proofUrl} target="_blank" className="flex items-center gap-1 text-xs text-primary font-semibold mt-2">
-                            <ExternalLink size={12} /> View Uploaded Proof
-                        </a>
-                    )}
+                    
+                    <div className="flex items-center gap-3 mt-1">
+                        {isOrder && (
+                            <span className="text-xs bg-surface-elevated px-2 py-1 rounded text-secondary border border-subtle">
+                                <strong className="text-primary">Job:</strong> {item.job?.title}
+                            </span>
+                        )}
+                        {item.proofUrl ? (
+                            <a 
+                              href={item.proofUrl} 
+                              target="_blank" 
+                              className="flex items-center gap-1.5 text-xs text-primary font-bold hover:underline"
+                            >
+                                <ExternalLink size={14} /> View Payment Receipt
+                            </a>
+                        ) : (
+                            <span className="text-xs text-muted italic">Waiting for client to upload receipt...</span>
+                        )}
+                    </div>
                 </div>
 
-                <div className="flex-col items-end gap-1">
-                    <span style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--text-primary)" }}>
+                <div className="flex-col items-end gap-1 px-6 border-l border-subtle">
+                    <span className="text-xs text-muted uppercase font-bold tracking-wider">Amount</span>
+                    <span style={{ fontSize: "1.5rem", fontWeight: 900, color: "var(--brand-primary)" }}>
                         ₦{amount.toLocaleString()}
                     </span>
-                    <span className="text-xs text-muted">Requested Amount</span>
                 </div>
             </div>
 
@@ -162,9 +180,10 @@ function VerificationCard({ item, type, onAction, processing }: any) {
                 <button 
                   className="btn btn-ghost text-danger border-danger hover:bg-danger hover:text-white px-4"
                   onClick={() => onAction(type, item.id, 'REJECT')}
+                  title="Reject Payment"
                   disabled={processing}
                 >
-                    <X size={18} />
+                    <X size={20} />
                 </button>
                 <button 
                   className="btn btn-primary px-6 gap-2"

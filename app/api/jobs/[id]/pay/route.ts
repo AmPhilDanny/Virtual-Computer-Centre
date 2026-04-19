@@ -78,6 +78,18 @@ export async function POST(
     }
 
     if (paymentMethod === "MANUAL") {
+      // Check if order is already PAID or handled
+      if (order.status === "PAID") {
+          return NextResponse.json({ error: "Order is already paid" }, { status: 400 });
+      }
+
+      if (order.status === "PENDING" && order.gateway === "MANUAL") {
+          return NextResponse.json({ 
+            success: true, 
+            message: "You have already notified us of this transfer. We are currently verifying it." 
+          });
+      }
+
       // Mark as pending manual verification
       await prisma.order.update({
         where: { id: order.id },

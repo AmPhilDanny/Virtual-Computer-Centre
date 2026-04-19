@@ -53,7 +53,25 @@ export async function POST(req: NextRequest) {
       return acc;
     }, {} as Record<string, string>);
 
-    if (gateway === "manual") {
+    if (gateway === "MANUAL") {
+      // Check for existing pending transaction for this user and amount to prevent duplicates
+      const existingPending = await prisma.walletTransaction.findFirst({
+          where: {
+              userId: (session.user as any).id,
+              amount: amount,
+              status: "PENDING",
+              gateway: "MANUAL"
+          }
+      });
+
+      if (existingPending) {
+          return NextResponse.json({ 
+              success: true, 
+              message: "You already have a pending funding request for this amount. Please wait for verification.",
+              transaction: existingPending
+          });
+      }
+
       // Create a PENDING transaction for manual verification
       const transaction = await prisma.walletTransaction.create({
         data: {
@@ -62,6 +80,7 @@ export async function POST(req: NextRequest) {
           balanceAfter: (session.user as any).walletBalance || 0, // Doesn't change yet
           type: "CREDIT",
           status: "PENDING",
+          gateway: "MANUAL",
           reference: `MAN-${Date.now()}`,
           description: `Manual Wallet Funding (Pending Verification)`
         }
