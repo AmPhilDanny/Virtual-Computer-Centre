@@ -9,7 +9,6 @@ import { Sun, Moon, LogOut, User as UserIcon, LogIn } from "lucide-react";
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "Services", href: "/#services" },
-  { label: "AI Tutor", href: "/dashboard/tutor" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ];
@@ -91,7 +90,6 @@ export default function Navbar() {
             padding: "var(--space-2)",
             width: "36px",
             height: "36px",
-            display: "flex",
             alignItems: "center",
             justifyContent: "center",
             color: "var(--text-primary)",

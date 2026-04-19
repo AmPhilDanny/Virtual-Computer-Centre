@@ -82,6 +82,11 @@ export default function DashboardLayout({
             </Link>
           </li>
           <li>
+            <Link href="/dashboard/tutor" className={isActive("/dashboard/tutor") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
+              <span className="nav-icon" style={{ fontSize: "1.1rem" }}>🤖</span> AI Tutor
+            </Link>
+          </li>
+          <li>
             <Link href="/dashboard/wallet" className={isActive("/dashboard/wallet") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <CreditCard className="nav-icon" /> Wallet
             </Link>

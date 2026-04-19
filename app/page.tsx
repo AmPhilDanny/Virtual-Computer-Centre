@@ -278,7 +278,7 @@ export default function HomePage() {
               <Link href="/auth/register" className="btn btn-lg" style={{ background: "#fff", color: "var(--brand-primary)", fontWeight: 700 }}>
                 Start Free Today
               </Link>
-              <Link href="/services" className="btn btn-lg btn-secondary" style={{ borderColor: "rgba(255,255,255,0.5)", color: "#fff" }}>
+              <Link href="/services" className="btn btn-lg" style={{ background: "rgba(255,255,255,0.15)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.5)", backdropFilter: "blur(8px)" }}>
                 Browse Services
               </Link>
             </div>
