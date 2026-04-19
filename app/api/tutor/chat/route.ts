@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateTutorResponse } from "@/lib/ai/tutorAgent";
 import { NextResponse } from "next/server";
+import { convertToModelMessages } from "ai";
 
 export async function POST(req: Request) {
   try {
@@ -47,7 +48,7 @@ export async function POST(req: Request) {
 
     // 4. Return Data Stream Response with persistence
     const result = await generateTutorResponse(
-      messages,
+      await convertToModelMessages(messages),
       { name: user?.name, ...((user?.studentProfile as any) || {}) },
       material.extractedText || "",
       sessionData.learningPatterns
