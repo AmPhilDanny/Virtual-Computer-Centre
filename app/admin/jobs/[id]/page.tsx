@@ -288,24 +288,85 @@ export default function AdminJobDetailPage() {
               <BrainCircuit size={16} /> Deliverable / AI Output
             </h3>
             <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "var(--space-3)" }}>
-              This is what the client will see and download when the job is marked <strong>Completed</strong>. You can write it manually or run the AI Agent to auto-generate it.
+              Write manually or paste AI-generated text. Clients will see this as their "main content".
             </p>
             <textarea
               className="form-textarea"
-              rows={14}
-              placeholder="AI output will appear here automatically after running the AI Agent. You can also type or paste the completed work here manually..."
+              rows={10}
+              placeholder="Paste AI text or write manually..."
               value={aiOutput}
               onChange={(e) => setAiOutput(e.target.value)}
-              style={{ fontFamily: "monospace", fontSize: "0.85rem" }}
+              style={{ fontFamily: "monospace", fontSize: "0.85rem", marginBottom: "var(--space-4)" }}
             />
+
+            {/* Admin Upload Section */}
+            <div style={{ 
+              border: "2px dashed var(--border-medium)", 
+              borderRadius: "var(--radius-lg)", 
+              padding: "var(--space-5)",
+              textAlign: "center",
+              background: "rgba(108, 71, 255, 0.03)"
+            }}>
+              <h4 style={{ fontSize: "0.875rem", marginBottom: "var(--space-2)" }}>Attach Finished Documents</h4>
+              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "var(--space-4)" }}>
+                Upload PDF, Word, or other files for the client to download.
+              </p>
+              
+              <input
+                type="file"
+                id="admin-upload"
+                multiple
+                hidden
+                onChange={async (e) => {
+                  const files = e.target.files;
+                  if (!files || files.length === 0) return;
+                  
+                  const { upload } = await import("@vercel/blob/client");
+                  
+                  setSaving(true);
+                  try {
+                    const newUrls: string[] = [];
+                    for (const file of Array.from(files)) {
+                      const blob = await upload(file.name, file, {
+                        access: "public",
+                        handleUploadUrl: "/api/jobs/upload",
+                      });
+                      newUrls.push(blob.url);
+                    }
+                    
+                    // Update job attachments with new URLs
+                    const updatedAttachments = [...(job.attachments || []), ...newUrls];
+                    
+                    const res = await fetch(`/api/admin/jobs/${id}`, {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ attachments: updatedAttachments }),
+                    });
+                    
+                    if (res.ok) {
+                      setMsg({ type: "success", text: "Files uploaded and attached successfully." });
+                      fetchJob();
+                    }
+                  } catch (err) {
+                    setMsg({ type: "error", text: "Failed to upload files." });
+                  } finally {
+                    setSaving(false);
+                  }
+                }}
+              />
+              <label htmlFor="admin-upload" className="btn btn-ghost btn-sm" style={{ cursor: "pointer" }}>
+                <Paperclip size={14} /> {saving ? "Uploading..." : "Click to Upload Files"}
+              </label>
+            </div>
+
             {aiOutput && (
-              <div className="flex gap-2 mt-3">
+              <div className="flex gap-2 mt-4">
                 <button
                   onClick={handleSave}
                   className="btn btn-primary btn-sm"
                   disabled={saving}
                 >
-                  <CheckCircle size={14} /> Save & Mark Completed
+                  <CheckCircle size={14} /> Update Text Content
                 </button>
               </div>
             )}

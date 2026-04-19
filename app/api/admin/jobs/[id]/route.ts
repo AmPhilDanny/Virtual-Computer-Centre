@@ -36,7 +36,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
   const { id } = await params;
   const body = await req.json();
-  const { status, adminNotes, aiOutput, completedAt } = body;
+  const { status, adminNotes, aiOutput, attachments, completedAt } = body;
 
   const updated = await prisma.job.update({
     where: { id },
@@ -44,6 +44,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       ...(status ? { status } : {}),
       ...(adminNotes !== undefined ? { adminNotes } : {}),
       ...(aiOutput !== undefined ? { aiOutput } : {}),
+      ...(attachments !== undefined ? { attachments } : {}),
       ...(status === "COMPLETED" ? { completedAt: new Date() } : {}),
     },
   });

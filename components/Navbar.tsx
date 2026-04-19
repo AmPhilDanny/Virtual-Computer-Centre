@@ -47,37 +47,38 @@ export default function Navbar() {
         </ul>
 
         {/* Actions */}
-        <div className="navbar-actions">
+        <div className="navbar-actions" style={{ gap: "var(--space-2)" }}>
           <button 
             onClick={toggleTheme}
             className="btn btn-ghost btn-sm"
-            style={{ padding: "8px", borderRadius: "10px", width: "40px", height: "40px" }}
+            style={{ padding: "8px", borderRadius: "10px", width: "36px", height: "36px" }}
             aria-label="Toggle theme"
           >
-            {theme === "dark" ? <Moon size={18} /> : <Sun size={18} />}
+            {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}
           </button>
           
           {status === "authenticated" ? (
             <>
-              <Link href="/dashboard" className="btn btn-ghost btn-sm flex items-center gap-2">
-                <UserIcon size={18} /> Dashboard
+              <Link href="/dashboard" className="btn btn-ghost btn-sm flex items-center gap-2" style={{ padding: "0 var(--space-3)" }}>
+                <UserIcon size={16} /> <span className="hide-on-xs">Dashboard</span>
               </Link>
               <button 
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="btn btn-secondary btn-sm flex items-center gap-2"
+                className="btn btn-secondary btn-sm flex items-center gap-1"
+                style={{ padding: "0 var(--space-3)" }}
               >
-                <LogOut size={18} /> Logout
+                <LogOut size={16} /> <span className="hide-on-xs">Exit</span>
               </button>
             </>
           ) : (
-            <>
-              <Link href="/auth/login" className="btn btn-secondary btn-sm">
-                Sign In
+            <div className="flex gap-2">
+              <Link href="/auth/login" className="btn btn-secondary btn-sm" style={{ padding: "0 var(--space-3)", fontSize: "0.8rem" }}>
+                Login
               </Link>
-              <Link href="/auth/register" className="btn btn-primary btn-sm">
-                Get Started
+              <Link href="/auth/register" className="btn btn-primary btn-sm" style={{ padding: "0 var(--space-4)", fontSize: "0.8rem" }}>
+                Join
               </Link>
-            </>
+            </div>
           )}
         </div>
 
@@ -91,9 +92,13 @@ export default function Navbar() {
             border: "1px solid var(--border-subtle)",
             borderRadius: "var(--radius-md)",
             padding: "var(--space-2)",
+            width: "36px",
+            height: "36px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             color: "var(--text-primary)",
             cursor: "pointer",
-            fontSize: "1.2rem",
           }}
         >
           {menuOpen ? "✕" : "☰"}

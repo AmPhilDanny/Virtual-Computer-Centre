@@ -33,37 +33,74 @@ export async function POST(req: NextRequest) {
     if (event === "charge.success") {
       const { amount, reference, metadata } = data;
       const userId = metadata.userId;
-      const fundedAmount = amount / 100; // Convert Kobo to Naira
+      const paidAmount = amount / 100;
 
-      // Atomic Balance Update & Transaction Log
-      await prisma.$transaction(async (tx) => {
-        const user = await tx.user.update({
-          where: { id: userId },
-          data: { walletBalance: { increment: fundedAmount } }
+      if (metadata.type === "WALLET_FUNDING") {
+        // Atomic Balance Update & Transaction Log
+        await prisma.$transaction(async (tx) => {
+          const user = await tx.user.update({
+            where: { id: userId },
+            data: { walletBalance: { increment: paidAmount } }
+          });
+
+          await tx.walletTransaction.create({
+            data: {
+              userId,
+              amount: paidAmount,
+              balanceAfter: user.walletBalance,
+              type: "CREDIT",
+              reference: reference,
+              description: "Wallet Funding via Paystack"
+            }
+          });
         });
+      } else if (metadata.type === "order_payment") {
+        const { orderId, walletDeducted } = metadata;
 
-        await tx.walletTransaction.create({
-          data: {
-            userId,
-            amount: fundedAmount,
-            balanceAfter: user.walletBalance,
-            type: "CREDIT",
-            reference: reference,
-            description: "Wallet Funding via Paystack"
+        await prisma.$transaction(async (tx) => {
+          // 1. Deduct from wallet if mixed
+          let currentBalanceAdjustment = 0;
+          if (walletDeducted > 0) {
+            const user = await tx.user.update({
+              where: { id: userId },
+              data: { walletBalance: { decrement: walletDeducted } }
+            });
+            currentBalanceAdjustment = user.walletBalance;
+
+            await tx.walletTransaction.create({
+              data: {
+                userId,
+                amount: walletDeducted,
+                balanceAfter: currentBalanceAdjustment,
+                type: "DEBIT",
+                reference: `ORDER-PARTIAL-${orderId}`,
+                description: `Partial payment (wallet) for Order #${orderId.slice(-6).toUpperCase()}`
+              }
+            });
           }
-        });
 
-        // Audit Log
-        await tx.auditLog.create({
-          data: {
-            actor: "system",
-            action: "WALLET_FUNDED",
-            entity: "User",
-            entityId: userId,
-            metadata: { amount: fundedAmount, reference }
-          }
+          // 2. Mark order as PAID
+          await tx.order.update({
+            where: { id: orderId },
+            data: { 
+              status: "PAID", 
+              gateway: walletDeducted > 0 ? "MIXED" : "PAYSTACK",
+              reference: reference
+            }
+          });
+
+          // 3. Audit Log
+          await tx.auditLog.create({
+            data: {
+              actor: "system",
+              action: "ORDER_PAID",
+              entity: "Order",
+              entityId: orderId,
+              metadata: { paidAmount, walletDeducted, reference }
+            }
+          });
         });
-      });
+      }
     }
 
     return NextResponse.json({ received: true });
