@@ -18,6 +18,7 @@ export default function OrderPaymentAction({
 }: OrderPaymentActionProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [receipt, setReceipt] = useState<File | null>(null);
   const [showManualInfo, setShowManualInfo] = useState(false);
   const [bankDetails, setBankDetails] = useState<{ bankName: string; accountName: string; accountNumber: string } | null>(null);
@@ -38,6 +39,7 @@ export default function OrderPaymentAction({
     if (loading) return;
     setLoading(true);
     setError(null);
+    setSuccess(null);
 
     let walletAmount = 0;
     if (method === "MIXED") {
@@ -74,9 +76,11 @@ export default function OrderPaymentAction({
         }
 
         if (method === "MANUAL") {
-            alert(data.message || "Payment notification sent. Please wait for admin verification.");
+            setSuccess(data.message || "Payment notification sent. Please wait for admin verification.");
+            setLoading(false);
+        } else {
+            window.location.reload(); 
         }
-        window.location.reload(); 
       } else {
         throw new Error(data.error || "Payment failed");
       }
@@ -130,6 +134,17 @@ export default function OrderPaymentAction({
           color: "var(--brand-danger)", fontSize: "0.875rem"
         }}>
           {error}
+        </div>
+      )}
+
+      {success && (
+        <div style={{ 
+          padding: "var(--space-4)", background: "rgba(0,200,83,0.1)", 
+          border: "1px solid var(--brand-success)", borderRadius: "var(--radius-md)",
+          color: "var(--brand-success)", fontSize: "0.875rem", textAlign: "center"
+        }} className="flex-col gap-2">
+            <CheckCircle size={24} className="mx-auto" />
+            <span style={{ fontWeight: 600 }}>{success}</span>
         </div>
       )}
 

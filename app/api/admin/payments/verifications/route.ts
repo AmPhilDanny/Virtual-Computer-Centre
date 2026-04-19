@@ -9,25 +9,40 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // DEBUG LOG: Start fetching
+    console.log("[ADMIN_VERIFY] Fetching pending payments...");
+
     // Fetch pending wallet transactions
     const walletPending = await prisma.walletTransaction.findMany({
-      where: { status: "PENDING" },
+      where: { 
+        status: "PENDING",
+        type: "CREDIT"
+      },
       include: { user: { select: { name: true, email: true } } },
       orderBy: { createdAt: "desc" }
     });
 
-    // Fetch orders with MANUAL gateway and PENDING status
-    const manualOrders = await prisma.order.findMany({
-      where: { gateway: "MANUAL", status: "PENDING" },
+    // Fetch ALL pending orders and filter manually to be case-insensitive and catch nulls
+    const allPendingOrders = await prisma.order.findMany({
+      where: { status: "PENDING" },
       include: { user: { select: { name: true, email: true } }, job: true },
       orderBy: { createdAt: "desc" }
     });
+
+    // Filter for Manual orders (Case-insensitive)
+    const manualOrders = allPendingOrders.filter(order => {
+        const gateway = (order.gateway || "").toUpperCase();
+        return gateway === "MANUAL" || gateway === ""; // Allow empty gateway for legacy manual notifications
+    });
+
+    console.log(`[ADMIN_VERIFY] Found ${walletPending.length} wallet requests and ${manualOrders.length} manual orders.`);
 
     return NextResponse.json({
       walletPending,
       manualOrders
     });
   } catch (error) {
+    console.error("[ADMIN_VERIFY] GET Error:", error);
     return NextResponse.json({ error: "Failed to fetch verifications" }, { status: 500 });
   }
 }

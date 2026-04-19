@@ -15,6 +15,7 @@ export default function FundWalletModal({ isOpen, onClose, onSuccess }: FundWall
   const [gateway, setGateway] = useState<"PAYSTACK" | "FLUTTERWAVE" | "MANUAL">("PAYSTACK");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [bankDetails, setBankDetails] = useState<any>(null);
   const [receipt, setReceipt] = useState<File | null>(null);
 
@@ -36,6 +37,7 @@ export default function FundWalletModal({ isOpen, onClose, onSuccess }: FundWall
 
     setLoading(true);
     setError(null);
+    setSuccess(null);
 
     try {
       const res = await fetch("/api/wallet", {
@@ -65,9 +67,9 @@ export default function FundWalletModal({ isOpen, onClose, onSuccess }: FundWall
             });
         }
 
-        onSuccess();
-        onClose();
-        alert(data.message || "Request submitted successfully.");
+        setSuccess(data.message || "Request submitted! Please wait for admin verification.");
+        setLoading(false);
+        if (onSuccess) onSuccess();
       } else {
         throw new Error(data.error || "Failed to initialize payment");
       }
@@ -200,18 +202,33 @@ export default function FundWalletModal({ isOpen, onClose, onSuccess }: FundWall
 
               {error && (
                 <div className="bg-danger-subtle p-3 rounded-lg border border-danger text-danger text-sm">
-                {error}
+                  {error}
                 </div>
               )}
 
-              <div className="flex gap-3">
-                <button className="btn btn-ghost flex-1 py-4" onClick={() => setStep(1)} disabled={loading}>
-                    Back
-                </button>
-                <button className="btn btn-primary flex-1 py-4" onClick={handleFund} disabled={loading}>
-                    {loading ? <Loader2 className="animate-spin" /> : "Complete Process"}
-                </button>
-              </div>
+              {success && (
+                <div className="text-success bg-success-subtle p-4 rounded-xl text-sm flex flex-col items-center gap-2 border border-success">
+                  <CheckCircle2 size={24} />
+                  <span className="font-bold">{success}</span>
+                  <button 
+                    className="btn btn-ghost btn-sm mt-2" 
+                    onClick={() => { setSuccess(null); onClose(); }}
+                  >
+                      Close Modal
+                  </button>
+                </div>
+              )}
+
+              {!success && (
+                <div className="flex gap-3 mt-4">
+                  <button className="btn btn-ghost flex-1 py-4" onClick={() => setStep(1)} disabled={loading}>
+                      Back
+                  </button>
+                  <button className="btn btn-primary flex-1 py-4 flex items-center justify-center gap-2" onClick={handleFund} disabled={loading}>
+                      {loading ? <Loader2 className="animate-spin" size={18} /> : "Complete Process"}
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>
