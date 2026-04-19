@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useChat } from "ai/react";
+import { useChat } from "@ai-sdk/react";
 import { 
   BookOpen, Upload, Send, Bot, User, 
   FileText, Plus, AlertCircle, CheckCircle2, 
