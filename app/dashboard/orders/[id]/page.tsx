@@ -305,7 +305,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                       <div className="flex-col gap-2">
                         {job.attachments.map((url: string, i: number) => {
                           const fileName = url.split("/").pop() || `Deliverable_${i+1}`;
-                          const isLikelyDeliverable = i >= (job.formData?.original_attachment_count || 0); // Logic helper
+                          const isLikelyDeliverable = i >= (formData.original_attachment_count || 0); // Logic helper
                           
                           return (
                             <a
