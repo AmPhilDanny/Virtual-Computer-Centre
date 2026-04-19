@@ -222,7 +222,9 @@ export default function TutorClient({ materials: initialMaterials, subscription,
                  {m.role === "user" ? <User size={16} /> : <Bot size={16} />}
                </div>
                <div className={`p-4 rounded-2xl max-w-[85%] shadow-sm ${m.role === "user" ? "bg-primary text-white rounded-tr-none" : "bg-subtle text-primary rounded-tl-none border border-subtle"}`} style={{ fontSize: "0.95rem", lineHeight: 1.6 }}>
-                  {m.content}
+                  {m.parts.map((part, i) => (
+                    part.type === "text" ? <span key={i}>{part.text}</span> : null
+                  ))}
                </div>
             </div>
           ))}
