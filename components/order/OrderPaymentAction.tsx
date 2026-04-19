@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, Wallet, Loader2, ArrowRight, ShieldCheck } from "lucide-react";
+import { CreditCard, Wallet, Loader2, ArrowRight, ShieldCheck, CheckCircle } from "lucide-react";
 
 interface OrderPaymentActionProps {
   jobId: string;
