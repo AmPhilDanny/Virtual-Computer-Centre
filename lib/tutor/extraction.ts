@@ -1,11 +1,10 @@
-import { PDFParse } from "pdf-parse";
-import mammoth from "mammoth";
+const pdfParse = require("pdf-parse");
+const mammoth = require("mammoth");
 
 export async function extractText(buffer: Buffer, mimeType: string): Promise<string> {
   try {
     if (mimeType === "application/pdf") {
-      const parser = new PDFParse({ data: buffer });
-      const data = await parser.getText();
+      const data = await pdfParse(buffer);
       return data.text;
     } else if (
       mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
