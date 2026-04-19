@@ -29,11 +29,20 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
     },
   });
 
+  // Security: ensure the job belongs to this user
+  if (!job || job.userId !== userId) notFound();
+
   // Fetch wallet balance for payment options
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { walletBalance: true }
   });
+
+  const formData = job.formData
+    ? typeof job.formData === "string"
+      ? JSON.parse(job.formData)
+      : (job.formData as Record<string, any>)
+    : {};
 
   const isPaid = job.order?.status === "PAID";
   const walletBalance = user?.walletBalance || 0;
