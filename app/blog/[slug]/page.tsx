@@ -6,6 +6,8 @@ import { ArrowLeft, Calendar } from "lucide-react";
 import Link from "next/link";
 import CommentSection from "@/components/blog/CommentSection";
 import type { Metadata } from "next";
+import { marked } from "marked";
+import DOMPurify from "isomorphic-dompurify";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -90,8 +92,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               color: "var(--text-primary)"
             }}
           >
-            {/* Simple Markdown-to-HTML conversion for now */}
-            <div dangerouslySetInnerHTML={{ __html: post.content?.replace(/\n\n/g, '<p style="margin-bottom: 2rem"></p>').replace(/\n/g, '<br/>') || "" }} />
+            {/* Full Markdown Rendering */}
+            <div 
+              className="prose prose-lg dark:prose-invert max-w-none" 
+              dangerouslySetInnerHTML={{ 
+                __html: DOMPurify.sanitize(marked.parse(post.content || "") as string) 
+              }} 
+            />
           </div>
 
           <hr className="mb-12 border-subtle" />

@@ -32,7 +32,8 @@ export async function POST(req: NextRequest) {
       discountValue, 
       minAmount, 
       expiresAt, 
-      maxUses 
+      maxUses,
+      isFeatured 
     } = body;
 
     const coupon = await prisma.coupon.create({
@@ -43,6 +44,7 @@ export async function POST(req: NextRequest) {
         minAmount: parseFloat(minAmount || 0),
         expiresAt: expiresAt ? new Date(expiresAt) : null,
         maxUses: maxUses ? parseInt(maxUses) : null,
+        isFeatured: isFeatured || false,
       }
     });
 

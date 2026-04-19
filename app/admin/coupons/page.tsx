@@ -9,9 +9,9 @@ import {
   Calendar, 
   Hash, 
   Tag,
-  AlertCircle,
   TrendingUp,
-  Clock
+  Clock,
+  Star
 } from "lucide-react";
 
 export default function CouponsPage() {
@@ -27,7 +27,8 @@ export default function CouponsPage() {
     discountValue: "",
     minAmount: "0",
     maxUses: "",
-    expiresAt: ""
+    expiresAt: "",
+    isFeatured: false
   });
 
   useEffect(() => {
@@ -64,7 +65,8 @@ export default function CouponsPage() {
           discountValue: "",
           minAmount: "0",
           maxUses: "",
-          expiresAt: ""
+          expiresAt: "",
+          isFeatured: false
         });
         fetchCoupons();
       } else {
@@ -84,6 +86,19 @@ export default function CouponsPage() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive: !currentStatus })
+      });
+      if (res.ok) fetchCoupons();
+    } catch (error) {
+      console.error("Update failed:", error);
+    }
+  };
+
+  const toggleFeatured = async (id: string, currentStatus: boolean) => {
+    try {
+      const res = await fetch(`/api/admin/coupons/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isFeatured: !currentStatus })
       });
       if (res.ok) fetchCoupons();
     } catch (error) {
@@ -181,6 +196,18 @@ export default function CouponsPage() {
                 onChange={(e) => setFormData({...formData, expiresAt: e.target.value})}
               />
             </div>
+            <div className="form-group span-2 flex items-center gap-3">
+              <input 
+                type="checkbox" 
+                id="isFeatured"
+                checked={formData.isFeatured}
+                onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})}
+                style={{ width: 18, height: 18 }}
+              />
+              <label htmlFor="isFeatured" className="form-label" style={{ margin: 0, cursor: "pointer" }}>
+                Feature this coupon on the storefront (Public Banner)
+              </label>
+            </div>
             <div className="span-2 flex justify-end gap-3 pt-4">
               <button type="button" onClick={() => setShowAddForm(false)} className="btn btn-ghost">Discard</button>
               <button type="submit" className="btn btn-primary px-10" disabled={isSubmitting}>
@@ -222,7 +249,8 @@ export default function CouponsPage() {
                   <tr key={c.id}>
                     <td>
                       <div className="flex items-center gap-2">
-                        <span className="font-mono bg-subtle px-3 py-1 rounded border border-subtle text-primary font-bold">
+                        <span className="font-mono bg-subtle px-3 py-1 rounded border border-subtle text-primary font-bold flex items-center gap-2">
+                          {c.isFeatured && <Star size={14} className="text-warning fill-warning" />}
                           {c.code}
                         </span>
                       </div>
@@ -258,6 +286,13 @@ export default function CouponsPage() {
                     </td>
                     <td style={{ textAlign: "right" }}>
                       <div className="flex justify-end gap-2">
+                        <button 
+                          onClick={() => toggleFeatured(c.id, c.isFeatured)}
+                          className={`btn btn-ghost btn-sm p-2 ${c.isFeatured ? 'text-warning' : 'text-muted'}`}
+                          title={c.isFeatured ? "Remove from Featured" : "Feature this code"}
+                        >
+                          <Star size={16} />
+                        </button>
                         <button 
                           onClick={() => handleDelete(c.id)}
                           className="btn btn-ghost btn-sm text-danger p-2"

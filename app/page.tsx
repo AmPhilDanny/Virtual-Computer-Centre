@@ -213,6 +213,63 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ======= AI TUTOR CTA ======= */}
+      <section className="section" style={{ paddingBottom: 0 }}>
+        <div className="container">
+          <div className="glass-card" style={{ 
+            background: "linear-gradient(145deg, rgba(108,71,255,0.1) 0%, rgba(30,30,40,0.8) 100%)",
+            border: "1px solid rgba(108,71,255,0.3)",
+            padding: "var(--space-10)",
+            display: "flex",
+            alignItems: "center",
+            gap: "var(--space-10)",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            position: "relative",
+            overflow: "hidden"
+          }}>
+            <div style={{ position: "absolute", top: -50, right: -50, fontSize: "15rem", opacity: 0.05 }}>🤖</div>
+            <div style={{ flex: "1 1 400px", position: "relative", zIndex: 1 }}>
+              <div className="eyebrow" style={{ color: "var(--brand-primary)" }}>New Feature</div>
+              <h2 style={{ fontSize: "2.5rem", marginBottom: "var(--space-3)" }}>
+                Meet Your Personal <span className="text-gradient">AI Tutor</span>
+              </h2>
+              <p style={{ fontSize: "1.1rem", color: "var(--text-secondary)", marginBottom: "var(--space-6)" }}>
+                Upload your textbooks, slides, and curriculums. Get 24/7 personalized tutoring tailored to your exact learning style and academic level.
+              </p>
+              <ul style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)", marginBottom: "var(--space-6)", listStyle: "none", padding: 0 }}>
+                {["Adaptive learning based on your profile", "Document analysis & quiz generation", "Always available, never gets tired"].map(item => (
+                  <li key={item} style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", color: "var(--text-primary)" }}>
+                    <span style={{ color: "var(--brand-success)" }}>✓</span> {item}
+                  </li>
+                ))}
+              </ul>
+              <div style={{ display: "flex", gap: "var(--space-4)" }}>
+                <Link href="/dashboard/tutor" className="btn btn-primary btn-lg flex items-center gap-2">
+                  Start Learning Now →
+                </Link>
+                <Link href="/auth/register" className="btn btn-secondary btn-lg">
+                  Free Trial
+                </Link>
+              </div>
+            </div>
+            <div style={{ flex: "1 1 300px", display: "flex", justifyContent: "center", position: "relative", zIndex: 1 }}>
+              <div style={{ 
+                width: "100%", 
+                maxWidth: "350px", 
+                height: "350px", 
+                borderRadius: "var(--radius-xl)", 
+                background: "url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800')", 
+                backgroundSize: "cover", 
+                backgroundPosition: "center",
+                boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
+                border: "4px solid rgba(255,255,255,0.05)"
+              }} />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ======= TESTIMONIALS ======= */}
       <section className="section">
         <div className="container">

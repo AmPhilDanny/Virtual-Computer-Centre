@@ -5,6 +5,8 @@ import {
   Bold, Italic, List, ListOrdered, Link, 
   Image as ImageIcon, Eye, Code, Save, X 
 } from "lucide-react";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
 
 interface BlogPostEditorProps {
   initialData?: {
@@ -24,11 +26,30 @@ export default function BlogPostEditor({ initialData, onSave, onCancel, loading 
     title: initialData?.title || "",
     content: initialData?.content || "",
     excerpt: initialData?.excerpt || "",
-    category: initialData?.category || "General",
+    categoryId: initialData?.category || "",
     image: initialData?.image || ""
   });
 
+  const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
   const [view, setView] = useState<"edit" | "preview">("edit");
+
+  useState(() => {
+    fetch("/api/admin/blog/categories")
+      .then(res => res.json())
+      .then(data => {
+        setCategories(data);
+        if (data.length > 0 && !initialData?.category) {
+          setData(prev => ({ ...prev, categoryId: data[0].id }));
+        }
+      });
+  });
+
+  const getCleanPreview = () => {
+    if (!data.content) return "";
+    const rawHtml = marked.parse(data.content) as string;
+    return DOMPurify.sanitize(rawHtml);
+  };
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setData({ ...data, [e.target.name]: e.target.value });
@@ -89,16 +110,14 @@ export default function BlogPostEditor({ initialData, onSave, onCancel, loading 
         <div className="form-group">
           <label className="form-label">Category</label>
           <select 
-            name="category"
+            name="categoryId"
             className="form-select" 
-            value={data.category}
+            value={data.categoryId}
             onChange={handleChange}
           >
-            <option>General</option>
-            <option>Updates</option>
-            <option>AI Insights</option>
-            <option>Tips & Tricks</option>
-            <option>Academic</option>
+            {categories.map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -153,15 +172,10 @@ export default function BlogPostEditor({ initialData, onSave, onCancel, loading 
           />
         ) : (
           <div className="flex-1 p-8 bg-white text-black rounded-2xl overflow-auto dark:bg-zinc-900 dark:text-gray-100" style={{ minHeight: "400px" }}>
-             <div className="prose prose-sm dark:prose-invert max-w-none">
-                {data.content ? (
-                  data.content.split('\n').map((line, i) => (
-                    <p key={i}>{line}</p>
-                  ))
-                ) : (
-                  <p className="text-gray-400 italic">No content to preview.</p>
-                )}
-             </div>
+             <div 
+                className="prose prose-sm dark:prose-invert max-w-none"
+                dangerouslySetInnerHTML={{ __html: getCleanPreview() || "<p class='text-gray-400 italic'>No content to preview.</p>" }}
+             />
           </div>
         )}
       </div>

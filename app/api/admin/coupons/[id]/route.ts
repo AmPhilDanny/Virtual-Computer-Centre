@@ -14,11 +14,15 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const { isActive } = body;
+    const { isActive, isFeatured } = body;
+
+    const dataToUpdate: any = {};
+    if (isActive !== undefined) dataToUpdate.isActive = isActive;
+    if (isFeatured !== undefined) dataToUpdate.isFeatured = isFeatured;
 
     const coupon = await prisma.coupon.update({
       where: { id },
-      data: { isActive }
+      data: dataToUpdate
     });
 
     return NextResponse.json(coupon);

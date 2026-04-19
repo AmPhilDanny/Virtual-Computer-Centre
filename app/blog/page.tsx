@@ -10,7 +10,7 @@ export default async function BlogPage() {
     orderBy: { createdAt: "desc" },
     include: {
       author: { select: { name: true } },
-      category: { select: { name: true } }
+      category: { select: { name: true, icon: true } }
     }
   });
 
@@ -52,7 +52,10 @@ export default async function BlogPage() {
                     )}
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="badge badge-primary">{post.category?.name || "General"}</span>
+                    <span className="badge badge-primary flex items-center gap-1">
+                      {post.category?.icon && <span>{post.category.icon}</span>}
+                      {post.category?.name || "General"}
+                    </span>
                     <div className="flex items-center gap-2 text-muted" style={{ fontSize: "0.75rem" }}>
                       <Clock size={12} /> {new Date(post.createdAt).toLocaleDateString()}
                     </div>

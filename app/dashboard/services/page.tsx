@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { ChevronRight, ArrowLeft } from "lucide-react";
+import FeaturedOffers from "@/components/FeaturedOffers";
 
 export default async function DashboardServicesPage() {
   const services = await prisma.service.findMany({
@@ -26,6 +27,8 @@ export default async function DashboardServicesPage() {
         </Link>
         <h2 style={{ fontSize: "1.25rem", margin: 0 }}>Select a Service</h2>
       </div>
+
+      <FeaturedOffers />
 
       <p className="text-secondary" style={{ marginBottom: "var(--space-8)", maxWidth: 600 }}>
         Choose the service you need from the categories below to start your order. 

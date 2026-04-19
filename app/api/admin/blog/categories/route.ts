@@ -20,11 +20,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    const { name } = await req.json();
+    const { name, icon } = await req.json();
     const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 
     const category = await prisma.blogCategory.create({
-      data: { name, slug }
+      data: { name, slug, icon }
     });
 
     return NextResponse.json(category);
