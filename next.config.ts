@@ -8,7 +8,8 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Prevent next.js from bundling node-native or complex packages
+  serverExternalPackages: ["pdf-parse", "mammoth"],
 };
 
 export default withPWA(nextConfig);
