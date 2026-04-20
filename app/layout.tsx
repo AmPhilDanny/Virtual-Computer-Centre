@@ -3,6 +3,7 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { prisma } from "@/lib/prisma";
 import PrivacyModal from "@/components/modals/PrivacyModal";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settingsList = await prisma.siteSettings.findMany();
@@ -92,6 +93,7 @@ export default async function RootLayout({
         <Providers>
           <PrivacyModal />
           {children}
+          <FloatingWhatsApp />
         </Providers>
       </body>
     </html>

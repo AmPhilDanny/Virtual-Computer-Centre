@@ -8,8 +8,10 @@ import { DefaultChatTransport } from "ai";
 import { 
   BookOpen, Upload, Send, Bot, User, 
   FileText, Plus, AlertCircle, CheckCircle2, 
-  ChevronRight, Library, Sparkles
+  ChevronRight, Library, Sparkles, MessageCircle
 } from "lucide-react";
+import { marked } from 'marked';
+import DOMPurify from 'isomorphic-dompurify';
 
 interface TutorClientProps {
   materials: any[];
@@ -155,23 +157,35 @@ export default function TutorClient({ materials: initialMaterials, subscription,
              </div>
            )}
            {materials.map((m) => (
-             <button
-               key={m.id}
-               onClick={() => setSelectedMaterial(m)}
-               className={`flex items-center gap-3 p-3 rounded-lg text-left transition-all ${selectedMaterial?.id === m.id ? "bg-primary text-white shadow-lg shadow-primary/20" : "hover:bg-subtle"}`}
-               style={{ border: "none", cursor: "pointer", width: "100%", fontSize: "0.9rem" }}
-             >
-               <FileText size={16} />
-               <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.title}</span>
-             </button>
+              <button
+                key={m.id}
+                onClick={() => setSelectedMaterial(m)}
+                className={`flex items-center gap-3 p-3 rounded-lg text-left transition-all ${
+                  selectedMaterial?.id === m.id 
+                    ? "bg-primary text-white shadow-lg shadow-primary/20 ring-2 ring-primary ring-offset-2 ring-offset-transparent" 
+                    : "hover:bg-subtle border border-transparent hover:border-border-subtle"
+                }`}
+                style={{ border: "none", cursor: "pointer", width: "100%", fontSize: "0.9rem" }}
+              >
+                <FileText size={16} />
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.title}</span>
+              </button>
            ))}
 
            {materials.length < 12 && (
-             <label className="flex items-center gap-3 p-3 rounded-lg border-dashed border-2 border-subtle hover:border-primary transition-all cursor-pointer bg-subtle/30" style={{ marginTop: "var(--space-2)" }}>
-                <Plus size={16} className="text-primary" />
-                <span style={{ fontSize: "0.9rem", fontWeight: 600 }}>{uploading ? "Uploading..." : "Add Material"}</span>
-                <input type="file" hidden onChange={onUpload} disabled={uploading} accept=".pdf,.docx,.txt" />
-             </label>
+             <div className="flex-col gap-2">
+               <label className="flex items-center gap-3 p-3 rounded-lg border-dashed border-2 border-subtle hover:border-primary transition-all cursor-pointer bg-subtle/30" style={{ marginTop: "var(--space-2)" }}>
+                  <Plus size={16} className="text-primary" />
+                  <span style={{ fontSize: "0.9rem", fontWeight: 600 }}>{uploading ? "Uploading..." : "Add Material"}</span>
+                  <input type="file" hidden onChange={onUpload} disabled={uploading} accept=".pdf,.docx,.txt" />
+               </label>
+               <div className="flex items-start gap-2 p-3 bg-info-subtle/30 rounded-lg border border-info/10">
+                  <AlertCircle size={14} className="text-info mt-0.5" />
+                  <p style={{ fontSize: "0.7rem", margin: 0, color: "var(--text-secondary)", lineHeight: 1.4 }}>
+                    Max size: 20MB. For larger files, please send them to us on <a href={`https://wa.me/${user?.contactNumber?.replace(/[^0-9]/g, '') || '2348123456789'}`} target="_blank" rel="noopener noreferrer" className="text-primary font-bold underline">WhatsApp</a>.
+                  </p>
+               </div>
+             </div>
            )}
         </div>
 
@@ -233,11 +247,17 @@ export default function TutorClient({ materials: initialMaterials, subscription,
                }}>
                  {m.role === "user" ? <User size={16} /> : <Bot size={16} />}
                </div>
-               <div className={`p-4 rounded-2xl max-w-[85%] shadow-sm ${m.role === "user" ? "bg-primary text-white rounded-tr-none" : "bg-subtle text-primary rounded-tl-none border border-subtle"}`} style={{ fontSize: "0.95rem", lineHeight: 1.6 }}>
-                  {m.parts.map((part, i) => (
-                    part.type === "text" ? <span key={i}>{part.text}</span> : null
-                  ))}
-               </div>
+                <div className={`p-4 rounded-2xl max-w-[85%] shadow-sm ${m.role === "user" ? "bg-primary text-white rounded-tr-none" : "bg-subtle text-primary rounded-tl-none border border-subtle"}`} style={{ fontSize: "0.95rem", lineHeight: 1.6 }}>
+                   {m.parts.map((part, i) => (
+                     part.type === "text" ? (
+                       <div 
+                         key={i} 
+                         className="prose prose-sm prose-invert max-w-none"
+                         dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(part.text) as string) }}
+                       />
+                     ) : null
+                   ))}
+                </div>
             </div>
           ))}
 

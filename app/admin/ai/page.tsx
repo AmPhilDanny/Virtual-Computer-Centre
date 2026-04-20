@@ -197,6 +197,18 @@ export default function AdminAIPage() {
                <div className="form-group">
                 <div className="flex justify-between items-center mb-2">
                   <label className="form-label" style={{ margin: 0 }}>Mistral AI Configuration</label>
+                  <button 
+                    type="button" 
+                    className="btn btn-ghost btn-sm"
+                    onClick={async () => {
+                      const res = await fetch("/api/admin/ai/status", { 
+                        method: "POST",
+                        body: JSON.stringify({ provider: 'mistral', apiKey: settings.mistralApiKey, model: settings.mistralModel })
+                      });
+                      const data = await res.json();
+                      alert(data.message);
+                    }}
+                  >Check Status</button>
                 </div>
                 <div className="grid-2 gap-4">
                   <input 
@@ -223,6 +235,18 @@ export default function AdminAIPage() {
                <div className="form-group">
                 <div className="flex justify-between items-center mb-2">
                   <label className="form-label" style={{ margin: 0 }}>Together AI Configuration</label>
+                  <button 
+                    type="button" 
+                    className="btn btn-ghost btn-sm"
+                    onClick={async () => {
+                      const res = await fetch("/api/admin/ai/status", { 
+                        method: "POST",
+                        body: JSON.stringify({ provider: 'togetherai', apiKey: settings.togetherApiKey, model: settings.togetherModel })
+                      });
+                      const data = await res.json();
+                      alert(data.message);
+                    }}
+                  >Check Status</button>
                 </div>
                 <div className="grid-2 gap-4">
                   <input 
@@ -248,6 +272,18 @@ export default function AdminAIPage() {
               <div className="form-group">
                 <div className="flex justify-between items-center mb-2">
                   <label className="form-label" style={{ margin: 0 }}>OpenRouter Configuration</label>
+                  <button 
+                    type="button" 
+                    className="btn btn-ghost btn-sm"
+                    onClick={async () => {
+                      const res = await fetch("/api/admin/ai/status", { 
+                        method: "POST",
+                        body: JSON.stringify({ provider: 'openrouter', apiKey: settings.openRouterApiKey, model: settings.openRouterModel })
+                      });
+                      const data = await res.json();
+                      alert(data.message);
+                    }}
+                  >Check Status</button>
                 </div>
                 <div className="grid-2 gap-4">
                   <input 

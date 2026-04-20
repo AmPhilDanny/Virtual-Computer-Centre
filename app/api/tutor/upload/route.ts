@@ -42,9 +42,9 @@ export async function POST(req: Request) {
 
     const arrayBuffer = await blobRes.arrayBuffer();
     
-    // Safety check for memory limit (5MB)
-    if (arrayBuffer.byteLength > 5 * 1024 * 1024) {
-       return new NextResponse("File too large. Maximum supported size for text extraction is 5MB.", { status: 400 });
+    // Safety check for memory limit (20MB)
+    if (arrayBuffer.byteLength > 20 * 1024 * 1024) {
+       return new NextResponse("File too large. Maximum supported size for text extraction is 20MB. For larger files, please contact us on WhatsApp.", { status: 400 });
     }
 
     const buffer = Buffer.from(arrayBuffer);
