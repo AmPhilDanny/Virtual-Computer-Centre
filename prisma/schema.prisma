@@ -49,8 +49,10 @@ model VendorProfile {
   userId         String   @unique
   storeName      String
   storeSlug      String   @unique
-  description    String   @db.Text
-  portfolioUrl   String?
+  fullName       String?
+  address        String?  @db.Text
+  idProofUrl     String?  @db.Text
+  resumeUrl      String?  @db.Text
   status         VendorStatus @default(PENDING) // PENDING, APPROVED, REJECTED, SUSPENDED
   adminNotes     String?  @db.Text
   totalEarnings  Float    @default(0)

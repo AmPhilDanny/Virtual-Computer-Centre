@@ -17,7 +17,11 @@ export default function BecomeVendorPage() {
     storeSlug: "",
     description: "",
     portfolioUrl: "",
+    fullName: "",
+    address: "",
   });
+  const [idFile, setIdFile] = useState<File | null>(null);
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") redirect("/auth/login");
@@ -43,16 +47,33 @@ export default function BecomeVendorPage() {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, files } = e.target;
+    if (files && files[0]) {
+      if (name === "idProof") setIdFile(files[0]);
+      if (name === "resume") setResumeFile(files[0]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!idFile || !resumeFile) {
+      alert("Please upload both ID Proof and Resume.");
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitStatus("idle");
 
     try {
+      const formData = new FormData();
+      Object.entries(form).forEach(([key, value]) => formData.append(key, value));
+      formData.append("idProof", idFile);
+      formData.append("resume", resumeFile);
+
       const res = await fetch("/api/vendor/apply", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: formData,
       });
 
       if (res.ok) {
@@ -60,6 +81,8 @@ export default function BecomeVendorPage() {
         const data = await res.json();
         setExistingProfile(data.profile);
       } else {
+        const errData = await res.json();
+        alert(errData.error || "Failed to submit application.");
         setSubmitStatus("error");
       }
     } catch (error) {
@@ -89,7 +112,7 @@ export default function BecomeVendorPage() {
               </div>
               <h1 style={{ margin: 0 }}>Application Under Review</h1>
               <p className="text-secondary">
-                Thanks for applying to be a vendor at {existingProfile.storeName}! Our team is currently reviewing your professional portfolio. 
+                Thanks for applying to be a vendor at {existingProfile.storeName}! Our team is currently reviewing your professional portfolio and identity documents for verification. 
                 We will update your account once approved.
               </p>
               <div className="badge badge-warning">Status: Pending Review</div>
@@ -131,75 +154,132 @@ export default function BecomeVendorPage() {
             <h1 style={{ margin: 0, fontSize: "2rem" }}>Join as a Vendor</h1>
           </div>
           <p className="text-secondary">
-            Apply to become a verified service provider on our platform. Reach more clients and manage your digital business with ease.
+            Apply to become a verified service provider on our platform. Professional verification is required to maintain platform security.
           </p>
         </div>
 
         <div className="bg-info-subtle p-6 rounded-2xl flex gap-4">
            <Info className="text-primary flex-shrink-0" size={24} />
            <div className="flex-col gap-2">
-              <h5 style={{ margin: 0, color: "var(--brand-primary)" }}>Why join the Marketplace?</h5>
-              <ul className="text-muted" style={{ fontSize: "0.85rem", paddingLeft: "1.2rem", margin: 0 }}>
-                 <li>Access to a wide pool of digital clients.</li>
-                 <li>Secure Escrow payments (80/20 split).</li>
-                 <li>Easy payout to your local bank account.</li>
-                 <li>Professional dashboard and order tracking.</li>
-              </ul>
+              <h5 style={{ margin: 0, color: "var(--brand-primary)" }}>Verification Requirements</h5>
+              <p className="text-muted" style={{ fontSize: "0.85rem", margin: 0 }}>
+                To protect our clients, all vendors must submit a valid National ID and a professional Resume. Your data is encrypted and only visible to administrators.
+              </p>
            </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-col gap-6">
-           <div className="grid-2 gap-6">
-              <div className="form-group">
-                <label className="form-label">Store / Business Name</label>
-                <input 
-                  type="text" 
-                  name="storeName" 
-                  className="form-input" 
-                  required 
-                  placeholder="e.g. Master Typists Nigeria"
-                  value={form.storeName}
-                  onChange={handleChange}
-                />
+        <form onSubmit={handleSubmit} className="flex-col gap-8">
+           <div className="flex-col gap-6">
+              <h3 style={{ fontSize: "1.1rem", borderBottom: "1px solid var(--border-subtle)", paddingBottom: "var(--space-2)" }}>Personal Information</h3>
+              <div className="grid-2 gap-6">
+                 <div className="form-group">
+                   <label className="form-label">Full Legal Name</label>
+                   <input 
+                     type="text" 
+                     name="fullName" 
+                     className="form-input" 
+                     required 
+                     placeholder="As it appears on your ID"
+                     value={form.fullName}
+                     onChange={handleChange}
+                   />
+                 </div>
+                 <div className="form-group">
+                   <label className="form-label">Portfolio URL</label>
+                   <input 
+                     type="url" 
+                     name="portfolioUrl" 
+                     className="form-input" 
+                     placeholder="https://..."
+                     value={form.portfolioUrl}
+                     onChange={handleChange}
+                   />
+                 </div>
               </div>
               <div className="form-group">
-                <label className="form-label">Store Slug (Unique ID)</label>
-                <input 
-                  type="text" 
-                  name="storeSlug" 
-                  className="form-input" 
-                  required 
-                  placeholder="e.g. master-typists"
-                  value={form.storeSlug.toLowerCase().replace(/ /g, "-")}
-                  onChange={handleChange}
-                />
+                 <label className="form-label">Home / Business Address</label>
+                 <textarea 
+                   name="address" 
+                   className="form-input" 
+                   required 
+                   placeholder="Your physical address..."
+                   style={{ minHeight: "80px" }}
+                   value={form.address}
+                   onChange={handleChange}
+                 />
               </div>
            </div>
 
-           <div className="form-group">
-              <label className="form-label">Professional Portfolio Link (URL)</label>
-              <input 
-                type="url" 
-                name="portfolioUrl" 
-                className="form-input" 
-                placeholder="https://..."
-                value={form.portfolioUrl}
-                onChange={handleChange}
-              />
-              <p className="text-muted" style={{ fontSize: "0.7rem" }}>Link to your previous work, website, or LinkedIn profile.</p>
+           <div className="flex-col gap-6">
+              <h3 style={{ fontSize: "1.1rem", borderBottom: "1px solid var(--border-subtle)", paddingBottom: "var(--space-2)" }}>Store Details</h3>
+              <div className="grid-2 gap-6">
+                 <div className="form-group">
+                   <label className="form-label">Store / Business Name</label>
+                   <input 
+                     type="text" 
+                     name="storeName" 
+                     className="form-input" 
+                     required 
+                     placeholder="e.g. Master Typists Nigeria"
+                     value={form.storeName}
+                     onChange={handleChange}
+                   />
+                 </div>
+                 <div className="form-group">
+                   <label className="form-label">Store Slug (Unique ID)</label>
+                   <input 
+                     type="text" 
+                     name="storeSlug" 
+                     className="form-input" 
+                     required 
+                     placeholder="e.g. master-typists"
+                     value={form.storeSlug.toLowerCase().replace(/ /g, "-")}
+                     onChange={handleChange}
+                   />
+                 </div>
+              </div>
+              <div className="form-group">
+                 <label className="form-label">Expertise & Experience</label>
+                 <textarea 
+                   name="description" 
+                   className="form-input" 
+                   required 
+                   style={{ minHeight: "100px" }}
+                   placeholder="Describe your specialized skills..."
+                   value={form.description}
+                   onChange={handleChange}
+                 />
+              </div>
            </div>
 
-           <div className="form-group">
-              <label className="form-label">Business Description & Expertise</label>
-              <textarea 
-                name="description" 
-                className="form-input" 
-                required 
-                style={{ minHeight: "120px" }}
-                placeholder="Briefly describe your services and why you're a professional in this field..."
-                value={form.description}
-                onChange={handleChange}
-              />
+           <div className="flex-col gap-6">
+              <h3 style={{ fontSize: "1.1rem", borderBottom: "1px solid var(--border-subtle)", paddingBottom: "var(--space-2)" }}>Verification Documents</h3>
+              <div className="grid-2 gap-6">
+                 <div className="form-group">
+                   <label className="form-label">National Identity Card (Image/PDF)</label>
+                   <input 
+                     type="file" 
+                     name="idProof" 
+                     className="form-input" 
+                     required 
+                     accept="image/*,.pdf"
+                     onChange={handleFileChange}
+                     style={{ padding: "8px" }}
+                   />
+                 </div>
+                 <div className="form-group">
+                   <label className="form-label">Professional Resume / CV (PDF)</label>
+                   <input 
+                     type="file" 
+                     name="resume" 
+                     className="form-input" 
+                     required 
+                     accept=".pdf"
+                     onChange={handleFileChange}
+                     style={{ padding: "8px" }}
+                   />
+                 </div>
+              </div>
            </div>
 
            <div className="flex-col gap-4">
@@ -208,15 +288,9 @@ export default function BecomeVendorPage() {
                className="btn btn-primary btn-lg" 
                disabled={isSubmitting}
              >
-                {isSubmitting ? "Submitting Application..." : "Submit Application"}
+                {isSubmitting ? "Submitting Secured Application..." : "Submit Application for Review"}
              </button>
              
-             {submitStatus === "error" && (
-               <div className="text-danger text-center" style={{ fontSize: "0.875rem" }}>
-                 Failed to submit application. Please check your details and try again.
-               </div>
-             )}
-           </div>
         </form>
       </div>
     </div>

@@ -9,10 +9,23 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { storeName, storeSlug, description, portfolioUrl } = await req.json();
+    const formData = await req.formData();
+    const storeName = formData.get("storeName") as string;
+    const storeSlug = formData.get("storeSlug") as string;
+    const description = formData.get("description") as string;
+    const portfolioUrl = formData.get("portfolioUrl") as string;
+    const fullName = formData.get("fullName") as string;
+    const address = formData.get("address") as string;
+    
+    const idProofFile = formData.get("idProof") as File;
+    const resumeFile = formData.get("resume") as File;
 
-    if (!storeName || !storeSlug || !description) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (!storeName || !storeSlug || !description || !fullName || !address) {
+      return NextResponse.json({ error: "Missing required profile fields" }, { status: 400 });
+    }
+
+    if (!idProofFile || !resumeFile) {
+      return NextResponse.json({ error: "ID Proof and Resume are required for verification" }, { status: 400 });
     }
 
     // Check if slug is unique
@@ -24,6 +37,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Store slug already taken" }, { status: 400 });
     }
 
+    // Process ID Proof
+    const idBytes = await idProofFile.arrayBuffer();
+    const idBuffer = Buffer.from(idBytes);
+    const idBase64 = `data:${idProofFile.type};base64,${idBuffer.toString("base64")}`;
+
+    // Process Resume
+    const resumeBytes = await resumeFile.arrayBuffer();
+    const resumeBuffer = Buffer.from(resumeBytes);
+    const resumeBase64 = `data:${resumeFile.type};base64,${resumeBuffer.toString("base64")}`;
+
     // Create the vendor profile
     const profile = await prisma.vendorProfile.create({
       data: {
@@ -32,6 +55,10 @@ export async function POST(req: NextRequest) {
         storeSlug,
         description,
         portfolioUrl,
+        fullName,
+        address,
+        idProofUrl: idBase64,
+        resumeUrl: resumeBase64,
         status: "PENDING",
       },
     });

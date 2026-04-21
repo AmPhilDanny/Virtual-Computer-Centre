@@ -20,6 +20,7 @@ type TabType = "overview" | "applications" | "payouts" | "services";
 export default function AdminVendorsPage() {
   const [activeTab, setActiveTab] = useState<TabType>("overview");
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedApp, setSelectedApp] = useState<any>(null); // State for viewing details
   const [data, setData] = useState<{
     stats: {
       totalVendors: number;
@@ -64,10 +65,31 @@ export default function AdminVendorsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ vendorId, action: "APPROVE" }),
       });
-      if (res.ok) fetchData();
+      if (res.ok) {
+        setSelectedApp(null);
+        fetchData();
+      }
     } catch (error) {
       console.error("Approval failed:", error);
     }
+  };
+
+  const handleRejectVendor = async (vendorId: string) => {
+     const notes = prompt("Enter rejection reason (optional):");
+     if (notes === null) return;
+     try {
+       const res = await fetch(`/api/admin/vendors/approve`, {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ vendorId, action: "REJECT", notes }),
+       });
+       if (res.ok) {
+         setSelectedApp(null);
+         fetchData();
+       }
+     } catch (error) {
+       console.error("Rejection failed:", error);
+     }
   };
 
   const handleMarkPayoutPaid = async (payoutId: string) => {
@@ -160,7 +182,7 @@ export default function AdminVendorsPage() {
 
               <div className="glass-card flex-col gap-6" style={{ padding: "var(--space-8)" }}>
                 <div className="flex justify-between items-center">
-                  <h3 style={{ margin: 0 }}>Recent Activity</h3>
+                   <h3 style={{ margin: 0 }}>Recent Activity</h3>
                 </div>
                 <p className="text-muted">No recent marketplace transactions.</p>
               </div>
@@ -168,34 +190,103 @@ export default function AdminVendorsPage() {
           )}
 
           {activeTab === "applications" && (
-            <div className="glass-card" style={{ padding: 0, overflow: "hidden" }}>
-              <table className="table" style={{ width: "100%", textAlign: "left", borderCollapse: "collapse" }}>
-                <thead style={{ background: "var(--bg-elevated)" }}>
-                  <tr>
-                    <th style={{ padding: "var(--space-4)" }}>Vendor Name</th>
-                    <th style={{ padding: "var(--space-4)" }}>User Email</th>
-                    <th style={{ padding: "var(--space-4)" }}>Applied On</th>
-                    <th style={{ padding: "var(--space-4)" }}>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.applications.length === 0 ? (
-                    <tr><td colSpan={4} style={{ textAlign: "center", padding: "var(--space-8)", color: "var(--text-muted)" }}>No pending applications.</td></tr>
-                  ) : (
-                    data.applications.map((app: any) => (
-                      <tr key={app.id} style={{ borderBottom: "1px solid var(--border-subtle)" }}>
-                        <td style={{ padding: "var(--space-4)" }}>{app.storeName}</td>
-                        <td style={{ padding: "var(--space-4)" }}>{app.user.email}</td>
-                        <td style={{ padding: "var(--space-4)" }}>{new Date(app.createdAt).toLocaleDateString()}</td>
-                        <td style={{ padding: "var(--space-4)" }} className="flex gap-2">
-                           <button onClick={() => handleApproveVendor(app.id)} className="btn btn-primary btn-sm">Approve</button>
-                           <button className="btn btn-ghost btn-sm text-danger">Reject</button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+            <div className="flex-col gap-6">
+              <div className="glass-card" style={{ padding: 0, overflow: "hidden" }}>
+                <table className="table" style={{ width: "100%", textAlign: "left", borderCollapse: "collapse" }}>
+                  <thead style={{ background: "var(--bg-elevated)" }}>
+                    <tr>
+                      <th style={{ padding: "var(--space-4)" }}>Store Name</th>
+                      <th style={{ padding: "var(--space-4)" }}>Applicant Email</th>
+                      <th style={{ padding: "var(--space-4)" }}>Date</th>
+                      <th style={{ padding: "var(--space-4)", textAlign: "right" }}>Review</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.applications.length === 0 ? (
+                      <tr><td colSpan={4} style={{ textAlign: "center", padding: "var(--space-8)", color: "var(--text-muted)" }}>No pending applications.</td></tr>
+                    ) : (
+                      data.applications.map((app: any) => (
+                        <tr key={app.id} style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+                          <td style={{ padding: "var(--space-4)" }}>{app.storeName}</td>
+                          <td style={{ padding: "var(--space-4)" }}>{app.user.email}</td>
+                          <td style={{ padding: "var(--space-4)" }}>{new Date(app.createdAt).toLocaleDateString()}</td>
+                          <td style={{ padding: "var(--space-4)", textAlign: "right" }}>
+                             <button onClick={() => setSelectedApp(app)} className="btn btn-outline btn-sm">
+                               Review Files
+                             </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* View Details Modal */}
+              {selectedApp && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.8)", backdropFilter: "blur(4px)" }}>
+                  <div className="glass-card flex-col gap-6" style={{ width: "100%", maxWidth: "600px", background: "var(--bg-base)", padding: "var(--space-8)", maxHeight: "90vh", overflowY: "auto" }}>
+                     <div className="flex justify-between items-center border-b border-subtle pb-4">
+                        <h2 style={{ margin: 0 }}>Vendor Application</h2>
+                        <button onClick={() => setSelectedApp(null)} className="btn btn-ghost btn-sm">✕ Close</button>
+                     </div>
+
+                     <div className="grid-2 gap-6">
+                        <div className="flex-col gap-1">
+                           <label className="text-muted text-xs uppercase font-bold">Store Name</label>
+                           <div style={{ fontWeight: 600 }}>{selectedApp.storeName}</div>
+                        </div>
+                        <div className="flex-col gap-1">
+                           <label className="text-muted text-xs uppercase font-bold">Applicant Name</label>
+                           <div style={{ fontWeight: 600 }}>{selectedApp.fullName || "N/A"}</div>
+                        </div>
+                     </div>
+
+                     <div className="flex-col gap-1">
+                        <label className="text-muted text-xs uppercase font-bold">Personal Address</label>
+                        <div style={{ fontSize: "0.9rem" }}>{selectedApp.address || "N/A"}</div>
+                     </div>
+
+                     <div className="flex-col gap-1">
+                        <label className="text-muted text-xs uppercase font-bold">Description</label>
+                        <div style={{ fontSize: "0.9rem", maxHeight: "100px", overflowY: "auto", border: "1px solid var(--border-subtle)", padding: "12px", borderRadius: "8px" }}>
+                           {selectedApp.description}
+                        </div>
+                     </div>
+
+                     <div className="flex-col gap-4">
+                        <label className="text-muted text-xs uppercase font-bold">Verification Documents</label>
+                        <div className="flex gap-4">
+                           {selectedApp.idProofUrl ? (
+                              <a href={selectedApp.idProofUrl} download={`ID_${selectedApp.storeSlug}`} className="btn btn-info btn-sm flex-1">
+                                 Download ID Proof
+                              </a>
+                           ) : <div className="text-danger text-xs">No ID Found</div>}
+                           
+                           {selectedApp.resumeUrl ? (
+                              <a href={selectedApp.resumeUrl} download={`Resume_${selectedApp.storeSlug}`} className="btn btn-secondary btn-sm flex-1">
+                                 Download Resume
+                              </a>
+                           ) : <div className="text-danger text-xs">No Resume Found</div>}
+                        </div>
+                        {selectedApp.portfolioUrl && (
+                          <a href={selectedApp.portfolioUrl} target="_blank" className="btn btn-ghost btn-sm text-primary">
+                             Browse Portfolio <ExternalLink size={14} style={{ marginLeft: "6px" }} />
+                          </a>
+                        )}
+                     </div>
+
+                     <div className="flex gap-3 border-t border-subtle pt-6">
+                        <button onClick={() => handleApproveVendor(selectedApp.id)} className="btn btn-primary flex-1">
+                           Approve Vendor
+                        </button>
+                        <button onClick={() => handleRejectVendor(selectedApp.id)} className="btn btn-outline text-danger flex-1">
+                           Reject Application
+                        </button>
+                     </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
