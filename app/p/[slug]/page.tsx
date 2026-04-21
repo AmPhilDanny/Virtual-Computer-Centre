@@ -39,7 +39,7 @@ export default async function DynamicPolicyPage({ params }: { params: Promise<{ 
   return (
     <>
       <Navbar />
-      <main className="section" style={{ minHeight: "80vh", pt: "var(--space-20)" }}>
+      <main className="section" style={{ minHeight: "80vh", paddingTop: "var(--space-20)" }}>
         <div className="container" style={{ maxWidth: "800px" }}>
           <div className="flex-col gap-2 mb-12">
             <span className="eyebrow">Official Document</span>
