@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
-import { FileText, Clock } from "lucide-react";
+import { FileText, Clock, User, ChevronRight } from "lucide-react";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL || "https://novaxdigitalcentre.vercel.app";
 
