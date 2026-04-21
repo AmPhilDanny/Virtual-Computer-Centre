@@ -12,7 +12,8 @@ import {
   FileText, 
   User,
   ShieldCheck,
-  Check
+  Check,
+  DollarSign
 } from "lucide-react";
 import Link from "next/link";
 
