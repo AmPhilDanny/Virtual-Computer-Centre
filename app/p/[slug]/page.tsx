@@ -14,8 +14,9 @@ const PAGE_MAP: Record<string, { title: string; key: string }> = {
   ai: { title: "AI Disclosure", key: "pageContent_aiDisclosure" },
 };
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const page = PAGE_MAP[params.slug];
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const page = PAGE_MAP[slug];
   if (!page) return { title: "Page Not Found" };
   
   return {
@@ -24,8 +25,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function DynamicPolicyPage({ params }: { params: { slug: string } }) {
-  const page = PAGE_MAP[params.slug];
+export default async function DynamicPolicyPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const page = PAGE_MAP[slug];
   if (!page) notFound();
 
   const settingsList = await prisma.siteSettings.findMany({
