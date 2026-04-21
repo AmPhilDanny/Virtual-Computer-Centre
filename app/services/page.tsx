@@ -1,14 +1,18 @@
-import type { Metadata } from "next";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL || "https://novaxdigitalcentre.vercel.app";
 
-export const metadata: Metadata = {
-  title: "All Services — Typing, NIN, Academic Help, AI Tools & More | NovaX Digital Centre",
-  description: "Browse 50+ professional services: document typing, NIN registration, assignment writing, CV and resume, transcription, data entry, AI summarization, grant writing — all delivered fast online.",
-  keywords: [
+export async function generateMetadata(): Promise<Metadata> {
+  const settingsList = await prisma.siteSettings.findMany();
+  const settings = settingsList.reduce((acc, curr) => {
+    acc[curr.key] = curr.value;
+    return acc;
+  }, {} as Record<string, string>);
+
+  const siteName = settings.siteName || "NovaX Digital Centre";
+  const title = settings.seoServicesTitle || `All Services — Typing, NIN, Academic Help, AI Tools & More | ${siteName}`;
+  const description = settings.seoServicesDesc || "Browse 50+ professional services: document typing, NIN registration, assignment writing, CV and resume, transcription, data entry, AI summarization, grant writing — all delivered fast online.";
+  const keywords = settings.seoServicesKeywords ? settings.seoServicesKeywords.split(",").map(k => k.trim()) : [
     "document typing Nigeria", "NIN registration Nigeria", "assignment writing Nigeria",
     "CV writing Nigeria", "resume writing Nigeria", "JAMB registration help Nigeria",
     "NYSC portal assistance", "BVN assistance Nigeria", "transcription services Nigeria",
@@ -16,21 +20,27 @@ export const metadata: Metadata = {
     "CAC business registration Nigeria", "TIN registration Nigeria", "proofreading Nigeria",
     "SOP writing Nigeria", "PowerPoint design Nigeria", "translation services Nigeria",
     "computer centre services Nigeria", "thesis writing Nigeria",
-  ],
-  alternates: { canonical: `${BASE}/services` },
-  openGraph: {
-    title: "All Services | NovaX Digital Centre",
-    description: "50+ professional digital services — typing, academic help, government forms, AI tools. Fast delivery. Affordable prices.",
-    url: `${BASE}/services`,
-    images: [{ url: `${BASE}/favicon.png`, width: 1200, height: 630, alt: "NovaX Digital Centre Services" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "50+ Services | NovaX Digital Centre",
-    description: "Document typing, NIN help, academic writing, AI tools and more. Order in minutes.",
-    images: [`${BASE}/favicon.png`],
-  },
-};
+  ];
+
+  return {
+    title,
+    description,
+    keywords,
+    alternates: { canonical: `${BASE}/services` },
+    openGraph: {
+      title,
+      description,
+      url: `${BASE}/services`,
+      images: [{ url: `${BASE}/favicon.png`, width: 1200, height: 630, alt: "NovaX Digital Centre Services" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`${BASE}/favicon.png`],
+    },
+  };
+}
 
 const allServices = [
   {

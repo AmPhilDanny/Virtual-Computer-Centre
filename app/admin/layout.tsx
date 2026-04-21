@@ -4,7 +4,7 @@ import { redirect, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
-import { LogOut, LayoutDashboard, Briefcase, Users, LayoutTemplate, Settings, Menu, X, Cpu, CreditCard, Smartphone, Store, Home } from "lucide-react";
+import { LogOut, LayoutDashboard, Briefcase, Users, LayoutTemplate, Settings, Menu, X, Cpu, CreditCard, Smartphone, Store, Home, Search } from "lucide-react";
 import { useSettings } from "@/components/SettingsProvider";
 
 export default function AdminLayout({
@@ -120,6 +120,11 @@ export default function AdminLayout({
           <li>
             <Link href="/admin/payments" className={isActive("/admin/payments") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <CreditCard className="nav-icon" /> Monetization & Pay
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/seo" className={isActive("/admin/seo") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
+              <Search className="nav-icon" /> SEO Manager
             </Link>
           </li>
           <li>

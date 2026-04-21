@@ -1,8 +1,41 @@
-import { prisma } from "@/lib/prisma";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import Link from "next/link";
-import { Clock, User, ChevronRight, FileText } from "lucide-react";
+import type { Metadata } from "next";
+
+const BASE = process.env.NEXT_PUBLIC_APP_URL || "https://novaxdigitalcentre.vercel.app";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settingsList = await prisma.siteSettings.findMany();
+  const settings = settingsList.reduce((acc, curr) => {
+    acc[curr.key] = curr.value;
+    return acc;
+  }, {} as Record<string, string>);
+
+  const siteName = settings.siteName || "NovaX Digital Centre";
+  const title = settings.seoBlogTitle || `Latest Updates & Insights | ${siteName}`;
+  const description = settings.seoBlogDesc || "Insights, guides, and news from the NovaX Digital Centre team. Stay informed about the latest in digital services and AI technology.";
+  const keywords = settings.seoBlogKeywords ? settings.seoBlogKeywords.split(",").map(k => k.trim()) : [
+    "digital services blog", "AI technology updates", "NovaX center news",
+    "academic writing tips", "government registration guides", "Nigeria digital hub",
+  ];
+
+  return {
+    title,
+    description,
+    keywords,
+    alternates: { canonical: `${BASE}/blog` },
+    openGraph: {
+      title,
+      description,
+      url: `${BASE}/blog`,
+      images: [{ url: `${BASE}/favicon.png`, width: 1200, height: 630, alt: "NovaX Digital Centre Blog" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`${BASE}/favicon.png`],
+    },
+  };
+}
 
 export default async function BlogPage() {
   const posts = await prisma.blogPost.findMany({

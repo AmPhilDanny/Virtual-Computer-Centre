@@ -13,38 +13,41 @@ export async function generateMetadata(): Promise<Metadata> {
   }, {} as Record<string, string>);
 
   const siteName = settings.siteName || "NovaX Digital Centre";
-  const siteDescription = settings.siteDescription || "AI-powered digital computer centre — professional typing, NIN registration, academic help, AI tutoring and document services in Nigeria.";
+  const siteDescription = settings.seoHomepageDesc || settings.siteDescription || "AI-powered digital computer centre — professional typing, NIN registration, academic help, AI tutoring and document services in Nigeria.";
   const faviconUrl = settings.faviconUrl || "/favicon.png";
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://novaxdigitalcentre.vercel.app";
   const ogImage = settings.logoUrl || `${baseUrl}/favicon.png`;
 
+  const dynamicKeywords = settings.seoHomepageKeywords ? settings.seoHomepageKeywords.split(",").map(k => k.trim()) : [];
+  const defaultKeywords = [
+    "computer centre Nigeria",
+    "typing services Nigeria",
+    "NIN registration help",
+    "document typing Nigeria",
+    "assignment help Nigeria",
+    "academic writing Nigeria",
+    "AI computer centre",
+    "online document services",
+    "CV writing Nigeria",
+    "data entry Nigeria",
+    "transcription Nigeria",
+    "grant writing Nigeria",
+    "JAMB form assistance",
+    "NYSC form assistance",
+    "AI tutor Nigeria",
+    "business plan writing Nigeria",
+    "digital services Nigeria",
+    "NovaX Digital Centre",
+    "virtual computer centre",
+  ];
+
   return {
     title: {
-      default: `${siteName} — AI-Powered Digital Services in Nigeria`,
+      default: settings.seoHomepageTitle || `${siteName} — AI-Powered Digital Services in Nigeria`,
       template: `%s | ${siteName}`,
     },
     description: siteDescription,
-    keywords: [
-      "computer centre Nigeria",
-      "typing services Nigeria",
-      "NIN registration help",
-      "document typing Nigeria",
-      "assignment help Nigeria",
-      "academic writing Nigeria",
-      "AI computer centre",
-      "online document services",
-      "CV writing Nigeria",
-      "data entry Nigeria",
-      "transcription Nigeria",
-      "grant writing Nigeria",
-      "JAMB form assistance",
-      "NYSC form assistance",
-      "AI tutor Nigeria",
-      "business plan writing Nigeria",
-      "digital services Nigeria",
-      "NovaX Digital Centre",
-      "virtual computer centre",
-    ],
+    keywords: dynamicKeywords.length > 0 ? dynamicKeywords : defaultKeywords,
     metadataBase: new URL(baseUrl),
     alternates: {
       canonical: baseUrl,

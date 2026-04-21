@@ -1,6 +1,42 @@
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import type { Metadata } from "next";
+import { prisma } from "@/lib/prisma";
+
+const BASE = process.env.NEXT_PUBLIC_APP_URL || "https://novaxdigitalcentre.vercel.app";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settingsList = await prisma.siteSettings.findMany();
+  const settings = settingsList.reduce((acc, curr) => {
+    acc[curr.key] = curr.value;
+    return acc;
+  }, {} as Record<string, string>);
+
+  const siteName = settings.siteName || "NovaX Digital Centre";
+  const title = settings.seoContactTitle || `Contact Information | ${siteName}`;
+  const description = settings.seoContactDesc || "Get in touch with NovaX Digital Centre. Have questions about our services or need assistance? Our team is here to help.";
+  const keywords = settings.seoContactKeywords ? settings.seoContactKeywords.split(",").map(k => k.trim()) : [
+    "contact NovaX", "customer support Nigeria", "digital centre location",
+    "help desk Nigeria", "service center contact",
+  ];
+
+  return {
+    title,
+    description,
+    keywords,
+    alternates: { canonical: `${BASE}/contact` },
+    openGraph: {
+      title,
+      description,
+      url: `${BASE}/contact`,
+      images: [{ url: `${BASE}/favicon.png`, width: 1200, height: 630, alt: "NovaX Digital Centre Contact" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`${BASE}/favicon.png`],
+    },
+  };
+}
 
 export default function ContactPage() {
   return (
