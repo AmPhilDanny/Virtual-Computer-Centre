@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'public',
   server: {
     // Points to the live production site
-    url: 'https://virtual-computer-centre.vercel.app', 
+    url: 'https://novaxdigitalcentre.vercel.app', 
     cleartext: true,
   },
   android: {
