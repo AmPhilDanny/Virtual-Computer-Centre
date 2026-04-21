@@ -1,19 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { CheckCircle2, Globe, Smartphone, DownloadCloud, Zap, GitBranch, Cpu, ExternalLink } from "lucide-react";
+import { CheckCircle2, Globe, Smartphone, DownloadCloud, Zap, GitBranch, Cpu, ExternalLink, Upload, Palette } from "lucide-react";
 
 export default function AdminPWAPage() {
   const [settings, setSettings] = useState<Record<string, string>>({
     pwaName: "Virtual Centre",
     pwaSplashColor: "#6366f1",
+    pwaThemeColor: "#6C47FF",
+    pwaIconUrl: "",
+    pwaSplashUrl: "",
   });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
+
+  const iconInputRef = useRef<HTMLInputElement>(null);
+  const splashInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function fetchSettings() {
@@ -53,6 +59,14 @@ export default function AdminPWAPage() {
           formData.append(key, value);
         }
       });
+
+      // Handle Files
+      if (iconInputRef.current?.files?.[0]) {
+        formData.append("pwaIconUrl", iconInputRef.current.files[0]);
+      }
+      if (splashInputRef.current?.files?.[0]) {
+        formData.append("pwaSplashUrl", splashInputRef.current.files[0]);
+      }
 
       const res = await fetch("/api/admin/settings", {
         method: "POST",
@@ -111,23 +125,43 @@ export default function AdminPWAPage() {
             <p className="text-secondary">Configure the offline-capable Progressive Web App manifest properties.</p>
 
             <form onSubmit={handleSubmit} className="flex-col gap-6">
-                <div className="form-group">
-                  <label className="form-label">App Home Screen Name</label>
-                  <input 
-                    type="text" 
-                    name="pwaName"
-                    className="form-input" 
-                    value={settings.pwaName || ""} 
-                    onChange={handleChange}
-                    placeholder="e.g. AI Centre"
-                    maxLength={16}
-                  />
-                  <p className="text-muted" style={{ fontSize: "0.7rem", marginTop: "var(--space-1)" }}>Short names (under 12 characters) are recommended so they don't truncate on mobile home screens.</p>
-                </div>
-
                 <div className="grid-2 gap-4">
                   <div className="form-group">
-                    <label className="form-label">Splash Screen & Theme Hex Color</label>
+                    <label className="form-label">App Home Screen Name</label>
+                    <input 
+                      type="text" 
+                      name="pwaName"
+                      className="form-input" 
+                      value={settings.pwaName || ""} 
+                      onChange={handleChange}
+                      placeholder="e.g. AI Centre"
+                      maxLength={16}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Theme Color (Status Bar)</label>
+                    <div className="flex items-center gap-2">
+                       <input type="color" name="pwaThemeColor" className="color-picker" value={settings.pwaThemeColor || "#6C47FF"} onChange={handleChange} />
+                       <input type="text" name="pwaThemeColor" className="form-input" value={settings.pwaThemeColor || ""} onChange={handleChange} style={{ flex: 1 }} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid-2 gap-6">
+                  <div className="form-group">
+                    <label className="form-label">App Icon (Square 512x512)</label>
+                    <div className="flex items-center gap-3">
+                       {settings.pwaIconUrl && (
+                          <img src={settings.pwaIconUrl} alt="App Icon" style={{ width: "40px", height: "40px", borderRadius: "10px", border: "1px solid var(--border-subtle)" }} />
+                       )}
+                       <input type="file" ref={iconInputRef} style={{ display: "none" }} accept="image/png,image/webp" onChange={() => setSaveStatus("idle")} />
+                       <button type="button" className="btn btn-ghost btn-sm" onClick={() => iconInputRef.current?.click()}>
+                          <Upload size={14} /> Upload Icon
+                       </button>
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Splash Screen Background</label>
                     <div className="flex items-center gap-2">
                       <input 
                         type="color" 
@@ -135,7 +169,6 @@ export default function AdminPWAPage() {
                         className="color-picker" 
                         value={settings.pwaSplashColor || "#000000"} 
                         onChange={handleChange}
-                        style={{ width: "40px", height: "40px", padding: 0, border: "none", borderRadius: "4px", cursor: "pointer" }}
                       />
                       <input 
                         type="text" 
@@ -150,13 +183,26 @@ export default function AdminPWAPage() {
                   </div>
                 </div>
 
+                <div className="form-group">
+                   <label className="form-label">Splash Logo (Optional centered graphic)</label>
+                   <div className="flex items-center gap-4">
+                      {settings.pwaSplashUrl && (
+                         <img src={settings.pwaSplashUrl} alt="Splash Logo" style={{ width: "64px", height: "64px", objectFit: "contain", background: "var(--bg-subtle)", borderRadius: "8px" }} />
+                      )}
+                      <input type="file" ref={splashInputRef} style={{ display: "none" }} accept="image/png,image/webp" onChange={() => setSaveStatus("idle")} />
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => splashInputRef.current?.click()}>
+                         <Upload size={14} /> {settings.pwaSplashUrl ? "Change Splash Logo" : "Upload Splash Logo"}
+                      </button>
+                   </div>
+                </div>
+
                <div className="flex items-center gap-4 pt-4">
-                 <button type="submit" className="btn btn-secondary btn-md" disabled={isSaving}>
-                    {isSaving ? "Saving..." : "Save Config Only"}
+                 <button type="submit" className="btn btn-primary btn-md" disabled={isSaving}>
+                    {isSaving ? "Saving..." : "Save Branding Configuration"}
                  </button>
                  {saveStatus === "success" && !isGenerating && (
                    <span className="flex items-center gap-1 text-success" style={{ fontSize: "0.875rem" }}>
-                     <CheckCircle2 size={16} /> Saved!
+                     <CheckCircle2 size={16} /> Saved Successfully!
                    </span>
                  )}
                </div>
@@ -165,32 +211,35 @@ export default function AdminPWAPage() {
 
           <div className="glass-card flex-col gap-6" style={{ padding: "var(--space-8)" }}>
             <h4 className="flex items-center gap-2" style={{ margin: 0 }}>
-               <Zap size={20} style={{ color: "var(--brand-warning)" }} /> Compile and Update Build
+               <Zap size={20} style={{ color: "var(--brand-warning)" }} /> Sync Mobile Build
             </h4>
             <p className="text-sm text-secondary">
-               Update the service workers and force the PWA manifest generator to push these settings to all connected client devices.
+               Updating these settings will automatically push to all installed apps. No need to re-download the APK!
             </p>
             <button 
                onClick={handleGenerateApp} 
-               className="btn btn-primary" 
-               style={{ justifyContent: "center", minHeight: "50px", fontSize: "1rem" }}
+               className="btn btn-outline" 
+               style={{ justifyContent: "center", minHeight: "50px" }}
                disabled={isGenerating}
             >
-               {isGenerating ? "Compiling App Artifacts..." : (
-                 <span className="flex items-center gap-2"><DownloadCloud size={18} /> Rebuild & Generate Mobile App</span>
+               {isGenerating ? "Processing App Sync..." : (
+                 <span className="flex items-center gap-2"><DownloadCloud size={18} /> Update Live Manifest</span>
                )}
             </button>
           </div>
         </div>
 
-        <div className="flex justify-center items-center">
+        <div className="flex flex-col items-center gap-4">
+           <h4 className="flex items-center gap-2" style={{ margin: 0 }}>
+             <Smartphone size={18} /> Live Mobile Preview
+           </h4>
            {/* Live Preview Device Box */}
            <div 
              className="device-preview"
              style={{
-               width: "300px",
-               height: "600px",
-               background: settings.pwaSplashColor || "#ffffff",
+               width: "280px",
+               height: "560px",
+               background: settings.pwaSplashColor || "#6366f1",
                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.4), inset 0 0 0 10px #18181b",
                borderRadius: "2.5rem",
                position: "relative",
@@ -199,17 +248,27 @@ export default function AdminPWAPage() {
                flexDirection: "column",
                alignItems: "center",
                justifyContent: "center",
-               transition: "background 0.3s ease"
+               transition: "background 0.30s cubic-bezier(0.4, 0, 0.2, 1)"
              }}
            >
               {/* Fake Device Notch */}
-              <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "120px", height: "30px", background: "#18181b", borderBottomLeftRadius: "1rem", borderBottomRightRadius: "1rem", zIndex: 10 }}></div>
+              <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "120px", height: "18px", background: "#18181b", borderBottomLeftRadius: "1rem", borderBottomRightRadius: "1rem", zIndex: 10 }}></div>
               
-              <div className="flex-col items-center justify-center gap-4 animate-pulse">
+              <div className="flex-col items-center justify-center gap-4">
                  {/* Icon Placeholder */}
-                 <div style={{ width: "80px", height: "80px", background: "white", borderRadius: "1.2rem", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    {settings.logoUrl ? (
-                      <img src={settings.logoUrl} alt="Logo" style={{ maxWidth: "60%", maxHeight: "60%", objectFit: "contain" }} />
+                 <div style={{ 
+                    width: "84px", 
+                    height: "84px", 
+                    background: "rgba(255,255,255,0.9)", 
+                    borderRadius: "1.4rem", 
+                    boxShadow: "0 10px 20px -3px rgba(0,0,0,0.2)", 
+                    display: "flex", 
+                    alignItems: "center", 
+                    justifyContent: "center",
+                    overflow: "hidden"
+                 }}>
+                    {settings.pwaSplashUrl || settings.pwaIconUrl ? (
+                      <img src={settings.pwaSplashUrl || settings.pwaIconUrl} alt="Logo" style={{ maxWidth: "70%", maxHeight: "70%", objectFit: "contain" }} />
                     ) : (
                       <Smartphone size={32} color={settings.pwaSplashColor || "#000"} />
                     )}
@@ -217,9 +276,17 @@ export default function AdminPWAPage() {
               </div>
 
               <div style={{ position: "absolute", bottom: "30px", textAlign: "center", width: "100%" }}>
-                  <span style={{ color: "white", fontFamily: "sans-serif", fontWeight: 600, letterSpacing: "1px", mixBlendMode: "difference" }}>
-                    {settings.pwaName || "App Preview"}
+                  <span style={{ 
+                    color: "white", 
+                    fontFamily: "var(--font-outfit)", 
+                    fontWeight: 600, 
+                    fontSize: "1.1rem",
+                    letterSpacing: "0.5px",
+                    textShadow: "0 2px 4px rgba(0,0,0,0.3)"
+                  }}>
+                    {settings.pwaName || "App Showcase"}
                   </span>
+                  <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.7)", marginTop: "4px" }}>Powered by NovaX Digital</div>
               </div>
            </div>
         </div>
