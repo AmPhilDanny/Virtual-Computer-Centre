@@ -290,7 +290,7 @@ export default function BecomeVendorPage() {
              >
                 {isSubmitting ? "Submitting Secured Application..." : "Submit Application for Review"}
              </button>
-             
+           </div>
         </form>
       </div>
     </div>
