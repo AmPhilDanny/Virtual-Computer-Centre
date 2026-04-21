@@ -34,7 +34,7 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
         src: iconUrl,
         sizes: "192x192 512x512",
         type: "image/png",
-        purpose: "maskable any",
+        purpose: "any",
       }
     ],
     orientation: "portrait",
