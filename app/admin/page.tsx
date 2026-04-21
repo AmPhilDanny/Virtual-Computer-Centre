@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { CheckCircle, Clock, AlertTriangle, ChevronRight } from "lucide-react";
+import { CheckCircle, Clock, AlertTriangle, Share2, ExternalLink } from "lucide-react";
+import AdminPitchLinks from "@/components/admin/AdminPitchLinks";
 
 export default async function AdminOverviewPage() {
   const [totalJobs, pendingJobs, aiJobs, servicesCount] = await Promise.all([
@@ -20,11 +21,11 @@ export default async function AdminOverviewPage() {
   });
 
   return (
-    <div>
-      <h2 style={{ fontSize: "1.25rem", marginBottom: "var(--space-6)" }}>System Overview</h2>
+    <div className="flex-col gap-8">
+      <h2 style={{ fontSize: "1.25rem", marginBottom: "var(--space-2)" }}>System Overview</h2>
       
       {/* Metrics Row */}
-      <div className="grid-3" style={{ marginBottom: "var(--space-10)" }}>
+      <div className="grid-3">
         <div className="metric-card" style={{ borderColor: "var(--brand-warning)" }}>
           <div className="metric-card-label">Pending Orders</div>
           <div className="metric-card-value">{pendingJobs}</div>
@@ -91,6 +92,9 @@ export default async function AdminOverviewPage() {
            </table>
          </div>
       </div>
+
+      {/* Admin-only Pitch Sharing Panel */}
+      <AdminPitchLinks />
     </div>
   );
 }
