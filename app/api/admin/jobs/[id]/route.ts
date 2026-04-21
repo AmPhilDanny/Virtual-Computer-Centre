@@ -59,6 +59,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       },
     });
     if (job) {
+      // 1. Send Notification
       import("@/lib/notifications").then((n) =>
         n.sendNotification({
           toEmail: job.user.email || undefined,
@@ -74,6 +75,53 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
           },
         })
       ).catch(console.error);
+
+      // 2. Marketplace Payout Logic
+      if (job.vendorId && job.fundsInEscrow) {
+        await prisma.$transaction(async (tx) => {
+          // Fetch commission rate
+          const settings = await tx.siteSettings.findUnique({ where: { key: "vendorCommission" } });
+          const commissionPercentage = settings ? parseFloat(settings.value) : 20;
+          const vendorShare = 1 - (commissionPercentage / 100);
+          const payoutAmount = (job.order?.total || 0) * vendorShare;
+
+          // Credit vendor wallet
+          const vendorProfile = await tx.vendorProfile.findUnique({ 
+            where: { id: job.vendorId! },
+            include: { user: true }
+          });
+
+          if (vendorProfile) {
+            await tx.user.update({
+              where: { id: vendorProfile.userId },
+              data: { walletBalance: { increment: payoutAmount } },
+            });
+
+            await tx.vendorProfile.update({
+              where: { id: vendorProfile.id },
+              data: { totalEarnings: { increment: payoutAmount } },
+            });
+
+            await tx.walletTransaction.create({
+              data: {
+                userId: vendorProfile.userId,
+                type: "CREDIT",
+                amount: payoutAmount,
+                balanceAfter: (vendorProfile.user.walletBalance || 0) + payoutAmount,
+                reference: `ADMIN_PAYOUT_${job.id}`,
+                description: `Admin-triggered payout for job #${job.id.substring(0, 8)}`,
+                status: "SUCCESS",
+              }
+            });
+
+            // Release escrow
+            await tx.job.update({
+              where: { id: job.id },
+              data: { fundsInEscrow: false }
+            });
+          }
+        });
+      }
     }
   }
 

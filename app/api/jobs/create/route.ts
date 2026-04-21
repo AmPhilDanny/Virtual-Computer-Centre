@@ -60,7 +60,9 @@ export async function POST(req: Request) {
           priority,
           attachments: attachments || [],
           complexity: aiAnalysis.complexity,
-          adminNotes: aiAnalysis.notesForAdmin
+          adminNotes: aiAnalysis.notesForAdmin,
+          vendorId: service.vendorId,
+          fundsInEscrow: service.vendorId ? true : false,
         },
         include: {
           user: { select: { email: true, name: true, phone: true } },

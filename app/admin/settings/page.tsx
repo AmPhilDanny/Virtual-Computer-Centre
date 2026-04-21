@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Settings, Database, Globe, Bell, Palette, Upload, Image as ImageIcon, CheckCircle2, ShieldAlert } from "lucide-react";
+import { Settings, Database, Globe, Bell, Palette, Upload, Image as ImageIcon, CheckCircle2, ShieldAlert, Store } from "lucide-react";
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Record<string, string>>({
@@ -325,6 +325,40 @@ export default function AdminSettingsPage() {
                 </div>
               </div>
            </div>
+
+            <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
+
+            <h4 className="flex items-center gap-2" style={{ margin: 0 }}>
+              <Store size={18} /> Multi-Vendor Marketplace
+            </h4>
+            <div className="grid-2 gap-6">
+              <div className="form-group flex-col" style={{ gap: "var(--space-2)" }}>
+                <label className="form-label flex items-center gap-2" style={{ cursor: "pointer" }}>
+                  <input 
+                    type="checkbox" 
+                    name="multiVendorEnabled" 
+                    checked={settings.multiVendorEnabled === "true"} 
+                    onChange={(e) => setSettings(prev => ({ ...prev, multiVendorEnabled: e.target.checked ? "true" : "false" }))}
+                  />
+                  Enable Marketplace Features
+                </label>
+                <p className="text-muted" style={{ fontSize: "0.75rem" }}>
+                  When enabled, users can apply to become vendors and sell their own services.
+                </p>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Default Commission (%)</label>
+                <input 
+                  type="number" 
+                  name="vendorCommission" 
+                  className="form-input" 
+                  value={settings.vendorCommission || "20"} 
+                  onChange={handleChange}
+                  min="0"
+                  max="100"
+                />
+              </div>
+            </div>
 
             <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
 

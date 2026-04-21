@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSettings } from "./SettingsProvider";
 import { useTheme } from "./ThemeProvider";
 import { useSession, signOut } from "next-auth/react";
-import { Sun, Moon, LogOut, User as UserIcon, LogIn } from "lucide-react";
+import { Sun, Moon, LogOut, User as UserIcon, LogIn, Store } from "lucide-react";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -58,6 +58,11 @@ export default function Navbar() {
           
           {status === "authenticated" ? (
             <>
+              {(session.user as any).role === "VENDOR" && (
+                <Link href="/vendor" className="btn btn-ghost btn-sm flex items-center gap-2 text-success" style={{ padding: "0 var(--space-3)" }}>
+                  <Store size={16} /> <span className="hide-on-xs">Vendor Hub</span>
+                </Link>
+              )}
               <Link href="/dashboard" className="btn btn-ghost btn-sm flex items-center gap-2" style={{ padding: "0 var(--space-3)" }}>
                 <UserIcon size={16} /> <span className="hide-on-xs">Dashboard</span>
               </Link>

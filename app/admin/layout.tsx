@@ -4,7 +4,7 @@ import { redirect, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
-import { LogOut, LayoutDashboard, Briefcase, Users, LayoutTemplate, Settings, Menu, X, Cpu, CreditCard, Smartphone } from "lucide-react";
+import { LogOut, LayoutDashboard, Briefcase, Users, LayoutTemplate, Settings, Menu, X, Cpu, CreditCard, Smartphone, Store } from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -85,6 +85,11 @@ export default function AdminLayout({
           <li>
             <Link href="/admin/users" className={isActive("/admin/users") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <Users className="nav-icon" /> Users & Clients
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/vendors" className={isActive("/admin/vendors") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
+              <Store className="nav-icon" /> Vendors & Marketplace
             </Link>
           </li>
         </ul>

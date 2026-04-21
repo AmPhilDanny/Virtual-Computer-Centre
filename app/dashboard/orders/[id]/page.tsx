@@ -6,6 +6,7 @@ import { ArrowLeft, CheckCircle, Clock, RefreshCw, AlertTriangle, Paperclip, Cre
 import OrderPaymentAction from "@/components/order/OrderPaymentAction";
 import DeliverableDownloads from "@/components/order/DeliverableDownloads";
 import ReceiptUploadButton from "@/components/order/ReceiptUploadButton";
+import OrderFulfillmentActions from "@/components/order/OrderFulfillmentActions";
 
 const STATUS_COLORS: Record<string, string> = {
   SUBMITTED: "warning",
@@ -29,6 +30,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       service: { select: { name: true, description: true } },
       order: { select: { id: true, total: true, status: true, gateway: true, proofUrl: true, createdAt: true } },
       revisions: { orderBy: { createdAt: "desc" } },
+      vendor: { select: { storeName: true, storeSlug: true } },
     },
   });
 
@@ -92,6 +94,10 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             Your order is in the queue. We'll notify you as soon as we start working on it.
           </StatusBanner>
         )}
+
+        {job.status === "REVIEW" && (
+          <OrderFulfillmentActions jobId={job.id} status={job.status} />
+        )}
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: "24px", alignItems: "start" }}>
@@ -129,6 +135,9 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <h3 style={{ fontSize: "0.95rem", fontWeight: 700, margin: "0 0 16px" }}>Order Detail</h3>
             <div className="flex-col gap-3">
               <SummaryItem label="Service" value={job.service.name} />
+              {job.vendor && (
+                <SummaryItem label="Vendor" value={job.vendor.storeName} />
+              )}
               <SummaryItem label="Payment" value={isPaid ? "Paid" : "Pending"} badge={isPaid ? "success" : "warning"} />
               <SummaryItem label="Priority" value={job.priority === "EXPRESS" ? "⚡ Express" : "Normal"} />
               <SummaryItem label="Date" value={new Date(job.createdAt).toLocaleDateString()} />

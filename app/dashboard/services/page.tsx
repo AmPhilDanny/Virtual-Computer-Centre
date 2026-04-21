@@ -1,11 +1,20 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { ChevronRight, ArrowLeft } from "lucide-react";
+import { ChevronRight, ArrowLeft, Store, Globe } from "lucide-react";
 import FeaturedOffers from "@/components/FeaturedOffers";
+import MarketplaceVendors from "@/components/MarketplaceVendors";
 
 export default async function DashboardServicesPage() {
+  const settings = await prisma.siteSettings.findMany();
+  const settingsMap = settings.reduce((acc, curr) => {
+    acc[curr.key] = curr.value;
+    return acc;
+  }, {} as Record<string, string>);
+
+  const isMarketplaceEnabled = settingsMap.multiVendorEnabled === "true";
+
   const services = await prisma.service.findMany({
-    where: { isActive: true },
+    where: { isActive: true, vendorId: null }, // Only official platform services
     orderBy: { category: "asc" }
   });
 
@@ -72,6 +81,26 @@ export default async function DashboardServicesPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {isMarketplaceEnabled && (
+        <div className="flex-col gap-6" style={{ marginTop: "var(--space-12)" }}>
+           <h3 style={{ 
+              fontSize: "1.25rem", 
+              fontWeight: 700, 
+              margin: 0,
+              display: "flex",
+              alignItems: "center",
+              gap: "12px"
+            }}>
+             <Store className="text-primary" /> Independent Member Marketplace
+           </h3>
+           <p className="text-secondary" style={{ maxWidth: 600 }}>
+             Hire professional freelancers and agencies directly. Your payment is held securely in escrow until you're satisfied with the work.
+           </p>
+           
+           <MarketplaceVendors />
         </div>
       )}
     </div>

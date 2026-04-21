@@ -39,6 +39,28 @@ model User {
   subscriptions  Subscription[]
   studyMaterials StudyMaterial[]
   tutorSessions  TutorSession[]
+  
+  // Vendor Extensions
+  vendorProfile  VendorProfile?
+}
+
+model VendorProfile {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  storeName      String
+  storeSlug      String   @unique
+  description    String   @db.Text
+  portfolioUrl   String?
+  status         VendorStatus @default(PENDING) // PENDING, APPROVED, REJECTED, SUSPENDED
+  adminNotes     String?  @db.Text
+  totalEarnings  Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  services       Service[]
+  jobs           Job[]
+  payoutRequests PayoutRequest[]
 }
 
 model Subscription {
@@ -133,9 +155,12 @@ model Service {
   aiPrompt    String?       @db.Text
   autonomyLevel AiAutonomy  @default(AI_PLUS_HUMAN)
   turnaroundHours Int       @default(24)
+  vendorId    String?
+  approvalStatus ServiceApprovalStatus @default(APPROVED)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
+  vendor    VendorProfile? @relation(fields: [vendorId], references: [id])
   jobs      Job[]
   datasets  Dataset[]
 }
@@ -154,6 +179,8 @@ model Job {
   aiConfidence  Float?
   adminNotes    String?   @db.Text
   complexity    Complexity @default(MEDIUM)
+  vendorId      String?
+  fundsInEscrow Boolean    @default(false)
   dueAt         DateTime?
   completedAt   DateTime?
   createdAt     DateTime  @default(now())
@@ -161,6 +188,7 @@ model Job {
 
   user    User    @relation(fields: [userId], references: [id])
   service Service @relation(fields: [serviceId], references: [id])
+  vendor  VendorProfile? @relation(fields: [vendorId], references: [id])
   order   Order?
   revisions Revision[]
 }
@@ -326,6 +354,21 @@ model UserConsent {
   user           User?    @relation(fields: [userId], references: [id])
 }
 
+model PayoutRequest {
+  id            String   @id @default(cuid())
+  vendorId      String
+  amount        Float
+  status        PayoutStatus @default(PENDING)
+  bankName      String
+  accountNumber String
+  accountName   String
+  adminNotes    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  vendor        VendorProfile @relation(fields: [vendorId], references: [id])
+}
+
 // =========================================
 // ENUMS
 // =========================================
@@ -335,6 +378,27 @@ enum UserRole {
   ADMIN
   SUPER_ADMIN
   AGENT
+  VENDOR
+}
+
+enum VendorStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum ServiceApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  PAID
+  REJECTED
 }
 
 enum ServiceCategory {
