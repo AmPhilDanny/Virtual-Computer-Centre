@@ -4,7 +4,7 @@ import { redirect, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
-import { LogOut, LayoutDashboard, Briefcase, Users, LayoutTemplate, Settings, Menu, X, Cpu, CreditCard, Smartphone, Store, Home, Search } from "lucide-react";
+import { LogOut, LayoutDashboard, Briefcase, Users, LayoutTemplate, Settings, Menu, X, Cpu, CreditCard, Smartphone, Store, Home, Search, FileText } from "lucide-react";
 import { useSettings } from "@/components/SettingsProvider";
 
 export default function AdminLayout({
