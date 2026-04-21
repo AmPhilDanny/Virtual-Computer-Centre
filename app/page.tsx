@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Store } from "lucide-react";
 
 const services = [
   { icon: "⌨️", title: "Typing Services", desc: "Fast, accurate document typing from handwritten notes, PDFs or audio recordings.", price: "From ₦500", href: "/services/document-typing", category: "Core" },
