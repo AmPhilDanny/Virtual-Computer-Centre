@@ -186,6 +186,7 @@ export default function AdminPagesManager() {
         <div className="flex-col gap-1">
           {PAGES.map(page => {
             const Icon = page.icon;
+            const isActive = activePageId === page.id;
             return (
               <button
                 key={page.id}
@@ -193,12 +194,19 @@ export default function AdminPagesManager() {
                   setActivePageId(page.id);
                   setSaveStatus("idle");
                 }}
-                className={`flex items-center gap-3 w-100 text-left p-3 rounded-lg transition-all ${
-                  activePageId === page.id 
-                  ? 'bg-primary text-white shadow-md' 
-                  : 'hover:bg-subtle text-secondary'
+                className={`flex items-center gap-3 w-full text-left p-2 rounded-lg transition-all ${
+                  isActive ? 'shadow-md' : 'hover:bg-subtle'
                 }`}
-                style={{ border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 500 }}
+                style={{ 
+                  border: "none", 
+                  cursor: "pointer", 
+                  fontSize: "0.875rem", 
+                  fontWeight: 500,
+                  width: "100%",
+                  padding: "0.75rem 1rem",
+                  background: isActive ? "var(--brand-primary)" : "transparent",
+                  color: isActive ? "#ffffff" : "var(--text-secondary)"
+                }}
               >
                 <Icon size={18} />
                 {page.label}
