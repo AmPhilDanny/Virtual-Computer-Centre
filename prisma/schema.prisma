@@ -51,6 +51,8 @@ model VendorProfile {
   storeSlug      String   @unique
   fullName       String?
   address        String?  @db.Text
+  description    String?  @db.Text
+  portfolioUrl   String?  @db.Text
   idProofUrl     String?  @db.Text
   resumeUrl      String?  @db.Text
   status         VendorStatus @default(PENDING) // PENDING, APPROVED, REJECTED, SUSPENDED
