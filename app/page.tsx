@@ -269,7 +269,41 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
+      {/* ======= TESTIMONIALS ======= */}
+      <section className="section">
+        <div className="container">
+          <div className="section-header">
+            <div className="eyebrow">Testimonials</div>
+            <h2>Loved by <span className="text-gradient">Thousands</span></h2>
+          </div>
+          <div className="grid-3">
+            {testimonials.map((t) => (
+              <div key={t.name} className="glass-card">
+                <div style={{ display: "flex", gap: "var(--space-3)", marginBottom: "var(--space-4)", alignItems: "center" }}>
+                  <div style={{
+                    width: "44px",
+                    height: "44px",
+                    borderRadius: "var(--radius-full)",
+                    background: "var(--grad-primary)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: 700,
+                    fontSize: "1rem",
+                    color: "#fff",
+                    flexShrink: 0,
+                  }}>
+                    {t.avatar}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: "0.9375rem" }}>{t.name}</div>
+                    <div style={{ fontSize: "0.8125rem", color: "var(--text-muted)" }}>{t.role}</div>
+                  </div>
+                </div>
+                <div style={{ color: "var(--brand-warning)", marginBottom: "var(--space-3)", fontSize: "0.85rem" }}>★★★★★</div>
+                <p style={{ fontSize: "0.9375rem", fontStyle: "italic", color: "var(--text-secondary)" }}>&ldquo;{t.text}&rdquo;</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
