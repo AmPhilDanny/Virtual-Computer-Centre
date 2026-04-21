@@ -156,21 +156,32 @@ export default function TutorClient({ materials: initialMaterials, subscription,
                 <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", margin: 0 }}>No materials yet</p>
              </div>
            )}
-           {materials.map((m) => (
-              <button
-                key={m.id}
-                onClick={() => setSelectedMaterial(m)}
-                className={`flex items-center gap-3 p-3 rounded-lg text-left transition-all ${
-                  selectedMaterial?.id === m.id 
-                    ? "bg-primary text-white shadow-lg shadow-primary/20 ring-2 ring-primary ring-offset-2 ring-offset-transparent" 
-                    : "hover:bg-subtle border border-transparent hover:border-border-subtle"
-                }`}
-                style={{ border: "none", cursor: "pointer", width: "100%", fontSize: "0.9rem" }}
-              >
-                <FileText size={16} />
-                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.title}</span>
-              </button>
-           ))}
+             {materials.map((m) => (
+                <button
+                  key={m.id}
+                  onClick={() => setSelectedMaterial(m)}
+                  className="flex items-center gap-3 p-4 rounded-xl text-left transition-all group"
+                  style={{ 
+                    border: "1px solid transparent", 
+                    cursor: "pointer", 
+                    width: "100%", 
+                    fontSize: "0.9rem",
+                    background: selectedMaterial?.id === m.id ? "var(--brand-primary)" : "transparent",
+                    color: selectedMaterial?.id === m.id ? "#fff" : "var(--text-primary)",
+                    boxShadow: selectedMaterial?.id === m.id ? "0 8px 24px rgba(108, 71, 255, 0.3)" : "none",
+                  }}
+                >
+                  <FileText size={18} className={selectedMaterial?.id === m.id ? "text-white" : "text-muted group-hover:text-primary"} />
+                  <span style={{ 
+                    overflow: "hidden", 
+                    textOverflow: "ellipsis", 
+                    whiteSpace: "nowrap",
+                    fontWeight: selectedMaterial?.id === m.id ? 700 : 400 
+                  }}>
+                    {m.title}
+                  </span>
+                </button>
+             ))}
 
            {materials.length < 12 && (
              <div className="flex-col gap-2">

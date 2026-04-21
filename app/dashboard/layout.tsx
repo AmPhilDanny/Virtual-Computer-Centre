@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { LogOut, Home, FileText, PlusCircle, CreditCard, User, Menu, X } from "lucide-react";
+import BecomeVendorModal from "@/components/modals/BecomeVendorModal";
 
 export default function DashboardLayout({
   children,
@@ -15,9 +16,11 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
+  const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
 
   useEffect(() => {
     if (session?.user) {
+      // Fetch wallet balance
       fetch("/api/wallet")
         .then(res => res.json())
         .then(data => {
@@ -26,6 +29,22 @@ export default function DashboardLayout({
           }
         })
         .catch(err => console.error("Failed to fetch wallet", err));
+
+      // Marketplace CTA Logic
+      const hasSeenCTA = sessionStorage.getItem("hasSeenVendorCTA");
+      const userRole = (session.user as any).role;
+
+      if (!hasSeenCTA && userRole === "CLIENT") {
+        fetch("/api/marketplace/config")
+          .then(res => res.json())
+          .then(data => {
+            if (data.enabled) {
+              setIsVendorModalOpen(true);
+              sessionStorage.setItem("hasSeenVendorCTA", "true");
+            }
+          })
+          .catch(console.error);
+      }
     }
   }, [session]);
 
@@ -161,6 +180,11 @@ export default function DashboardLayout({
           {children}
         </div>
       </main>
+
+      <BecomeVendorModal 
+        isOpen={isVendorModalOpen} 
+        onClose={() => setIsVendorModalOpen(false)} 
+      />
     </div>
   );
 }
