@@ -28,7 +28,9 @@ export default function Navbar() {
             <img src={settings.logoUrl} alt={settings.siteName} style={{ height: "40px", objectFit: "contain" }} />
           ) : (
             <>
-              <div className="navbar-logo-icon">⚡</div>
+              <div className="navbar-logo-icon" style={{ overflow: "hidden", background: "var(--brand-primary)" }}>
+                <img src="/favicon.png" alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              </div>
               <span className="navbar-logo-text">
                 {settings.siteName.split(" ")[0]}<span>{settings.siteName.split(" ").slice(1).join("")}</span>
               </span>

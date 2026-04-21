@@ -4,7 +4,7 @@ import { redirect, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
-import { LogOut, LayoutDashboard, Briefcase, Users, LayoutTemplate, Settings, Menu, X, Cpu, CreditCard, Smartphone, Store } from "lucide-react";
+import { LogOut, LayoutDashboard, Briefcase, Users, LayoutTemplate, Settings, Menu, X, Cpu, CreditCard, Smartphone, Store, Home } from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -34,8 +34,8 @@ export default function AdminLayout({
       {/* Mobile Header */}
       <div className="mobile-dashboard-header">
         <Link href="/admin" className="navbar-logo">
-          <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "0.9rem", background: "var(--brand-danger)" }}>
-            🛡️
+          <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "0.9rem", background: "var(--brand-danger)", overflow: "hidden" }}>
+             <img src="/favicon.png" alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <span className="navbar-logo-text" style={{ fontSize: "1.1rem" }}>Admin<span>Panel</span></span>
         </Link>
@@ -59,13 +59,22 @@ export default function AdminLayout({
       {/* Sidebar */}
       <aside className={`sidebar ${isSidebarOpen ? 'mobile-open' : ''}`}>
         <Link href="/admin" className="sidebar-logo">
-          <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "1rem", background: "var(--brand-danger)" }}>
-            🛡️
+          <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "1rem", background: "var(--brand-danger)", overflow: "hidden" }}>
+             <img src="/favicon.png" alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <span className="navbar-logo-text">Admin<span>Panel</span></span>
         </Link>
 
-        <div className="sidebar-section-label">Management</div>
+        <div className="sidebar-section-label">Global</div>
+        <ul className="sidebar-nav">
+          <li>
+            <Link href="/" onClick={() => setIsSidebarOpen(false)}>
+              <Home className="nav-icon" /> Back to Website
+            </Link>
+          </li>
+        </ul>
+
+        <div className="sidebar-section-label" style={{ marginTop: "var(--space-4)" }}>Management</div>
         <ul className="sidebar-nav">
           <li>
             <Link href="/admin" className={pathname === "/admin" ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>

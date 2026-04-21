@@ -66,8 +66,8 @@ export default function DashboardLayout({
       {/* Mobile Header */}
       <div className="mobile-dashboard-header">
         <Link href="/" className="navbar-logo">
-          <div className="navbar-logo-icon" style={{ width: 28, height: 28, fontSize: "0.8rem" }}>
-            🤖
+          <div className="navbar-logo-icon" style={{ width: 28, height: 28, fontSize: "0.8rem", background: "var(--brand-primary)", overflow: "hidden" }}>
+             <img src="/favicon.png" alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <span className="navbar-logo-text" style={{ fontSize: "1rem" }}>AI<span>Centre</span></span>
         </Link>
@@ -91,13 +91,22 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside className={`sidebar ${isSidebarOpen ? 'mobile-open' : ''}`}>
         <Link href="/" className="sidebar-logo">
-          <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "1rem" }}>
-            🤖
+          <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "1rem", background: "var(--brand-primary)", overflow: "hidden" }}>
+             <img src="/favicon.png" alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <span className="navbar-logo-text">AI<span>Centre</span></span>
         </Link>
 
-        <div className="sidebar-section-label">Main Menu</div>
+        <div className="sidebar-section-label">Global Navigation</div>
+        <ul className="sidebar-nav">
+          <li>
+            <Link href="/" onClick={() => setIsSidebarOpen(false)}>
+              <Home className="nav-icon" /> Back to Website
+            </Link>
+          </li>
+        </ul>
+
+        <div className="sidebar-section-label" style={{ marginTop: "var(--space-4)" }}>Main Menu</div>
         <ul className="sidebar-nav">
           <li>
             <Link href="/dashboard" className={pathname === "/dashboard" ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
