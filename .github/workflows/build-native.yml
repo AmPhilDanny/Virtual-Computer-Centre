@@ -38,6 +38,11 @@ jobs:
       - name: Add Android Platform
         run: npx cap add android
 
+      # Automatically generate custom Fhinovax icons to replace default Capacitor icons
+      - name: Generate Custom Icons
+        run: npx @capacitor/assets generate --iconBackgroundColor '#ffffff' --splashBackgroundColor '#ffffff'
+
+
       # Generate local.properties with the SDK path the runner just set up
       - name: Generate local.properties
         run: echo "sdk.dir=$ANDROID_HOME" > android/local.properties
