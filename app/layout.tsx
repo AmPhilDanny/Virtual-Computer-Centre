@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { prisma } from "@/lib/prisma";
@@ -50,9 +50,19 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export const viewport = {
-  themeColor: "#6C47FF",
-};
+export async function generateViewport(): Promise<Viewport> {
+  const settingsList = await prisma.siteSettings.findMany({
+    where: { key: { in: ["pwaThemeColor", "brandPrimary"] } }
+  });
+  const settings = settingsList.reduce((acc, curr) => {
+    acc[curr.key] = curr.value;
+    return acc;
+  }, {} as Record<string, string>);
+
+  return {
+    themeColor: settings.pwaThemeColor || settings.brandPrimary || "#6C47FF",
+  };
+}
 
 export default async function RootLayout({
   children,

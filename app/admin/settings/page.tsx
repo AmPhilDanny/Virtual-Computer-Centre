@@ -42,10 +42,13 @@ export default function AdminSettingsPage() {
     AI_COMPLETED_WHAPP_TEMPLATE: "",
     pwaName: "Virtual Computer Centre",
     pwaSplashColor: "#6366f1",
+    pwaThemeColor: "#6C47FF",
+    pwaIconUrl: "",
     paystackSecretKey: "",
     flutterwaveSecretKey: "",
     virusScannerApiKey: "",
     walletFundingRate: "1", // 1 NGN = 1 Wallet Unit
+    TUTOR_MONTHLY_PRICE: "5000",
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -53,6 +56,7 @@ export default function AdminSettingsPage() {
   const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
   const logoInputRef = useRef<HTMLInputElement>(null);
   const faviconInputRef = useRef<HTMLInputElement>(null);
+  const pwaIconInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function fetchSettings() {
@@ -95,6 +99,9 @@ export default function AdminSettingsPage() {
       }
       if (faviconInputRef.current?.files?.[0]) {
         formData.append("faviconUrl", faviconInputRef.current.files[0]);
+      }
+      if (pwaIconInputRef.current?.files?.[0]) {
+        formData.append("pwaIconUrl", pwaIconInputRef.current.files[0]);
       }
 
       const res = await fetch("/api/admin/settings", {
@@ -357,6 +364,72 @@ export default function AdminSettingsPage() {
                   min="0"
                   max="100"
                 />
+              </div>
+            </div>
+
+            <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
+
+            <h4 className="flex items-center gap-2" style={{ margin: 0 }}>
+              <Globe size={18} /> PWA & Mobile App Branding
+            </h4>
+
+            <div className="grid-2 gap-6">
+               <div className="form-group">
+                 <label className="form-label">App / PWA Name</label>
+                 <input 
+                   type="text" 
+                   name="pwaName"
+                   className="form-input" 
+                   value={settings.pwaName} 
+                   onChange={handleChange}
+                 />
+               </div>
+               <div className="form-group">
+                 <label className="form-label">App Icon (Square 512x512)</label>
+                 <div className="flex items-center gap-3">
+                    {settings.pwaIconUrl && (
+                       <img src={settings.pwaIconUrl} alt="App Icon" style={{ width: "48px", height: "48px", borderRadius: "12px", border: "1px solid var(--border-subtle)" }} />
+                    )}
+                    <input 
+                       type="file" 
+                       ref={pwaIconInputRef}
+                       style={{ display: "none" }} 
+                       accept="image/png,image/webp"
+                       onChange={() => setSaveStatus("idle")}
+                    />
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => pwaIconInputRef.current?.click()}>
+                       <Upload size={14} /> Upload Icon
+                    </button>
+                 </div>
+               </div>
+            </div>
+
+            <div className="grid-2 gap-6">
+              <div className="form-group">
+                <label className="form-label">Theme Color (Status Bar)</label>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="color" 
+                    name="pwaThemeColor"
+                    className="color-picker" 
+                    value={settings.pwaThemeColor} 
+                    onChange={handleChange}
+                  />
+                  <input type="text" name="pwaThemeColor" className="form-input" value={settings.pwaThemeColor} onChange={handleChange} />
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Splash Screen Background</label>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="color" 
+                    name="pwaSplashColor"
+                    className="color-picker" 
+                    value={settings.pwaSplashColor} 
+                    onChange={handleChange}
+                  />
+                  <input type="text" name="pwaSplashColor" className="form-input" value={settings.pwaSplashColor} onChange={handleChange} />
+                </div>
               </div>
             </div>
 

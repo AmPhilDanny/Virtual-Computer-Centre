@@ -6,7 +6,7 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const settingsList = await prisma.siteSettings.findMany({
     where: {
       key: {
-        in: ["pwaName", "pwaSplashColor", "siteName", "brandPrimary"]
+        in: ["pwaName", "pwaSplashColor", "pwaThemeColor", "pwaIconUrl", "siteName", "brandPrimary"]
       }
     }
   });
@@ -18,6 +18,8 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
 
   const name = settings.pwaName || settings.siteName || "Virtual Computer Centre";
   const splashColor = settings.pwaSplashColor || settings.brandPrimary || "#6366f1";
+  const themeColor = settings.pwaThemeColor || settings.brandPrimary || "#6C47FF";
+  const iconUrl = settings.pwaIconUrl || "/icons/icon-512.png";
 
   return {
     name: name,
@@ -26,20 +28,14 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     start_url: "/",
     display: "standalone",
     background_color: splashColor,
-    theme_color: settings.brandPrimary || "#6366f1",
+    theme_color: themeColor,
     icons: [
       {
-        src: "/icons/icon-192.png",
-        sizes: "192x192",
+        src: iconUrl,
+        sizes: "192x192 512x512",
         type: "image/png",
-        purpose: "maskable",
-      },
-      {
-        src: "/icons/icon-512.png",
-        sizes: "512x512",
-        type: "image/png",
-        purpose: "maskable",
-      },
+        purpose: "maskable any",
+      }
     ],
     orientation: "portrait",
   };
