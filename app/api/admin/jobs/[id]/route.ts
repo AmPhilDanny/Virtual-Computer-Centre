@@ -56,6 +56,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       include: {
         user: { select: { email: true, name: true, phone: true } },
         service: { select: { name: true } },
+        order: { select: { total: true } },
       },
     });
     if (job) {
