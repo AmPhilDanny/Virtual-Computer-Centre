@@ -1,7 +1,35 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Store } from "lucide-react";
+
+const BASE = process.env.NEXT_PUBLIC_APP_URL || "https://novaxdigitalcentre.vercel.app";
+
+export const metadata: Metadata = {
+  title: "NovaX Digital Centre — Typing, NIN, AI Tutor & Document Services Nigeria",
+  description: "Nigeria's #1 AI-powered digital computer centre. Professional document typing, NIN registration, assignment help, CV writing, AI tutoring, transcription and more — delivered fast online.",
+  keywords: [
+    "typing services Nigeria", "computer centre Nigeria", "NIN registration online Nigeria",
+    "assignment help Nigeria", "AI tutor Nigeria online", "CV writing Nigeria",
+    "document services Nigeria", "transcription Nigeria", "data entry Nigeria",
+    "JAMB registration help", "NYSC form Nigeria", "online computer centre",
+    "NovaX Digital Centre", "AI document summarizer Nigeria", "grant writing Nigeria",
+  ],
+  alternates: { canonical: BASE },
+  openGraph: {
+    title: "NovaX Digital Centre — Typing, NIN, AI Tutor & Document Services Nigeria",
+    description: "Nigeria's #1 AI-powered digital centre. Typing, NIN, academic help, AI tutoring and more — delivered fast online.",
+    url: BASE,
+    images: [{ url: `${BASE}/favicon.png`, width: 1200, height: 630, alt: "NovaX Digital Centre" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "NovaX Digital Centre — AI Digital Services Nigeria",
+    description: "Typing, NIN registration, assignment help, AI tutoring and more. Fast. Affordable. Online.",
+    images: [`${BASE}/favicon.png`],
+  },
+};
 
 const services = [
   { icon: "⌨️", title: "Typing Services", desc: "Fast, accurate document typing from handwritten notes, PDFs or audio recordings.", price: "From ₦500", href: "/services/document-typing", category: "Core" },
