@@ -44,6 +44,7 @@ export default function AdminSettingsPage() {
     pwaSplashColor: "#6366f1",
     pwaThemeColor: "#6C47FF",
     pwaIconUrl: "",
+    pwaSplashUrl: "",
     paystackSecretKey: "",
     flutterwaveSecretKey: "",
     virusScannerApiKey: "",
@@ -57,6 +58,7 @@ export default function AdminSettingsPage() {
   const logoInputRef = useRef<HTMLInputElement>(null);
   const faviconInputRef = useRef<HTMLInputElement>(null);
   const pwaIconInputRef = useRef<HTMLInputElement>(null);
+  const pwaSplashInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function fetchSettings() {
@@ -102,6 +104,9 @@ export default function AdminSettingsPage() {
       }
       if (pwaIconInputRef.current?.files?.[0]) {
         formData.append("pwaIconUrl", pwaIconInputRef.current.files[0]);
+      }
+      if (pwaSplashInputRef.current?.files?.[0]) {
+        formData.append("pwaSplashUrl", pwaSplashInputRef.current.files[0]);
       }
 
       const res = await fetch("/api/admin/settings", {
@@ -431,6 +436,25 @@ export default function AdminSettingsPage() {
                   <input type="text" name="pwaSplashColor" className="form-input" value={settings.pwaSplashColor} onChange={handleChange} />
                 </div>
               </div>
+            </div>
+
+            <div className="form-group">
+               <label className="form-label">Optional: PWA Splash Logo (centered on splash screen)</label>
+               <div className="flex items-center gap-4">
+                  {settings.pwaSplashUrl && (
+                     <img src={settings.pwaSplashUrl} alt="Splash Logo" style={{ width: "64px", height: "64px", objectFit: "contain", background: "var(--bg-subtle)", borderRadius: "8px" }} />
+                  )}
+                  <input 
+                     type="file" 
+                     ref={pwaSplashInputRef}
+                     style={{ display: "none" }} 
+                     accept="image/png,image/webp"
+                     onChange={() => setSaveStatus("idle")}
+                  />
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => pwaSplashInputRef.current?.click()}>
+                     <Upload size={14} /> {settings.pwaSplashUrl ? "Change Splash Logo" : "Upload Splash Logo"}
+                  </button>
+               </div>
             </div>
 
             <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
