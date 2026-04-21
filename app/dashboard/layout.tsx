@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { LogOut, Home, FileText, PlusCircle, CreditCard, User, Menu, X } from "lucide-react";
 import BecomeVendorModal from "@/components/modals/BecomeVendorModal";
+import { useSettings } from "@/components/SettingsProvider";
 
 export default function DashboardLayout({
   children,
@@ -13,6 +14,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { data: session, status } = useSession();
+  const settings = useSettings();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
@@ -67,7 +69,7 @@ export default function DashboardLayout({
       <div className="mobile-dashboard-header">
         <Link href="/" className="navbar-logo">
           <div className="navbar-logo-icon" style={{ width: 28, height: 28, fontSize: "0.8rem", background: "var(--brand-primary)", overflow: "hidden" }}>
-             <img src="/favicon.png" alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+             <img src={settings.faviconUrl || settings.logoUrl || "/favicon.png"} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <span className="navbar-logo-text" style={{ fontSize: "1rem" }}>AI<span>Centre</span></span>
         </Link>
@@ -92,7 +94,7 @@ export default function DashboardLayout({
       <aside className={`sidebar ${isSidebarOpen ? 'mobile-open' : ''}`}>
         <Link href="/" className="sidebar-logo">
           <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "1rem", background: "var(--brand-primary)", overflow: "hidden" }}>
-             <img src="/favicon.png" alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+             <img src={settings.faviconUrl || settings.logoUrl || "/favicon.png"} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <span className="navbar-logo-text">AI<span>Centre</span></span>
         </Link>

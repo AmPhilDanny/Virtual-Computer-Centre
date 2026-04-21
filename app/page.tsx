@@ -270,41 +270,44 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ======= TESTIMONIALS ======= */}
-      <section className="section">
-        <div className="container">
-          <div className="section-header">
-            <div className="eyebrow">Testimonials</div>
-            <h2>Loved by <span className="text-gradient">Thousands</span></h2>
           </div>
-          <div className="grid-3">
-            {testimonials.map((t) => (
-              <div key={t.name} className="glass-card">
-                <div style={{ display: "flex", gap: "var(--space-3)", marginBottom: "var(--space-4)", alignItems: "center" }}>
-                  <div style={{
-                    width: "44px",
-                    height: "44px",
-                    borderRadius: "var(--radius-full)",
-                    background: "var(--grad-primary)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: 700,
-                    fontSize: "1rem",
-                    color: "#fff",
-                    flexShrink: 0,
-                  }}>
-                    {t.avatar}
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: "0.9375rem" }}>{t.name}</div>
-                    <div style={{ fontSize: "0.8125rem", color: "var(--text-muted)" }}>{t.role}</div>
-                  </div>
-                </div>
-                <div style={{ color: "var(--brand-warning)", marginBottom: "var(--space-3)", fontSize: "0.85rem" }}>★★★★★</div>
-                <p style={{ fontSize: "0.9375rem", fontStyle: "italic", color: "var(--text-secondary)" }}>&ldquo;{t.text}&rdquo;</p>
+        </div>
+      </section>
+
+      {/* ======= MARKETPLACE CTA ======= */}
+      <section className="section" style={{ background: "var(--bg-elevated)", borderTop: "1px solid var(--border-subtle)" }}>
+        <div className="container">
+          <div className="glass-card flex items-center justify-between gap-10 flex-wrap" style={{ padding: "var(--space-10)", border: "1px solid var(--brand-primary)" }}>
+            <div style={{ flex: "1 1 400px" }}>
+              <div className="eyebrow">Marketplace</div>
+              <h2 style={{ marginBottom: "var(--space-4)" }}>Earn by Sharing Your <span className="text-gradient">Expertise</span></h2>
+              <p style={{ marginBottom: "var(--space-6)" }}>
+                Are you a skilled writer, data entry expert, or digital professional? Join our marketplace and start selling your services to our global client base.
+              </p>
+              <div className="flex gap-4">
+                <Link href="/dashboard/become-vendor" className="btn btn-primary btn-lg">
+                  Become a Vendor →
+                </Link>
+                <Link href="/services" className="btn btn-ghost btn-lg">
+                  Browse Projects
+                </Link>
               </div>
-            ))}
+            </div>
+            <div style={{ flex: "1 1 300px", display: "flex", justifyContent: "center" }}>
+               <div style={{ position: "relative" }}>
+                  <div style={{ 
+                    width: "120px", height: "120px", borderRadius: "30px", 
+                    background: "var(--grad-primary)", display: "flex", 
+                    alignItems: "center", justifyContent: "center", color: "#fff",
+                    boxShadow: "var(--shadow-glow)"
+                  }}>
+                    <Store size={48} />
+                  </div>
+                  <div style={{ position: "absolute", bottom: -20, right: -20, background: "var(--brand-success)", color: "#fff", padding: "8px 16px", borderRadius: "var(--radius-full)", fontWeight: 700, fontSize: "0.8rem", boxShadow: "var(--shadow-md)" }}>
+                    Verified Vendor
+                  </div>
+               </div>
+            </div>
           </div>
         </div>
       </section>

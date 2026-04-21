@@ -29,7 +29,7 @@ export default function Navbar() {
           ) : (
             <>
               <div className="navbar-logo-icon" style={{ overflow: "hidden", background: "var(--brand-primary)" }}>
-                <img src="/favicon.png" alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <img src={settings.faviconUrl || "/favicon.png"} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               </div>
               <span className="navbar-logo-text">
                 {settings.siteName.split(" ")[0]}<span>{settings.siteName.split(" ").slice(1).join("")}</span>

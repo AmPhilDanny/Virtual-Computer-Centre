@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
 import { LogOut, LayoutDashboard, Briefcase, Users, LayoutTemplate, Settings, Menu, X, Cpu, CreditCard, Smartphone, Store, Home } from "lucide-react";
+import { useSettings } from "@/components/SettingsProvider";
 
 export default function AdminLayout({
   children,
@@ -12,6 +13,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const { data: session, status } = useSession();
+  const settings = useSettings();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -35,7 +37,7 @@ export default function AdminLayout({
       <div className="mobile-dashboard-header">
         <Link href="/admin" className="navbar-logo">
           <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "0.9rem", background: "var(--brand-danger)", overflow: "hidden" }}>
-             <img src="/favicon.png" alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+             <img src={settings.faviconUrl || settings.logoUrl || "/favicon.png"} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <span className="navbar-logo-text" style={{ fontSize: "1.1rem" }}>Admin<span>Panel</span></span>
         </Link>
@@ -60,7 +62,7 @@ export default function AdminLayout({
       <aside className={`sidebar ${isSidebarOpen ? 'mobile-open' : ''}`}>
         <Link href="/admin" className="sidebar-logo">
           <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "1rem", background: "var(--brand-danger)", overflow: "hidden" }}>
-             <img src="/favicon.png" alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+             <img src={settings.faviconUrl || settings.logoUrl || "/favicon.png"} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <span className="navbar-logo-text">Admin<span>Panel</span></span>
         </Link>
