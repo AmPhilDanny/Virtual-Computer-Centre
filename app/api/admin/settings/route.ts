@@ -18,23 +18,27 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
+    const contentType = req.headers.get("content-type") || "";
     const updates: Record<string, string> = {};
 
-    for (const [key, value] of formData.entries()) {
-      if (value instanceof File) {
-        // Convert File to Base64 for database storage (Neon/Vercel persistence)
-        const bytes = await value.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const mimeType = value.type || "image/png";
-        const base64 = buffer.toString("base64");
-        updates[key] = `data:${mimeType};base64,${base64}`;
-      } else if (typeof value === "string") {
-        updates[key] = value;
+    if (contentType.includes("application/json")) {
+      const json = await req.json();
+      Object.assign(updates, json);
+    } else {
+      const formData = await req.formData();
+      for (const [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          const bytes = await value.arrayBuffer();
+          const buffer = Buffer.from(bytes);
+          const mimeType = value.type || "image/png";
+          const base64 = buffer.toString("base64");
+          updates[key] = `data:${mimeType};base64,${base64}`;
+        } else if (typeof value === "string") {
+          updates[key] = value;
+        }
       }
     }
 
-    // Update settings in database
     const updatePromises = Object.entries(updates).map(([key, value]) =>
       prisma.siteSettings.upsert({
         where: { key },
@@ -44,7 +48,6 @@ export async function POST(req: NextRequest) {
     );
 
     await Promise.all(updatePromises);
-
     return NextResponse.json({ success: true, updates });
   } catch (error) {
     console.error("Error updating site settings:", error);

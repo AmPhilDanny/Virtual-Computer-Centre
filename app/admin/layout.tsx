@@ -89,11 +89,6 @@ export default function AdminLayout({
             </Link>
           </li>
           <li>
-            <Link href="/admin/services" className={isActive("/admin/services") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
-              <LayoutTemplate className="nav-icon" /> Services Catalog
-            </Link>
-          </li>
-          <li>
             <Link href="/admin/users" className={isActive("/admin/users") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <Users className="nav-icon" /> Users & Clients
             </Link>
@@ -101,6 +96,30 @@ export default function AdminLayout({
           <li>
             <Link href="/admin/vendors" className={isActive("/admin/vendors") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <Store className="nav-icon" /> Vendors & Marketplace
+            </Link>
+          </li>
+        </ul>
+
+        <div className="sidebar-section-label" style={{ marginTop: "var(--space-6)" }}>Content Management</div>
+        <ul className="sidebar-nav">
+          <li>
+            <Link href="/admin/services" className={isActive("/admin/services") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
+              <LayoutTemplate className="nav-icon" /> Services Catalog
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/blog" className={isActive("/admin/blog") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
+              <FileText className="nav-icon" /> Blog Articles
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/pages" className={isActive("/admin/pages") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
+              <Menu className="nav-icon" /> Pages Manager
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/seo" className={isActive("/admin/seo") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
+              <Search className="nav-icon" /> SEO Manager
             </Link>
           </li>
         </ul>
@@ -120,11 +139,6 @@ export default function AdminLayout({
           <li>
             <Link href="/admin/payments" className={isActive("/admin/payments") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <CreditCard className="nav-icon" /> Monetization & Pay
-            </Link>
-          </li>
-          <li>
-            <Link href="/admin/seo" className={isActive("/admin/seo") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
-              <Search className="nav-icon" /> SEO Manager
             </Link>
           </li>
           <li>

@@ -2,23 +2,23 @@ import Link from "next/link";
 
 const footerLinks = {
   Services: [
-    { label: "Typing Services", href: "/services/typing" },
-    { label: "Academic Help", href: "/services/academic" },
-    { label: "Government Forms", href: "/services/government" },
-    { label: "CV & Resume", href: "/services/cv-resume" },
-    { label: "AI-Enhanced", href: "/services/ai-enhanced" },
+    { label: "Typing Services", href: "/services/document-typing" },
+    { label: "Academic Help", href: "/services/assignment-writing" },
+    { label: "NIN Assistance", href: "/services/nin-assistance" },
+    { label: "CV & Resume", href: "/services/cv-resume-writing" },
+    { label: "AI Summarizer", href: "/services/document-summarization" },
   ],
   Company: [
-    { label: "About Us", href: "/about" },
+    { label: "About Us", href: "/p/about" },
     { label: "Blog", href: "/blog" },
     { label: "Contact", href: "/contact" },
-    { label: "Careers", href: "/careers" },
+    { label: "Careers", href: "/p/careers" },
   ],
   Legal: [
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Service", href: "/terms" },
-    { label: "Refund Policy", href: "/refund" },
-    { label: "AI Disclosure", href: "/ai-disclosure" },
+    { label: "Privacy Policy", href: "/p/privacy" },
+    { label: "Terms of Service", href: "/p/terms" },
+    { label: "Refund Policy", href: "/p/refund" },
+    { label: "AI Disclosure", href: "/p/ai" },
   ],
 };
 
@@ -36,9 +36,9 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="navbar-logo" style={{ marginBottom: "var(--space-4)" }}>
-              <div className="navbar-logo-icon">⚡</div>
+              <div className="navbar-logo-icon">✨</div>
               <span className="navbar-logo-text">
-                AI<span>Centre</span>
+                NovaX<span>Digital</span>
               </span>
             </div>
             <p
@@ -49,7 +49,7 @@ export default function Footer() {
                 maxWidth: "280px",
               }}
             >
-              Your AI-powered digital computer centre. Professional services delivered by intelligent agents, reviewed by experts.
+              Nigeria&apos;s #1 AI-powered digital computer centre. Professional services delivered by intelligent agents, reviewed by experts.
             </p>
             <div
               style={{

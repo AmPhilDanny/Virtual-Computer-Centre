@@ -69,7 +69,18 @@ const testimonials = [
   { name: "Fatima K.", role: "Small Business Owner", text: "They handled my CAC registration assistance smoothly. No stress at all.", avatar: "F" },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const settingsList = await prisma.siteSettings.findMany();
+  const settings = settingsList.reduce((acc, curr) => {
+    acc[curr.key] = curr.value;
+    return acc;
+  }, {} as Record<string, string>);
+
+  const heroBadge = settings.homeHeroBadge || "🤖 Powered by Advanced AI Agents";
+  const heroTitle = settings.homeHeroTitle || "Your Digital Computer Centre, <br /> <span class=\"text-gradient\">Now Powered by AI</span>";
+  const heroSubtitle = settings.homeHeroSubtitle || "Professional typing, academic, government, and business services completed by intelligent AI agents — fast, accurate, and affordable.";
+  const heroCta = settings.homeHeroCta || "Explore Services →";
+
   return (
     <>
       <Navbar />
@@ -80,19 +91,15 @@ export default function HomePage() {
         <div className="hero-bg-orb hero-bg-orb-2" />
         <div className="container" style={{ position: "relative", zIndex: 1 }}>
           <div className="hero-badge">
-            <span>🤖</span> Powered by Advanced AI Agents
+            <span>{heroBadge.split(" ")[0]}</span> {heroBadge.split(" ").slice(1).join(" ")}
           </div>
-          <h1 className="hero-title">
-            Your Digital Computer Centre,
-            <br />
-            <span className="text-gradient">Now Powered by AI</span>
-          </h1>
+          <h1 className="hero-title" dangerouslySetInnerHTML={{ __html: heroTitle }} />
           <p className="hero-subtitle">
-            Professional typing, academic, government, and business services completed by intelligent AI agents — fast, accurate, and affordable.
+            {heroSubtitle}
           </p>
           <div className="hero-actions">
             <Link href="/services" className="btn btn-primary btn-xl">
-              Explore Services →
+              {heroCta}
             </Link>
             <Link href="/auth/register" className="btn btn-secondary btn-xl">
               Create Free Account
