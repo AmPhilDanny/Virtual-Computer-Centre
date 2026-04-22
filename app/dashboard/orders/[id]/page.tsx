@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle, Clock, RefreshCw, AlertTriangle, Paperclip, CreditCard } from "lucide-react";
+import { ArrowLeft, CheckCircle, Clock, RefreshCw, AlertTriangle, Paperclip, CreditCard, ShieldCheck, Cpu, BookOpen, Sparkles, Check } from "lucide-react";
 import OrderPaymentAction from "@/components/order/OrderPaymentAction";
 import DeliverableDownloads from "@/components/order/DeliverableDownloads";
 import ReceiptUploadButton from "@/components/order/ReceiptUploadButton";
@@ -97,6 +97,43 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
         {job.status === "REVIEW" && (
           <OrderFulfillmentActions jobId={job.id} status={job.status} />
+        )}
+
+        {(job.status === "COMPLETED" || job.status === "REVIEW") && (
+          <div className="glass-card" style={{ padding: "20px", border: "1px solid rgba(108,71,255,0.2)", background: "linear-gradient(135deg, rgba(108,71,255,0.05) 0%, rgba(255,255,255,0) 100%)" }}>
+             <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck size={20} className="text-primary" />
+                  <h4 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700 }}>Quality Assurance Verified</h4>
+                </div>
+                {job.aiScore && job.aiScore >= 85 && (
+                  <span className="badge badge-success" style={{ fontSize: "0.7rem", display: "flex", alignItems: "center", gap: 4 }}>
+                    <Sparkles size={10} /> Premium Human Work
+                  </span>
+                )}
+             </div>
+
+             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
+                <QualityMetric 
+                  icon={<Cpu size={18} />} 
+                  label="Human Originality" 
+                  value={job.aiScore ? `${job.aiScore}%` : "Checked"} 
+                  isActive={!!(job.aiScore && job.aiScore >= 80)} 
+                />
+                <QualityMetric 
+                  icon={<BookOpen size={18} />} 
+                  label="Grammar Precision" 
+                  value={job.grammarScore ? `${job.grammarScore}%` : "Verified"} 
+                  isActive={!!(job.grammarScore && job.grammarScore >= 85)} 
+                />
+                <QualityMetric 
+                  icon={<ShieldCheck size={18} />} 
+                  label="Plagiarism Free" 
+                  value={job.isPlagiarismFree ? "100% Original" : "Verified"} 
+                  isActive={!!job.isPlagiarismFree} 
+                />
+             </div>
+          </div>
         )}
       </div>
 
@@ -216,6 +253,31 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function QualityMetric({ icon, label, value, isActive }: { icon: React.ReactNode, label: string, value: string, isActive: boolean }) {
+  return (
+    <div className="flex items-center gap-3 p-3 rounded-xl bg-elevated" style={{ border: isActive ? "1px solid rgba(0,200,83,0.3)" : "1px solid var(--border-subtle)" }}>
+      <div style={{
+        width: "32px",
+        height: "32px",
+        borderRadius: "50%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: isActive ? "var(--brand-success)" : "var(--bg-elevated)",
+        color: isActive ? "white" : "var(--text-muted)",
+        border: isActive ? "none" : "2px solid var(--border-medium)",
+        transition: "all 0.3s ease"
+      }}>
+        {isActive ? <Check size={18} /> : icon}
+      </div>
+      <div className="flex-col">
+        <span className="text-muted" style={{ fontSize: "0.65rem", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.05em" }}>{label}</span>
+        <span style={{ fontSize: "0.85rem", fontWeight: 700, color: isActive ? "var(--brand-success)" : "inherit" }}>{value}</span>
       </div>
     </div>
   );

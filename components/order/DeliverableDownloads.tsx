@@ -160,7 +160,7 @@ export default function DeliverableDownloads({ aiOutput, title, attachments }: D
             marginBottom: 12
           }}>
             <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-              Formatted Content
+              Verified Human-Written Content
             </span>
             <div style={{ display: "flex", gap: 6 }}>
               {[

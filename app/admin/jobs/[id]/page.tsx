@@ -37,6 +37,10 @@ export default function AdminJobDetailPage() {
       setStatus(data.status || "");
       setAdminNotes(data.adminNotes || "");
       setAiOutput(data.aiOutput || "");
+      setAiScore(data.aiScore ?? 100);
+      setGrammarScore(data.grammarScore ?? 100);
+      setPlagiarismScore(data.plagiarismScore ?? 0);
+      setIsPlagiarismFree(data.isPlagiarismFree ?? true);
     } catch {
       setMsg({ type: "error", text: "Failed to load job." });
     } finally {
@@ -55,7 +59,15 @@ export default function AdminJobDetailPage() {
       const res = await fetch(`/api/admin/jobs/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status, adminNotes, aiOutput }),
+        body: JSON.stringify({ 
+          status, 
+          adminNotes, 
+          aiOutput,
+          aiScore,
+          grammarScore,
+          plagiarismScore,
+          isPlagiarismFree
+        }),
       });
       if (!res.ok) throw new Error("Save failed");
       setMsg({ type: "success", text: "Job updated successfully. Client will be notified if marked Completed." });
@@ -282,22 +294,106 @@ export default function AdminJobDetailPage() {
             </div>
           )}
 
-          {/* Deliverable / AI Output */}
+          {/* Deliverable / Final Content */}
           <div className="glass-card" style={{ padding: "var(--space-6)" }}>
             <h3 style={{ fontSize: "1rem", marginBottom: "var(--space-4)" }} className="flex items-center gap-2">
-              <BrainCircuit size={16} /> Deliverable / AI Output
+              <BrainCircuit size={16} /> Final Human-Verified Content
             </h3>
-            <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "var(--space-3)" }}>
-              Write manually or paste AI-generated text. Clients will see this as their "main content".
-            </p>
-            <textarea
-              className="form-textarea"
-              rows={10}
-              placeholder="Paste AI text or write manually..."
-              value={aiOutput}
-              onChange={(e) => setAiOutput(e.target.value)}
-              style={{ fontFamily: "monospace", fontSize: "0.85rem", marginBottom: "var(--space-4)" }}
-            />
+
+            {/* QA TABS */}
+            <div className="flex gap-4 mb-4" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+               <button 
+                 onClick={() => setActiveTab("details")}
+                 style={{ 
+                   padding: "8px 16px", 
+                   fontSize: "0.875rem", 
+                   fontWeight: 600,
+                   color: activeTab === "details" ? "var(--brand-primary)" : "var(--text-muted)",
+                   borderBottom: activeTab === "details" ? "2px solid var(--brand-primary)" : "none",
+                   background: "none", borderLeft: "none", borderRight: "none", borderTop: "none", cursor: "pointer"
+                 }}
+               >Content Editor</button>
+               <button 
+                 onClick={() => setActiveTab("quality")}
+                 style={{ 
+                   padding: "8px 16px", 
+                   fontSize: "0.875rem", 
+                   fontWeight: 600,
+                   color: activeTab === "quality" ? "var(--brand-primary)" : "var(--text-muted)",
+                   borderBottom: activeTab === "quality" ? "2px solid var(--brand-primary)" : "none",
+                   background: "none", borderLeft: "none", borderRight: "none", borderTop: "none", cursor: "pointer"
+                 }}
+               >Quality Verification</button>
+            </div>
+
+            {activeTab === "details" ? (
+              <>
+                <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "var(--space-3)" }}>
+                  Write manually or paste AI-generated text. Clients see this as the "delivered content".
+                </p>
+                <textarea
+                  className="form-textarea"
+                  rows={10}
+                  placeholder="Paste AI text or write manually..."
+                  value={aiOutput}
+                  onChange={(e) => setAiOutput(e.target.value)}
+                  style={{ fontFamily: "monospace", fontSize: "0.85rem", marginBottom: "var(--space-4)" }}
+                />
+              </>
+            ) : (
+              <div className="flex-col gap-5 py-2">
+                <div className="form-group">
+                  <label className="form-label flex justify-between">
+                    <span>Human Originality Score</span>
+                    <span style={{ color: "var(--brand-primary)", fontWeight: 700 }}>{aiScore}%</span>
+                  </label>
+                  <input 
+                    type="range" min="0" max="100" className="w-full" 
+                    value={aiScore} onChange={(e) => setAiScore(parseInt(e.target.value))} 
+                    style={{ accentColor: "var(--brand-primary)" }}
+                  />
+                  <p className="text-xs text-muted mt-1">Realistic score of 85-95% is standard for human writing.</p>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label flex justify-between">
+                    <span>Grammar Accuracy Score</span>
+                    <span style={{ color: "var(--brand-success)", fontWeight: 700 }}>{grammarScore}%</span>
+                  </label>
+                  <input 
+                    type="range" min="0" max="100" className="w-full" 
+                    value={grammarScore} onChange={(e) => setGrammarScore(parseInt(e.target.value))} 
+                    style={{ accentColor: "var(--brand-success)" }}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label flex justify-between">
+                    <span>Plagiarism Score</span>
+                    <span style={{ color: plagiarismScore > 15 ? "var(--brand-danger)" : "var(--brand-info)", fontWeight: 700 }}>{plagiarismScore}%</span>
+                  </label>
+                  <input 
+                    type="range" min="0" max="100" className="w-full" 
+                    value={plagiarismScore} onChange={(e) => setPlagiarismScore(parseInt(e.target.value))} 
+                    style={{ accentColor: plagiarismScore > 15 ? "var(--brand-danger)" : "var(--brand-info)" }}
+                  />
+                </div>
+
+                <label className="flex items-center gap-3 p-3 bg-elevated rounded-lg cursor-pointer hover:bg-subtle transition-colors">
+                  <input 
+                    type="checkbox" 
+                    checked={isPlagiarismFree} 
+                    onChange={(e) => setIsPlagiarismFree(e.target.checked)}
+                    className="w-5 h-5 rounded border-zinc-700 bg-zinc-800 text-purple-600 focus:ring-purple-500"
+                  />
+                  <div>
+                    <div style={{ fontSize: "0.875rem", fontWeight: 600 }}>Verify Plagiarism-Free</div>
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Confirm this content has been checked and is original.</div>
+                  </div>
+                </label>
+              </div>
+            )}
+
 
             {/* Admin Upload Section */}
             <div style={{ 

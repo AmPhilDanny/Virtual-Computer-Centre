@@ -187,6 +187,13 @@ model Job {
   fundsInEscrow Boolean    @default(false)
   dueAt         DateTime?
   completedAt   DateTime?
+  
+  // Verification & Quality Assurance
+  aiScore          Float?    // Human Originality %
+  grammarScore     Float?    // Grammar Accuracy %
+  plagiarismScore  Float?    // Plagiarism percentage
+  isPlagiarismFree Boolean   @default(false)
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

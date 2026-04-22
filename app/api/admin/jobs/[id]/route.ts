@@ -36,7 +36,16 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
   const { id } = await params;
   const body = await req.json();
-  const { status, adminNotes, aiOutput, attachments, completedAt } = body;
+  const { 
+    status, 
+    adminNotes, 
+    aiOutput, 
+    attachments, 
+    aiScore,
+    grammarScore,
+    plagiarismScore,
+    isPlagiarismFree
+  } = body;
 
   const updated = await prisma.job.update({
     where: { id },
@@ -45,6 +54,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       ...(adminNotes !== undefined ? { adminNotes } : {}),
       ...(aiOutput !== undefined ? { aiOutput } : {}),
       ...(attachments !== undefined ? { attachments } : {}),
+      ...(aiScore !== undefined ? { aiScore: parseFloat(aiScore) } : {}),
+      ...(grammarScore !== undefined ? { grammarScore: parseFloat(grammarScore) } : {}),
+      ...(plagiarismScore !== undefined ? { plagiarismScore: parseFloat(plagiarismScore) } : {}),
+      ...(isPlagiarismFree !== undefined ? { isPlagiarismFree } : {}),
       ...(status === "COMPLETED" ? { completedAt: new Date() } : {}),
     },
   });
