@@ -27,6 +27,11 @@ export default function AdminJobDetailPage() {
   const [status, setStatus] = useState("");
   const [adminNotes, setAdminNotes] = useState("");
   const [aiOutput, setAiOutput] = useState("");
+  const [aiScore, setAiScore] = useState(100);
+  const [grammarScore, setGrammarScore] = useState(100);
+  const [plagiarismScore, setPlagiarismScore] = useState(0);
+  const [isPlagiarismFree, setIsPlagiarismFree] = useState(true);
+  const [activeTab, setActiveTab] = useState("details");
 
   const fetchJob = async () => {
     setLoading(true);
