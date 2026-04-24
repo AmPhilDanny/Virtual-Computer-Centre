@@ -37,7 +37,9 @@ export default function AdminSeoPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+
 
   useEffect(() => {
     async function fetchSeo() {
