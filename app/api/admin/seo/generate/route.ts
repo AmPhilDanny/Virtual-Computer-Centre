@@ -3,6 +3,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getActiveAiModel } from "@/lib/ai/factory";
 import { generateText } from "ai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -39,7 +41,16 @@ export async function POST(req: Request) {
       context += `Recent Blog Posts: ${recentPosts.map(p => p.title).join(", ")}. `;
     }
 
-    const model = await getActiveAiModel();
+    let model;
+    try {
+      model = await getActiveAiModel();
+    } catch (e) {
+      console.error("AI FACTORY FAILED:", e);
+      const google = createGoogleGenerativeAI({
+        apiKey: settings.geminiApiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY || "",
+      });
+      model = google("gemini-1.5-flash");
+    }
 
     const prompt = `
       You are an expert SEO strategist. Generate a high-performance SEO configuration for the "${page}" page of a digital services platform in Nigeria.
@@ -48,12 +59,12 @@ export async function POST(req: Request) {
       Location: Nigeria
       Context: ${context}
       
-      Return a JSON object with exactly these fields:
-      - title: A compelling browser title (max 60 characters)
-      - description: A persuasive meta description (max 160 characters)
-      - keywords: A string of 15-20 relevant comma-separated keywords
-      
-      The tone should be professional, trustworthy, and optimized for high click-through rates on Google. Focus on local Nigerian context where relevant.
+      Return ONLY a JSON object with exactly these fields:
+      {
+        "title": "Compelling browser title (max 60 characters)",
+        "description": "Persuasive meta description (max 160 characters)",
+        "keywords": "15-20 comma-separated keywords"
+      }
       
       Format the response as raw JSON without markdown blocks.
     `;
@@ -63,27 +74,35 @@ export async function POST(req: Request) {
       prompt,
     });
 
-    // Clean up response if AI included markdown blocks
-    const cleanedText = text.replace(/```json\n?|\n?```/g, "").trim();
-    const result = JSON.parse(cleanedText);
 
-    // Save to settings
-    const prefix = `seo${page.charAt(0).toUpperCase() + page.slice(1)}`;
-    const updates = [
-      { key: `${prefix}Title`, value: result.title },
-      { key: `${prefix}Desc`, value: result.description },
-      { key: `${prefix}Keywords`, value: result.keywords }
-    ];
+    try {
+      // Clean up response if AI included markdown blocks or extra text
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      const jsonText = jsonMatch ? jsonMatch[0] : text;
+      const result = JSON.parse(jsonText.replace(/```json\n?|\n?```/g, "").trim());
 
-    for (const update of updates) {
-      await prisma.siteSettings.upsert({
-        where: { key: update.key },
-        update: { value: update.value },
-        create: { key: update.key, value: update.value },
-      });
+      // Save to settings
+      const prefix = `seo${page.charAt(0).toUpperCase() + page.slice(1)}`;
+      const updates = [
+        { key: `${prefix}Title`, value: result.title || "" },
+        { key: `${prefix}Desc`, value: result.description || result.desc || "" },
+        { key: `${prefix}Keywords`, value: result.keywords || "" }
+      ];
+
+      for (const update of updates) {
+        await prisma.siteSettings.upsert({
+          where: { key: update.key },
+          update: { value: update.value },
+          create: { key: update.key, value: update.value },
+        });
+      }
+
+      return NextResponse.json({ success: true, result });
+    } catch (parseError) {
+      console.error("AI Response Parsing Failed:", parseError, "Raw Text:", text);
+      return new NextResponse("AI returned invalid data format", { status: 500 });
     }
 
-    return NextResponse.json({ success: true, result });
   } catch (error) {
     console.error("AI SEO Generation Failed:", error);
     return new NextResponse("Failed to generate SEO", { status: 500 });
