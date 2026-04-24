@@ -12,6 +12,15 @@ interface Settings {
   faviconUrl: string;
   supportEmail: string;
   contactNumber: string;
+  topNavLinks?: string;
+  footerMenuLinks?: string;
+  footerCopyright?: string;
+  footerBrandText?: string;
+  twitterUrl?: string;
+  facebookUrl?: string;
+  linkedinUrl?: string;
+  instagramUrl?: string;
+  whatsappUrl?: string;
 }
 
 const defaultSettings: Settings = {
@@ -24,7 +33,9 @@ const defaultSettings: Settings = {
   faviconUrl: "",
   supportEmail: "support@aicomputercentre.com",
   contactNumber: "+234 812 345 6789",
+  footerCopyright: `© ${new Date().getFullYear()} NovaX Digital Centre. All rights reserved.`,
 };
+
 
 const SettingsContext = createContext<Settings>(defaultSettings);
 
