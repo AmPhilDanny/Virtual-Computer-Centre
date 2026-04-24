@@ -7,7 +7,9 @@ export const metadata: Metadata = {
   robots: "noindex, nofollow", // Keep hidden from search engines
 };
 
+const features = [
   {
+
     icon: "👨‍💻",
     title: "Human-Verified Quality",
     desc: "Every AI-generated output is meticulously reviewed and edited by human experts to ensure 100% accuracy, professional tone, and human originality.",
@@ -39,7 +41,10 @@ export const metadata: Metadata = {
   },
 
 
+];
+
 const services = ["Academic Typing & Proofreading", "NIN & Government Registrations", "AI Document Generation", "Business Plans & Proposals", "Virtual Administrative Assistance", "AI-Powered Tutoring Sessions"];
+
 
 const techStack = [
   ["Framework", "Next.js 16 (App Router, Edge-Ready)"],
