@@ -24,17 +24,18 @@ interface Settings {
 }
 
 const defaultSettings: Settings = {
-  siteName: "AI Computer Centre",
-  siteDescription: "AI-powered digital computer centre delivering online services.",
+  siteName: "NovaX Digital Centre",
+  siteDescription: "Nigeria's premier AI-powered digital services platform with human-expert verification.",
   brandPrimary: "#0070f3",
   brandSecondary: "#7928ca",
   brandAccent: "#ff0080",
   logoUrl: "",
   faviconUrl: "",
-  supportEmail: "support@aicomputercentre.com",
+  supportEmail: "support@novaxdigitalcentre.com",
   contactNumber: "+234 812 345 6789",
   footerCopyright: `© ${new Date().getFullYear()} NovaX Digital Centre. All rights reserved.`,
 };
+
 
 
 const SettingsContext = createContext<Settings>(defaultSettings);

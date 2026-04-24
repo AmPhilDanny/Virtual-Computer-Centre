@@ -4,7 +4,16 @@ const prisma = new PrismaClient();
 
 const CONTENT_SEEDS = [
   {
+    key: "siteName",
+    value: "NovaX Digital Centre"
+  },
+  {
+    key: "supportEmail",
+    value: "support@novaxdigitalcentre.com"
+  },
+  {
     key: "pageContent_about",
+
     value: `
       <h2>About NovaX Digital Centre</h2>
       <p>NovaX Digital Centre is Nigeria's premier hybrid digital services platform. We bridge the gap between traditional computer centre services and the future of AI-driven productivity.</p>

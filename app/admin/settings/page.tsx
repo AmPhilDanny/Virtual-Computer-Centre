@@ -72,9 +72,10 @@ function LinkManager({
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Record<string, string>>({
-    siteName: "AI Computer Centre",
-    siteDescription: "AI-powered digital computer centre delivering online services.",
-    supportEmail: "support@aicomputercentre.com",
+    siteName: "NovaX Digital Centre",
+    siteDescription: "Nigeria's premier AI-powered digital services platform with human-expert verification.",
+    supportEmail: "support@novaxdigitalcentre.com",
+
     contactNumber: "+234 812 345 6789",
     brandPrimary: "#0070f3",
     brandSecondary: "#7928ca",
@@ -145,6 +146,7 @@ export default function AdminSettingsPage() {
       ],
     }),
     footerCopyright: `© ${new Date().getFullYear()} NovaX Digital Centre. All rights reserved.`,
+
     footerBrandText: "Nigeria's #1 AI-powered digital computer centre. Professional services delivered by intelligent agents, reviewed by experts.",
     twitterUrl: "#",
     facebookUrl: "#",

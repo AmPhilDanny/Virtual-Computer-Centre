@@ -28,13 +28,20 @@ export default function Navbar() {
             <img src={settings.logoUrl} alt={settings.siteName} style={{ height: "40px", objectFit: "contain" }} />
           ) : (
             <>
-              <div className="navbar-logo-icon" style={{ overflow: "hidden", background: "var(--brand-primary)" }}>
-                <img src={settings.faviconUrl || "/favicon.png"} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              </div>
+              {settings.faviconUrl ? (
+                <div className="navbar-logo-icon" style={{ overflow: "hidden", background: "var(--brand-primary)" }}>
+                  <img src={settings.faviconUrl} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+              ) : (
+                <div className="navbar-logo-icon" style={{ display: "flex", alignItems: "center", justifyItems: "center", background: "var(--brand-primary)", borderRadius: "8px" }}>
+                  <span style={{ fontSize: "0.8rem", fontWeight: "bold", color: "#fff", width: "100%", textAlign: "center" }}>N</span>
+                </div>
+              )}
               <span className="navbar-logo-text">
                 {settings.siteName.split(" ")[0]}<span>{settings.siteName.split(" ").slice(1).join("")}</span>
               </span>
             </>
+
           )}
         </Link>
 
