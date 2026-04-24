@@ -7,38 +7,37 @@ export const metadata: Metadata = {
   robots: "noindex, nofollow", // Keep hidden from search engines
 };
 
-const features = [
+  {
+    icon: "👨‍💻",
+    title: "Human-Verified Quality",
+    desc: "Every AI-generated output is meticulously reviewed and edited by human experts to ensure 100% accuracy, professional tone, and human originality.",
+  },
   {
     icon: "🧠",
-    title: "Multi-Model AI Engine",
-    desc: "Simultaneous access to Gemini, Groq, Mistral, Together AI, and Meta Llama — with automatic failover ensuring 99.9% AI availability across all service requests.",
+    title: "Hybrid Multi-Model Engine",
+    desc: "We combine the speed of Gemini, Llama, and Mistral with human editorial oversight, delivering 'High-Confidence' work that bypasses AI detectors.",
   },
   {
     icon: "📚",
     title: "AI Tutor Subscription",
-    desc: "Adaptive, curriculum-aware tutoring with RAG-based document retrieval. Students upload textbooks; our AI delivers course-specific answers with persistent session memory.",
+    desc: "Adaptive, curriculum-aware tutoring with RAG-based document retrieval. Students upload textbooks; our AI delivers course-specific answers with persistent memory.",
   },
   {
     icon: "🛒",
     title: "Verified Vendor Marketplace",
-    desc: "Identity-verified service providers (National ID + Resume required) operating under escrow-protected transactions and an 80/20 revenue share model.",
-  },
-  {
-    icon: "📱",
-    title: "Native Mobile + PWA",
-    desc: "A single codebase powers a full website, an installable Progressive Web App, and a native Android APK — all updating live without re-downloading.",
-  },
-  {
-    icon: "💳",
-    title: "Integrated Payments",
-    desc: "Paystack and Flutterwave dual-gateway support with automated wallet top-ups, escrow management, coupon discounts, and vendor payout processing.",
+    desc: "Identity-verified service providers (National ID required) operating under escrow-protected transactions and an 80/20 revenue share model.",
   },
   {
     icon: "🛡️",
-    title: "Enterprise-Grade Security",
-    desc: "Role-based access control (Admin, Vendor, Client), mandatory vendor document verification, virus scanning for uploads, and full audit logging.",
+    title: "Institutional Trust",
+    desc: "Built-in plagiarism checks, human originality scores, and grammar verification bars build deep trust with students and professional clients.",
   },
-];
+  {
+    icon: "📱",
+    title: "Native Mobile Ecosystem",
+    desc: "A single codebase powers a full website, an installable PWA, and a native Android APK — all updating live without re-downloading.",
+  },
+
 
 const services = ["Academic Typing & Proofreading", "NIN & Government Registrations", "AI Document Generation", "Business Plans & Proposals", "Virtual Administrative Assistance", "AI-Powered Tutoring Sessions"];
 
@@ -221,12 +220,13 @@ export default function PitchPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "12px" }}>
           {[
             "✅ Live Production Platform — novaxdigitalcentre.vercel.app",
+            "✅ Human-in-the-Loop (HITL) Verification Pipeline Active",
             "✅ Native Android APK via automated GitHub Actions CI/CD",
-            "✅ Installable PWA across all modern mobile browsers",
             "✅ Multi-AI redundancy with automatic failover live",
             "✅ Vendor identity verification pipeline active",
             "✅ PostgreSQL database with full schema deployed",
           ].map((item) => (
+
             <div key={item} style={{ 
               padding: "14px 18px", background: "rgba(0,229,160,0.05)",
               border: "1px solid rgba(0,229,160,0.15)", borderRadius: "10px",

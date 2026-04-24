@@ -349,7 +349,7 @@ export default function AdminJobDetailPage() {
               <div className="flex-col gap-5 py-2">
                 <div className="form-group">
                   <label className="form-label flex justify-between">
-                    <span>Human Originality Score</span>
+                    <span>Human Originality</span>
                     <span style={{ color: "var(--brand-primary)", fontWeight: 700 }}>{aiScore}%</span>
                   </label>
                   <input 
@@ -360,9 +360,10 @@ export default function AdminJobDetailPage() {
                   <p className="text-xs text-muted mt-1">Realistic score of 85-95% is standard for human writing.</p>
                 </div>
 
+
                 <div className="form-group">
                   <label className="form-label flex justify-between">
-                    <span>Grammar Accuracy Score</span>
+                    <span>Grammar Accuracy</span>
                     <span style={{ color: "var(--brand-success)", fontWeight: 700 }}>{grammarScore}%</span>
                   </label>
                   <input 
@@ -370,7 +371,9 @@ export default function AdminJobDetailPage() {
                     value={grammarScore} onChange={(e) => setGrammarScore(parseInt(e.target.value))} 
                     style={{ accentColor: "var(--brand-success)" }}
                   />
+                  <p className="text-xs text-muted mt-1">Verified accuracy of syntax, spelling, and tone.</p>
                 </div>
+
 
                 <div className="form-group">
                   <label className="form-label flex justify-between">

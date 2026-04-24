@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { useSettings } from "./SettingsProvider";
 
-const footerLinks = {
+const defaultFooterLinks = {
   Services: [
     { label: "Typing Services", href: "/services/document-typing" },
     { label: "Academic Help", href: "/services/assignment-writing" },
@@ -23,6 +24,20 @@ const footerLinks = {
 };
 
 export default function Footer() {
+  const settings = useSettings();
+
+  const menuLinks = settings.footerMenuLinks 
+    ? JSON.parse(settings.footerMenuLinks) 
+    : defaultFooterLinks;
+
+  const socialLinks = [
+    { icon: "𝕏", url: settings.twitterUrl || "#" },
+    { icon: "📘", url: settings.facebookUrl || "#" },
+    { icon: "💼", url: settings.linkedinUrl || "#" },
+    { icon: "📸", url: settings.instagramUrl || "#" },
+    { icon: "💬", url: settings.whatsappUrl || "#" },
+  ].filter(s => s.url !== "#");
+
   return (
     <footer
       style={{
@@ -38,7 +53,7 @@ export default function Footer() {
             <div className="navbar-logo" style={{ marginBottom: "var(--space-4)" }}>
               <div className="navbar-logo-icon">✨</div>
               <span className="navbar-logo-text">
-                NovaX<span>Digital</span>
+                {settings.siteName?.split(" ")[0] || "NovaX"}<span>{settings.siteName?.split(" ").slice(1).join("") || "Digital"}</span>
               </span>
             </div>
             <p
@@ -49,7 +64,7 @@ export default function Footer() {
                 maxWidth: "280px",
               }}
             >
-              Nigeria&apos;s #1 AI-powered digital computer centre. Professional services delivered by intelligent agents, reviewed by experts.
+              {settings.footerBrandText || "Nigeria's #1 AI-powered digital computer centre. Professional services delivered by intelligent agents, reviewed by experts."}
             </p>
             <div
               style={{
@@ -58,10 +73,12 @@ export default function Footer() {
                 marginTop: "var(--space-5)",
               }}
             >
-              {["𝕏", "📘", "💼", "📸"].map((icon, i) => (
+              {socialLinks.map((social, i) => (
                 <a
                   key={i}
-                  href="#"
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
                     width: "36px",
                     height: "36px",
@@ -75,14 +92,14 @@ export default function Footer() {
                     transition: "all var(--transition-fast)",
                   }}
                 >
-                  {icon}
+                  {social.icon}
                 </a>
               ))}
             </div>
           </div>
 
           {/* Links */}
-          {Object.entries(footerLinks).map(([section, links]) => (
+          {Object.entries(menuLinks).map(([section, links]: [string, any]) => (
             <div key={section}>
               <h4
                 style={{
@@ -97,7 +114,7 @@ export default function Footer() {
                 {section}
               </h4>
               <ul style={{ listStyle: "none" }}>
-                {links.map((link) => (
+                {links.map((link: any) => (
                   <li key={link.href} style={{ marginBottom: "var(--space-2)" }}>
                     <Link
                       href={link.href}
@@ -131,7 +148,7 @@ export default function Footer() {
           className="footer-bottom"
         >
           <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>
-            © {new Date().getFullYear()} AI Computer Centre. All rights reserved.
+            {settings.footerCopyright || `© ${new Date().getFullYear()} NovaX Digital Centre. All rights reserved.`}
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
             <span
@@ -151,3 +168,4 @@ export default function Footer() {
     </footer>
   );
 }
+

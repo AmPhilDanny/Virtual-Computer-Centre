@@ -118,20 +118,21 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                   icon={<Cpu size={18} />} 
                   label="Human Originality" 
                   value={job.aiScore ? `${job.aiScore}%` : "Checked"} 
-                  isActive={!!(job.aiScore && job.aiScore >= 80)} 
+                  isActive={!!(job.aiScore && job.aiScore >= 85)} 
                 />
                 <QualityMetric 
                   icon={<BookOpen size={18} />} 
-                  label="Grammar Precision" 
+                  label="Grammar Accuracy" 
                   value={job.grammarScore ? `${job.grammarScore}%` : "Verified"} 
                   isActive={!!(job.grammarScore && job.grammarScore >= 85)} 
                 />
                 <QualityMetric 
                   icon={<ShieldCheck size={18} />} 
-                  label="Plagiarism Free" 
+                  label="Plagiarism-Free" 
                   value={job.isPlagiarismFree ? "100% Original" : "Verified"} 
                   isActive={!!job.isPlagiarismFree} 
                 />
+
              </div>
           </div>
         )}

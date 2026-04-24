@@ -21,45 +21,56 @@ export async function getActiveAiModel() {
 }
 
 export function getAiModel(provider: AiProviderType, settings: Record<string, string>) {
-  switch (provider) {
-    case 'google': {
-      const google = createGoogleGenerativeAI({
-        apiKey: settings.geminiApiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-      });
-      return google(settings.geminiModel || "gemini-2.0-flash-exp");
+  try {
+    switch (provider) {
+      case 'google': {
+        const apiKey = settings.geminiApiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+        if (!apiKey) {
+          console.warn("AI FACTORY: Google API Key missing. Falling back to environment if available.");
+        }
+        const google = createGoogleGenerativeAI({
+          apiKey: apiKey || "",
+        });
+        // Using gemini-1.5-flash as the stable production-ready default
+        return google(settings.geminiModel || "gemini-1.5-flash");
+      }
+      case 'groq': {
+        const groq = createGroq({
+          apiKey: settings.groqApiKey || "",
+        });
+        return groq(settings.groqModel || "llama-3.3-70b-versatile");
+      }
+      case 'mistral': {
+        const mistral = createMistral({
+          apiKey: settings.mistralApiKey || "",
+        });
+        return mistral(settings.mistralModel || "mistral-large-latest");
+      }
+      case 'togetherai': {
+        const together = createTogetherAI({
+          apiKey: settings.togetherApiKey || "",
+        });
+        return together(settings.togetherModel || "meta-llama/Llama-Vision-Free");
+      }
+      case 'fireworks': {
+        const fireworks = createOpenAI({
+          baseURL: 'https://api.fireworks.ai/inference/v1',
+          apiKey: settings.fireworksApiKey || "",
+        });
+        return fireworks(settings.fireworksModel || "accounts/fireworks/models/llama-v3p1-70b-instruct");
+      }
+      case 'openrouter': {
+        const openrouter = createOpenRouter({
+          apiKey: settings.openRouterApiKey || "",
+        });
+        return openrouter(settings.openRouterModel || "google/gemini-2.0-flash-001");
+      }
+      default:
+        throw new Error(`Unsupported AI provider: ${provider}`);
     }
-    case 'groq': {
-      const groq = createGroq({
-        apiKey: settings.groqApiKey,
-      });
-      return groq(settings.groqModel || "llama-3.3-70b-versatile");
-    }
-    case 'mistral': {
-      const mistral = createMistral({
-        apiKey: settings.mistralApiKey,
-      });
-      return mistral(settings.mistralModel || "mistral-large-latest");
-    }
-    case 'togetherai': {
-      const together = createTogetherAI({
-        apiKey: settings.togetherApiKey,
-      });
-      return together(settings.togetherModel || "meta-llama/Llama-Vision-Free");
-    }
-    case 'fireworks': {
-      const fireworks = createOpenAI({
-        baseURL: 'https://api.fireworks.ai/inference/v1',
-        apiKey: settings.fireworksApiKey,
-      });
-      return fireworks(settings.fireworksModel || "accounts/fireworks/models/llama-v3p1-70b-instruct");
-    }
-    case 'openrouter': {
-      const openrouter = createOpenRouter({
-        apiKey: settings.openRouterApiKey,
-      });
-      return openrouter(settings.openRouterModel || "google/gemini-2.0-flash-001");
-    }
-    default:
-      throw new Error(`Unsupported AI provider: ${provider}`);
+  } catch (error) {
+    console.error(`AI FACTORY ERROR (${provider}):`, error);
+    throw error;
   }
 }
+

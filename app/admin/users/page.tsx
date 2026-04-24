@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+export const dynamic = "force-dynamic";
+
 import { Users, Mail, UserPlus, Trash2, ShieldCheck, ChevronRight } from "lucide-react";
 
 export default async function AdminUsersPage() {

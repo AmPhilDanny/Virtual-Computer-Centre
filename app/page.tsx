@@ -59,9 +59,10 @@ const services = [
 const steps = [
   { num: "01", title: "Choose a Service", desc: "Browse our catalog and select the service that fits your need." },
   { num: "02", title: "Submit Your Job", desc: "Fill out the smart form, attach files, and choose your delivery speed." },
-  { num: "03", title: "AI Gets to Work", desc: "Our intelligent agents process, review, and quality-check your task." },
-  { num: "04", title: "Receive & Review", desc: "Download your completed work. Request free revisions if needed." },
+  { num: "03", title: "Human + AI Review", desc: "Our agents process the task, followed by a meticulous human expert quality check." },
+  { num: "04", title: "Verified Delivery", desc: "Download your completed work with a certified Human Originality Score." },
 ];
+
 
 const testimonials = [
   { name: "Chioma A.", role: "Student, UNILAG", text: "I submitted my thesis formatting at 11pm and it was done by 6am. Absolutely incredible service.", avatar: "C" },
@@ -76,10 +77,11 @@ export default async function HomePage() {
     return acc;
   }, {} as Record<string, string>);
 
-  const heroBadge = settings.homeHeroBadge || "🤖 Powered by Advanced AI Agents";
-  const heroTitle = settings.homeHeroTitle || "Your Digital Computer Centre, <br /> <span class=\"text-gradient\">Now Powered by AI</span>";
-  const heroSubtitle = settings.homeHeroSubtitle || "Professional typing, academic, government, and business services completed by intelligent AI agents — fast, accurate, and affordable.";
-  const heroCta = settings.homeHeroCta || "Explore Services →";
+  const heroBadge = settings.homeHeroBadge || "🛡️ Human-Verified AI Digital Services";
+  const heroTitle = settings.homeHeroTitle || "Premium Digital Services, <br /> <span class=\"text-gradient\">Verified by Humans</span>";
+  const heroSubtitle = settings.homeHeroSubtitle || "Fast, affordable digital services powered by advanced AI and perfected by human experts. From typing to academic research — we guarantee professional quality.";
+  const heroCta = settings.homeHeroCta || "Get Started →";
+
 
   return (
     <>
@@ -216,9 +218,10 @@ export default async function HomePage() {
                 {[
                   { icon: "🔍", name: "Intake Agent", desc: "Validates your submission and flags missing information instantly." },
                   { icon: "🧠", name: "Analysis Agent", desc: "Determines complexity, scope, and the best execution path." },
-                  { icon: "⚙️", name: "Execution Agent", desc: "Completes the task using specialized AI models and tools." },
-                  { icon: "✅", name: "QA Agent", desc: "Reviews the output for quality, accuracy, and compliance." },
-                  { icon: "🚨", name: "Escalation Agent", desc: "Flags complex tasks for human expert review automatically." },
+                  { icon: "⚙️", name: "Execution Agent", desc: "Completes the initial draft using specialized AI models." },
+                  { icon: "✅", name: "QA Agent", desc: "Reviews the output for accuracy and compliance." },
+                  { icon: "👨‍💻", name: "Human Inspector", desc: "Meticulously reviews every word to guarantee human originality." },
+
                 ].map((agent) => (
                   <div key={agent.name} style={{
                     display: "flex",

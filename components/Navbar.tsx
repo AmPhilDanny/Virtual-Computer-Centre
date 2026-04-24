@@ -40,12 +40,13 @@ export default function Navbar() {
 
         {/* Desktop Nav */}
         <ul className="navbar-nav">
-          {navLinks.map((link) => (
+          {(settings.topNavLinks ? JSON.parse(settings.topNavLinks) : navLinks).map((link: any) => (
             <li key={link.href}>
               <Link href={link.href}>{link.label}</Link>
             </li>
           ))}
         </ul>
+
 
         {/* Actions */}
         <div className="navbar-actions" style={{ gap: "var(--space-2)" }}>
@@ -116,7 +117,7 @@ export default function Navbar() {
             padding: "var(--space-4)",
           }}
         >
-          {navLinks.map((link) => (
+          {(settings.topNavLinks ? JSON.parse(settings.topNavLinks) : navLinks).map((link: any) => (
             <Link
               key={link.href}
               href={link.href}
@@ -132,6 +133,7 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+
           <div
             style={{
               display: "flex",

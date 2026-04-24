@@ -3,108 +3,95 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
-// =========================================
-// AUTH MODELS
-// =========================================
-
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?   @db.Text
-  password      String?
-  phone         String?
-  role          UserRole  @default(CLIENT)
-  walletBalance Float     @default(0)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  accounts Account[]
-  sessions Session[]
-  jobs     Job[]
-  orders   Order[]
-  blogPosts BlogPost[] @relation("BlogAuthor")
-  blogComments BlogComment[]
+  id                 String              @id @default(cuid())
+  name               String?
+  email              String              @unique
+  emailVerified      DateTime?
+  image              String?
+  password           String?
+  phone              String?
+  role               UserRole            @default(CLIENT)
+  walletBalance      Float               @default(0)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  studentProfile     Json?
+  accounts           Account[]
+  blogComments       BlogComment[]
+  blogPosts          BlogPost[]          @relation("BlogAuthor")
+  jobs               Job[]
+  orders             Order[]
+  sessions           Session[]
+  studyMaterials     StudyMaterial[]
+  subscriptions      Subscription[]
+  tutorSessions      TutorSession[]
+  consents           UserConsent[]
+  vendorProfile      VendorProfile?
   walletTransactions WalletTransaction[]
-  consents UserConsent[]
-  
-  // AI Tutor Extensions
-  studentProfile Json?        // { academicLevel, learningStyle, interests, bio, occupation }
-  subscriptions  Subscription[]
-  studyMaterials StudyMaterial[]
-  tutorSessions  TutorSession[]
-  
-  // Vendor Extensions
-  vendorProfile  VendorProfile?
 }
 
 model VendorProfile {
-  id             String   @id @default(cuid())
-  userId         String   @unique
+  id             String          @id @default(cuid())
+  userId         String          @unique
   storeName      String
-  storeSlug      String   @unique
+  storeSlug      String          @unique
+  status         VendorStatus    @default(PENDING)
+  adminNotes     String?
+  totalEarnings  Float           @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  address        String?
   fullName       String?
-  address        String?  @db.Text
-  description    String?  @db.Text
-  portfolioUrl   String?  @db.Text
-  idProofUrl     String?  @db.Text
-  resumeUrl      String?  @db.Text
-  status         VendorStatus @default(PENDING) // PENDING, APPROVED, REJECTED, SUSPENDED
-  adminNotes     String?  @db.Text
-  totalEarnings  Float    @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  services       Service[]
+  idProofUrl     String?
+  resumeUrl      String?
+  description    String?
+  portfolioUrl   String?
   jobs           Job[]
   payoutRequests PayoutRequest[]
+  services       Service[]
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Subscription {
   id        String   @id @default(cuid())
   userId    String
   planType  String   @default("Tutor_Monthly")
-  status    String   @default("ACTIVE") // ACTIVE, CANCELLED, EXPIRED
+  status    String   @default("ACTIVE")
   amount    Float
-  reference String   @unique // Paystack subscription reference
+  reference String   @unique
   startsAt  DateTime @default(now())
   expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model StudyMaterial {
-  id           String   @id @default(cuid())
-  userId       String
-  title        String
-  fileUrl      String   @db.Text
-  fileType     String   // TEXTBOOK | CURRICULUM | READING
-  extractedText String? @db.Text
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String   @id @default(cuid())
+  userId        String
+  title         String
+  fileUrl       String
+  fileType      String
+  extractedText String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model TutorSession {
   id               String   @id @default(cuid())
   userId           String
-  messages         Json     // Array of chat messages
-  learningPatterns Json?    // AI insights into student behavior
+  messages         Json
+  learningPatterns Json?
   lastActivity     DateTime @default(now())
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {
@@ -113,15 +100,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -142,146 +128,129 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// =========================================
-// CORE BUSINESS MODELS
-// =========================================
-
 model Service {
-  id          String        @id @default(cuid())
-  name        String
-  slug        String        @unique
-  description String        @db.Text
-  category    ServiceCategory
-  basePrice   Float
-  expressMultiplier Float   @default(1.5)
-  isActive    Boolean       @default(true)
-  formSchema  Json?         // Dynamic form fields definition
-  aiPrompt    String?       @db.Text
-  autonomyLevel AiAutonomy  @default(AI_PLUS_HUMAN)
-  turnaroundHours Int       @default(24)
-  vendorId    String?
-  approvalStatus ServiceApprovalStatus @default(APPROVED)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  vendor    VendorProfile? @relation(fields: [vendorId], references: [id])
-  jobs      Job[]
-  datasets  Dataset[]
+  id                String                @id @default(cuid())
+  name              String
+  slug              String                @unique
+  description       String
+  category          ServiceCategory
+  basePrice         Float
+  expressMultiplier Float                 @default(1.5)
+  isActive          Boolean               @default(true)
+  formSchema        Json?
+  aiPrompt          String?
+  autonomyLevel     AiAutonomy            @default(AI_PLUS_HUMAN)
+  turnaroundHours   Int                   @default(24)
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  approvalStatus    ServiceApprovalStatus @default(APPROVED)
+  vendorId          String?
+  datasets          Dataset[]
+  jobs              Job[]
+  vendor            VendorProfile?        @relation(fields: [vendorId], references: [id])
 }
 
 model Job {
-  id            String    @id @default(cuid())
-  userId        String
-  serviceId     String
-  title         String
-  description   String    @db.Text
-  formData      Json?     // Client submitted form answers
-  status        JobStatus @default(SUBMITTED)
-  priority      Priority  @default(NORMAL)
-  attachments   String[]  // File URLs
-  aiOutput      String?   @db.Text
-  aiConfidence  Float?
-  adminNotes    String?   @db.Text
-  complexity    Complexity @default(MEDIUM)
-  vendorId      String?
-  fundsInEscrow Boolean    @default(false)
-  dueAt         DateTime?
-  completedAt   DateTime?
-  
-  // Verification & Quality Assurance
-  aiScore          Float?    // Human Originality %
-  grammarScore     Float?    // Grammar Accuracy %
-  plagiarismScore  Float?    // Plagiarism percentage
-  isPlagiarismFree Boolean   @default(false)
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  user    User    @relation(fields: [userId], references: [id])
-  service Service @relation(fields: [serviceId], references: [id])
-  vendor  VendorProfile? @relation(fields: [vendorId], references: [id])
-  order   Order?
-  revisions Revision[]
+  id               String         @id @default(cuid())
+  userId           String
+  serviceId        String
+  title            String
+  description      String
+  formData         Json?
+  status           JobStatus      @default(SUBMITTED)
+  priority         Priority       @default(NORMAL)
+  attachments      String[]
+  aiOutput         String?
+  aiConfidence     Float?
+  adminNotes       String?
+  complexity       Complexity     @default(MEDIUM)
+  dueAt            DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  fundsInEscrow    Boolean        @default(false)
+  vendorId         String?
+  aiScore          Float?
+  grammarScore     Float?
+  isPlagiarismFree Boolean        @default(false)
+  plagiarismScore  Float?
+  service          Service        @relation(fields: [serviceId], references: [id])
+  user             User           @relation(fields: [userId], references: [id])
+  vendor           VendorProfile? @relation(fields: [vendorId], references: [id])
+  order            Order?
+  revisions        Revision[]
 }
 
 model Revision {
   id        String   @id @default(cuid())
   jobId     String
-  reason    String   @db.Text
+  reason    String
   createdAt DateTime @default(now())
-
-  job Job @relation(fields: [jobId], references: [id])
+  job       Job      @relation(fields: [jobId], references: [id])
 }
 
 model Order {
-  id         String      @id @default(cuid())
-  userId     String
-  jobId      String      @unique
-  amount     Float
-  discount   Float       @default(0)
-  total      Float
-  currency   String      @default("NGN")
-  status     PaymentStatus @default(PENDING)
-  gateway    String?     // paystack | flutterwave
-  reference  String?     @unique
-  couponId   String?
-  metadata   Json?
-  proofUrl   String?     // For manual payments
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-
-  user   User @relation(fields: [userId], references: [id])
-  job    Job  @relation(fields: [jobId], references: [id])
-  coupon Coupon? @relation(fields: [couponId], references: [id])
+  id        String        @id @default(cuid())
+  userId    String
+  jobId     String        @unique
+  amount    Float
+  currency  String        @default("NGN")
+  status    PaymentStatus @default(PENDING)
+  gateway   String?
+  reference String?       @unique
+  metadata  Json?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  couponId  String?
+  discount  Float         @default(0)
+  total     Float
+  proofUrl  String?
+  coupon    Coupon?       @relation(fields: [couponId], references: [id])
+  job       Job           @relation(fields: [jobId], references: [id])
+  user      User          @relation(fields: [userId], references: [id])
 }
 
 model Coupon {
   id            String    @id @default(cuid())
   code          String    @unique
-  discountType  String    // PERCENTAGE | FIXED
+  discountType  String
   discountValue Float
   minAmount     Float     @default(0)
   expiresAt     DateTime?
   maxUses       Int?
   usedCount     Int       @default(0)
   isActive      Boolean   @default(true)
-  isFeatured    Boolean   @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-
+  isFeatured    Boolean   @default(false)
   orders        Order[]
 }
 
-// =========================================
-// CMS MODELS
-// =========================================
-
 model SiteSettings {
-  id          String   @id @default(cuid())
-  key         String   @unique
-  value       String   @db.Text
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
 }
 
 model Dataset {
-  id          String   @id @default(cuid())
-  name        String
-  fileUrl     String?  @db.Text
-  fileType    String?
-  content     String?  @db.Text // Extracted/Manual text for AI knowledge
-  size        Int?
-  serviceId   String?  // If null, it's a global dataset
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  service     Service? @relation(fields: [serviceId], references: [id])
+  id        String   @id @default(cuid())
+  name      String
+  fileUrl   String?
+  fileType  String?
+  content   String?
+  size      Int?
+  serviceId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  service   Service? @relation(fields: [serviceId], references: [id])
 }
 
 model Page {
   id          String   @id @default(cuid())
   title       String
   slug        String   @unique
-  content     Json?    // Block-based structured content
+  content     Json?
   metaTitle   String?
   metaDesc    String?
   isPublished Boolean  @default(true)
@@ -290,47 +259,45 @@ model Page {
 }
 
 model BlogPost {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
   title       String
-  slug        String   @unique
-  excerpt     String?  @db.Text
-  content     String?  @db.Text // Markdown content
-  coverImage  String?  @db.Text
+  slug        String        @unique
+  excerpt     String?
+  content     String?
+  coverImage  String?
+  isPublished Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   authorId    String
   categoryId  String?
-  isPublished Boolean  @default(false)
-  metaTitle   String?
   metaDesc    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  author      User     @relation("BlogAuthor", fields: [authorId], references: [id])
-  category    BlogCategory? @relation(fields: [categoryId], references: [id])
+  metaTitle   String?
   comments    BlogComment[]
+  author      User          @relation("BlogAuthor", fields: [authorId], references: [id])
+  category    BlogCategory? @relation(fields: [categoryId], references: [id])
 }
 
 model BlogCategory {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  slug        String   @unique
-  icon        String?
-  posts       BlogPost[]
+  id    String     @id @default(cuid())
+  name  String     @unique
+  slug  String     @unique
+  icon  String?
+  posts BlogPost[]
 }
 
 model BlogComment {
-  id          String   @id @default(cuid())
-  content     String   @db.Text
-  postId      String
-  userId      String
-  createdAt   DateTime @default(now())
-
-  post        BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  content   String
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AuditLog {
   id        String   @id @default(cuid())
-  actor     String   // userId or "system"
+  actor     String
   action    String
   entity    String
   entityId  String?
@@ -339,50 +306,43 @@ model AuditLog {
 }
 
 model WalletTransaction {
-  id            String   @id @default(cuid())
-  userId        String
-  type          String   // CREDIT | DEBIT
-  amount        Float
-  balanceAfter  Float
-  reference     String   @unique // Paystack ref or Internal ref
-  description   String?
-  status        WalletTransactionStatus @default(SUCCESS)
-  gateway       String?     // paystack | flutterwave | manual
-  proofUrl      String?     // For manual funding
-  createdAt     DateTime @default(now())
-
-  user          User     @relation(fields: [userId], references: [id])
+  id           String                  @id @default(cuid())
+  userId       String
+  type         String
+  amount       Float
+  balanceAfter Float
+  reference    String                  @unique
+  description  String?
+  createdAt    DateTime                @default(now())
+  proofUrl     String?
+  status       WalletTransactionStatus @default(SUCCESS)
+  gateway      String?
+  user         User                    @relation(fields: [userId], references: [id])
 }
 
 model UserConsent {
-  id             String   @id @default(cuid())
-  userId         String?  // Null for guest sessions
-  ipAddress      String?
-  consentType    String   // PRIVACY_POLICY | TERMS_OF_SERVICE | ACADEMIC_INTEGRITY
-  browserAgent   String?
-  createdAt      DateTime @default(now())
-
-  user           User?    @relation(fields: [userId], references: [id])
+  id           String   @id @default(cuid())
+  userId       String?
+  ipAddress    String?
+  consentType  String
+  browserAgent String?
+  createdAt    DateTime @default(now())
+  user         User?    @relation(fields: [userId], references: [id])
 }
 
 model PayoutRequest {
-  id            String   @id @default(cuid())
+  id            String        @id @default(cuid())
   vendorId      String
   amount        Float
-  status        PayoutStatus @default(PENDING)
+  status        PayoutStatus  @default(PENDING)
   bankName      String
   accountNumber String
   accountName   String
   adminNotes    String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   vendor        VendorProfile @relation(fields: [vendorId], references: [id])
 }
-
-// =========================================
-// ENUMS
-// =========================================
 
 enum UserRole {
   CLIENT
