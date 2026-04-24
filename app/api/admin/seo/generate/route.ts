@@ -12,9 +12,11 @@ export async function POST(req: Request) {
   const session = await auth();
 
   const user = session?.user as any;
-  if (user?.role !== "ADMIN") {
+  if (user?.role !== "ADMIN" && user?.role !== "SUPER_ADMIN") {
+    console.error("SEO AUTH FAILED: User is not ADMIN/SUPER_ADMIN. Role:", user?.role);
     return new NextResponse("Unauthorized", { status: 401 });
   }
+
 
   try {
     const { page } = await req.json();

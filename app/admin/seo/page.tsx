@@ -249,9 +249,10 @@ export default function AdminSeoPage() {
                 <div style={{ width: 28, height: 28, background: "#f1f3f4", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px" }}>🌐</div>
                 <div className="flex-col">
                   <div style={{ fontSize: "14px", color: "#202124", lineHeight: "20px" }}>NovaX Digital Centre</div>
-                  <div style={{ fontSize: "12px", color: "#4d5156", lineHeight: "16px" }}>{`https://novax.centre${PAGES.find(p => p.id === activeTab)?.path}`}</div>
+                  <div style={{ fontSize: "12px", color: "#4d5156", lineHeight: "16px" }}>{`https://novaxdigitalcentre.vercel.app${PAGES.find(p => p.id === activeTab)?.path}`}</div>
                 </div>
               </div>
+
               <h3 style={{ fontSize: "20px", color: "#1a0dab", fontWeight: 400, margin: "4px 0", cursor: "pointer", textDecoration: "none" }}>
                 {current.title || "Your Page Title Will Appear Here"}
               </h3>
