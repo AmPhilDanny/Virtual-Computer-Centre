@@ -1,4 +1,6 @@
 "use client";
+export const dynamic = "force-dynamic";
+
 
 import { useState, useEffect } from "react";
 import { Sparkles, Save, Search, Globe, AlertCircle, CheckCircle2, ChevronRight, Eye } from "lucide-react";
@@ -40,7 +42,8 @@ export default function AdminSeoPage() {
   useEffect(() => {
     async function fetchSeo() {
       try {
-        const res = await fetch("/api/admin/settings");
+        const res = await fetch("/api/admin/settings", { cache: "no-store" });
+
         if (res.ok) {
           const data = await res.json();
           const newConfig = { ...config };
@@ -76,6 +79,7 @@ export default function AdminSeoPage() {
   const handleGenerate = async () => {
     setIsGenerating(true);
     setStatus("idle");
+    setErrorMsg("");
     try {
       const res = await fetch("/api/admin/seo/generate", {
         method: "POST",
@@ -88,10 +92,13 @@ export default function AdminSeoPage() {
         handleChange("keywords", result.keywords);
         setStatus("success");
       } else {
+        const msg = await res.text();
+        setErrorMsg(msg || "There was a problem syncing with the AI engine.");
         setStatus("error");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("AI Generation failed:", err);
+      setErrorMsg(err.message || "Network error occurred while connecting to the AI engine.");
       setStatus("error");
     } finally {
       setIsGenerating(false);
@@ -289,10 +296,11 @@ export default function AdminSeoPage() {
           <AlertCircle size={24} />
           <div className="flex-col">
             <div className="font-bold">Configuration Error</div>
-            <div className="text-sm opacity-90">There was a problem syncing with the AI engine.</div>
+            <div className="text-sm opacity-90">{errorMsg}</div>
           </div>
         </div>
       )}
+
     </div>
   );
 }

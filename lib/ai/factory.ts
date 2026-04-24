@@ -26,51 +26,61 @@ export function getAiModel(provider: AiProviderType, settings: Record<string, st
       case 'google': {
         const apiKey = settings.geminiApiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
         if (!apiKey) {
-          console.warn("AI FACTORY: Google API Key missing. Falling back to environment if available.");
+          throw new Error("Google Gemini API Key is missing. Please configure it in Settings.");
         }
-        const google = createGoogleGenerativeAI({
-          apiKey: apiKey || "",
-        });
-        // Using gemini-1.5-flash as the stable production-ready default
+        const google = createGoogleGenerativeAI({ apiKey });
         return google(settings.geminiModel || "gemini-1.5-flash");
       }
       case 'groq': {
-        const groq = createGroq({
-          apiKey: settings.groqApiKey || "",
-        });
+        const apiKey = settings.groqApiKey || process.env.GROQ_API_KEY;
+        if (!apiKey) {
+          throw new Error("Groq API Key is missing. Please configure it in Settings.");
+        }
+        const groq = createGroq({ apiKey });
         return groq(settings.groqModel || "llama-3.3-70b-versatile");
       }
       case 'mistral': {
-        const mistral = createMistral({
-          apiKey: settings.mistralApiKey || "",
-        });
+        const apiKey = settings.mistralApiKey || process.env.MISTRAL_API_KEY;
+        if (!apiKey) {
+          throw new Error("Mistral API Key is missing. Please configure it in Settings.");
+        }
+        const mistral = createMistral({ apiKey });
         return mistral(settings.mistralModel || "mistral-large-latest");
       }
       case 'togetherai': {
-        const together = createTogetherAI({
-          apiKey: settings.togetherApiKey || "",
-        });
+        const apiKey = settings.togetherApiKey || process.env.TOGETHER_API_KEY;
+        if (!apiKey) {
+          throw new Error("Together AI API Key is missing. Please configure it in Settings.");
+        }
+        const together = createTogetherAI({ apiKey });
         return together(settings.togetherModel || "meta-llama/Llama-Vision-Free");
       }
       case 'fireworks': {
+        const apiKey = settings.fireworksApiKey || process.env.FIREWORKS_API_KEY;
+        if (!apiKey) {
+          throw new Error("Fireworks AI API Key is missing. Please configure it in Settings.");
+        }
         const fireworks = createOpenAI({
           baseURL: 'https://api.fireworks.ai/inference/v1',
-          apiKey: settings.fireworksApiKey || "",
+          apiKey,
         });
         return fireworks(settings.fireworksModel || "accounts/fireworks/models/llama-v3p1-70b-instruct");
       }
       case 'openrouter': {
-        const openrouter = createOpenRouter({
-          apiKey: settings.openRouterApiKey || "",
-        });
+        const apiKey = settings.openRouterApiKey || process.env.OPENROUTER_API_KEY;
+        if (!apiKey) {
+          throw new Error("OpenRouter API Key is missing. Please configure it in Settings.");
+        }
+        const openrouter = createOpenRouter({ apiKey });
         return openrouter(settings.openRouterModel || "google/gemini-2.0-flash-001");
       }
       default:
         throw new Error(`Unsupported AI provider: ${provider}`);
     }
-  } catch (error) {
-    console.error(`AI FACTORY ERROR (${provider}):`, error);
+  } catch (error: any) {
+    console.error(`AI FACTORY ERROR (${provider}):`, error.message);
     throw error;
   }
 }
+
 

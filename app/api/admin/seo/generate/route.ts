@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 import { auth } from "@/lib/auth";
+
 import { prisma } from "@/lib/prisma";
 import { getActiveAiModel } from "@/lib/ai/factory";
 import { generateText } from "ai";
@@ -100,11 +102,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, result });
     } catch (parseError) {
       console.error("AI Response Parsing Failed:", parseError, "Raw Text:", text);
-      return new NextResponse("AI returned invalid data format", { status: 500 });
+      return new NextResponse("AI returned invalid data format. Please try again.", { status: 500 });
     }
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("AI SEO Generation Failed:", error);
-    return new NextResponse("Failed to generate SEO", { status: 500 });
+    const message = error.message || "Failed to generate SEO configuration";
+    return new NextResponse(message, { status: 500 });
   }
 }
+
