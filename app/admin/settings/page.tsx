@@ -508,87 +508,8 @@ export default function AdminSettingsPage() {
             <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
 
             <h4 className="flex items-center gap-2" style={{ margin: 0 }}>
-              <Globe size={18} /> PWA & Mobile App Branding
+               <Share2 size={18} /> Social Media Links
             </h4>
-
-            <div className="grid-2 gap-6">
-               <div className="form-group">
-                 <label className="form-label">App / PWA Name</label>
-                 <input 
-                   type="text" 
-                   name="pwaName"
-                   className="form-input" 
-                   value={settings.pwaName} 
-                   onChange={handleChange}
-                 />
-               </div>
-               <div className="form-group">
-                 <label className="form-label">App Icon (Square 512x512)</label>
-                 <div className="flex items-center gap-3">
-                    {settings.pwaIconUrl && (
-                       <img src={settings.pwaIconUrl} alt="App Icon" style={{ width: "48px", height: "48px", borderRadius: "12px", border: "1px solid var(--border-subtle)" }} />
-                    )}
-                    <input 
-                       type="file" 
-                       ref={pwaIconInputRef}
-                       style={{ display: "none" }} 
-                       accept="image/png,image/webp"
-                       onChange={() => setSaveStatus("idle")}
-                    />
-                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => pwaIconInputRef.current?.click()}>
-                       <Upload size={14} /> Upload Icon
-                    </button>
-                 </div>
-               </div>
-            </div>
-
-            <div className="grid-2 gap-6">
-              <div className="form-group">
-                <label className="form-label">Theme Color (Status Bar)</label>
-                <div className="flex items-center gap-2">
-                  <input 
-                    type="color" 
-                    name="pwaThemeColor"
-                    className="color-picker" 
-                    value={settings.pwaThemeColor} 
-                    onChange={handleChange}
-                  />
-                  <input type="text" name="pwaThemeColor" className="form-input" value={settings.pwaThemeColor} onChange={handleChange} />
-                </div>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Splash Screen Background</label>
-                <div className="flex items-center gap-2">
-                  <input 
-                    type="color" 
-                    name="pwaSplashColor"
-                    className="color-picker" 
-                    value={settings.pwaSplashColor} 
-                    onChange={handleChange}
-                  />
-                  <input type="text" name="pwaSplashColor" className="form-input" value={settings.pwaSplashColor} onChange={handleChange} />
-                </div>
-              </div>
-            </div>
-
-            <div className="form-group">
-               <label className="form-label">Optional: PWA Splash Logo (centered on splash screen)</label>
-               <div className="flex items-center gap-4">
-                  {settings.pwaSplashUrl && (
-                     <img src={settings.pwaSplashUrl} alt="Splash Logo" style={{ width: "64px", height: "64px", objectFit: "contain", background: "var(--bg-subtle)", borderRadius: "8px" }} />
-                  )}
-                  <input 
-                     type="file" 
-                     ref={pwaSplashInputRef}
-                     style={{ display: "none" }} 
-                     accept="image/png,image/webp"
-                     onChange={() => setSaveStatus("idle")}
-                  />
-                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => pwaSplashInputRef.current?.click()}>
-                     <Upload size={14} /> {settings.pwaSplashUrl ? "Change Splash Logo" : "Upload Splash Logo"}
-                  </button>
-               </div>
-            </div>
 
             <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
 

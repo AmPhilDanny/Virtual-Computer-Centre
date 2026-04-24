@@ -108,7 +108,7 @@ export default function PitchPremiumPage() {
             <br />
             <span style={{ fontSize: "65%" }}>Investor Edition — Financial Model</span>
           </h1>
-          <p style={{ fontSize: "1.1rem", color: "#94a3b8", lineHeight: 1.7, marginBottom: "40px" }}>
+          <p style={{ fontSize: "1.1rem", color: "#cbd5e1", lineHeight: 1.7, marginBottom: "40px" }}>
             Full revenue model, pricing architecture, five-year growth projections,<br />
             and investment opportunity breakdown.
           </p>
@@ -126,7 +126,7 @@ export default function PitchPremiumPage() {
       <section style={{ padding: "80px 24px", maxWidth: "1040px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "50px" }}>
           <h2 style={{ fontSize: "2.2rem", fontWeight: 800, marginBottom: "12px" }}>5-Year Growth Projections</h2>
-          <p style={{ color: "#94a3b8" }}>Modelled on conservative adoption rates within Nigeria's growing digital economy.</p>
+          <p style={{ color: "#cbd5e1" }}>Modelled on conservative adoption rates within Nigeria's growing digital economy.</p>
         </div>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 8px" }}>
@@ -145,8 +145,8 @@ export default function PitchPremiumPage() {
                   borderRadius: "12px"
                 }}>
                   <td style={{ padding: "18px 16px", fontWeight: 700, color: row.highlight ? "#a78bfa" : "#e2e8f0", borderRadius: "12px 0 0 12px" }}>{row.year} {row.highlight ? "🎯" : ""}</td>
-                  <td style={{ padding: "18px 16px", color: "#94a3b8" }}>{row.users}</td>
-                  <td style={{ padding: "18px 16px", color: "#94a3b8" }}>{row.vendors}</td>
+                  <td style={{ padding: "18px 16px", color: "#cbd5e1" }}>{row.users}</td>
+                  <td style={{ padding: "18px 16px", color: "#cbd5e1" }}>{row.vendors}</td>
                   <td style={{ padding: "18px 16px", fontWeight: 600, color: "#00e5a0" }}>{row.mrr}</td>
                   <td style={{ padding: "18px 16px", fontWeight: 800, color: "#ffffff", borderRadius: "0 12px 12px 0" }}>{row.arr}</td>
                 </tr>
@@ -154,7 +154,7 @@ export default function PitchPremiumPage() {
             </tbody>
           </table>
         </div>
-        <p style={{ marginTop: "20px", color: "#475569", fontSize: "0.8rem", textAlign: "center" }}>
+        <p style={{ marginTop: "20px", color: "#94a3b8", fontSize: "0.8rem", textAlign: "center" }}>
           * Projections assume 15% MoM user growth in Y1–Y2, scaling to 8% by Y3–Y5. Revenue modelled on average ARPU of ₦720/month per active user.
         </p>
       </section>
@@ -164,7 +164,7 @@ export default function PitchPremiumPage() {
         <div style={{ maxWidth: "900px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "50px" }}>
             <h2 style={{ fontSize: "2.2rem", fontWeight: 800, marginBottom: "12px" }}>Revenue Stream Composition</h2>
-            <p style={{ color: "#94a3b8" }}>Diversified revenue protects against single-stream volatility.</p>
+            <p style={{ color: "#cbd5e1" }}>Diversified revenue protects against single-stream volatility.</p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             {revenueBreakdown.map((r) => (
@@ -184,7 +184,7 @@ export default function PitchPremiumPage() {
       <section style={{ padding: "80px 24px", maxWidth: "960px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "50px" }}>
           <h2 style={{ fontSize: "2.2rem", fontWeight: 800, marginBottom: "12px" }}>Service Pricing Catalogue</h2>
-          <p style={{ color: "#94a3b8" }}>Competitively priced for Nigeria's market with a 15–30% margin per order.</p>
+          <p style={{ color: "#cbd5e1" }}>Competitively priced for Nigeria's market with a 15–30% margin per order.</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "14px" }}>
           {servicePricing.map((s) => (
@@ -211,7 +211,7 @@ export default function PitchPremiumPage() {
         <div style={{ maxWidth: "1020px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "50px" }}>
             <h2 style={{ fontSize: "2.2rem", fontWeight: 800, marginBottom: "12px" }}>AI Tutor Subscription Tiers</h2>
-            <p style={{ color: "#94a3b8" }}>Monthly recurring revenue from the fastest-growing segment of our user base.</p>
+            <p style={{ color: "#cbd5e1" }}>Monthly recurring revenue from the fastest-growing segment of our user base.</p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px" }}>
             {tutorPlans.map((plan) => (
@@ -252,7 +252,7 @@ export default function PitchPremiumPage() {
       <section style={{ padding: "80px 24px", maxWidth: "960px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "50px" }}>
           <h2 style={{ fontSize: "2.2rem", fontWeight: 800, marginBottom: "12px" }}>Vendor Partner Tiers</h2>
-          <p style={{ color: "#94a3b8" }}>Graduated commission structure incentivizes high-quality, high-volume vendors.</p>
+          <p style={{ color: "#cbd5e1" }}>Graduated commission structure incentivizes high-quality, high-volume vendors.</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "20px" }}>
           {vendorTiers.map((tier) => (
@@ -264,7 +264,7 @@ export default function PitchPremiumPage() {
                 <h3 style={{ margin: 0, fontWeight: 800 }}>{tier.name}</h3>
                 <span style={{ background: "rgba(0,229,160,0.1)", color: "#00e5a0", padding: "4px 12px", borderRadius: "100px", fontWeight: 700, fontSize: "0.85rem" }}>{tier.commission}</span>
               </div>
-              <p style={{ color: "#94a3b8", fontSize: "0.85rem", lineHeight: 1.6, marginBottom: "20px" }}>{tier.desc}</p>
+              <p style={{ color: "#cbd5e1", fontSize: "0.85rem", lineHeight: 1.6, marginBottom: "20px" }}>{tier.desc}</p>
               <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "8px" }}>
                 {tier.perks.map((p) => (
                   <li key={p} style={{ fontSize: "0.85rem", color: "#cbd5e1", display: "flex", gap: "8px" }}>
@@ -282,7 +282,7 @@ export default function PitchPremiumPage() {
         <div style={{ maxWidth: "860px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "50px" }}>
             <h2 style={{ fontSize: "2.2rem", fontWeight: 800, marginBottom: "12px" }}>Use of Investment Funds</h2>
-            <p style={{ color: "#94a3b8" }}>Disciplined capital allocation to drive user growth, product depth, and market expansion.</p>
+            <p style={{ color: "#cbd5e1" }}>Disciplined capital allocation to drive user growth, product depth, and market expansion.</p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
             {[
@@ -298,7 +298,7 @@ export default function PitchPremiumPage() {
               }}>
                 <div style={{ fontSize: "2rem", fontWeight: 900, color: "#6C47FF", marginBottom: "6px" }}>{item.pct}</div>
                 <div style={{ fontWeight: 700, marginBottom: "6px" }}>{item.label}</div>
-                <div style={{ color: "#94a3b8", fontSize: "0.82rem" }}>{item.desc}</div>
+                <div style={{ color: "#cbd5e1", fontSize: "0.82rem" }}>{item.desc}</div>
               </div>
             ))}
           </div>
@@ -311,7 +311,7 @@ export default function PitchPremiumPage() {
           <h2 style={{ fontSize: "2.5rem", fontWeight: 900, marginBottom: "20px" }}>
             Partner With the Platform<br />Powering Africa's Digital Economy
           </h2>
-          <p style={{ color: "#94a3b8", lineHeight: 1.8, marginBottom: "48px", fontSize: "1.05rem" }}>
+          <p style={{ color: "#cbd5e1", lineHeight: 1.8, marginBottom: "48px", fontSize: "1.05rem" }}>
             A ₦2.64 billion annual revenue trajectory by 2030, built on proven infrastructure, a live production platform, and a verified vendor ecosystem — the foundation is in place. What we need is the fuel.
           </p>
           <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
@@ -336,7 +336,7 @@ export default function PitchPremiumPage() {
 
       {/* FOOTER */}
       <footer style={{ padding: "32px 24px", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-        <p style={{ color: "#475569", fontSize: "0.8rem" }}>
+        <p style={{ color: "#94a3b8", fontSize: "0.8rem" }}>
           © 2026 NovaX Digital Centre. Confidential. For authorised investors and partners only.<br/>
           Financial projections are forward-looking estimates and not guaranteed.
         </p>

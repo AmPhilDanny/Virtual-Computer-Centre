@@ -91,7 +91,7 @@ export default function PitchPage() {
           }}>
             NovaX Digital Centre
           </h1>
-          <p style={{ fontSize: "clamp(1.1rem, 2.5vw, 1.4rem)", color: "#94a3b8", lineHeight: 1.7, marginBottom: "48px" }}>
+          <p style={{ fontSize: "clamp(1.1rem, 2.5vw, 1.4rem)", color: "#cbd5e1", lineHeight: 1.7, marginBottom: "48px" }}>
             Africa's most advanced AI-powered digital services ecosystem.<br/>
             Built for the next generation of entrepreneurs, students, and professionals.
           </p>
@@ -118,7 +118,7 @@ export default function PitchPage() {
       <section style={{ padding: "80px 24px", maxWidth: "960px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "60px" }}>
           <h2 style={{ fontSize: "2.2rem", fontWeight: 800, marginBottom: "16px" }}>The Problem We're Solving</h2>
-          <p style={{ color: "#94a3b8", maxWidth: "600px", margin: "0 auto", lineHeight: 1.8 }}>
+          <p style={{ color: "#cbd5e1", maxWidth: "600px", margin: "0 auto", lineHeight: 1.8 }}>
             Nigeria has over <strong style={{ color: "#a78bfa" }}>210 million people</strong>, 35%+ youth unemployment, and a rapidly growing digital economy — yet everyday access to professional digital services remains broken.
           </p>
         </div>
@@ -134,7 +134,7 @@ export default function PitchPage() {
             }}>
               <div style={{ fontSize: "2.5rem", marginBottom: "16px" }}>{item.emoji}</div>
               <h3 style={{ fontSize: "1.15rem", fontWeight: 700, marginBottom: "10px" }}>{item.title}</h3>
-              <p style={{ color: "#94a3b8", lineHeight: 1.7, margin: 0, fontSize: "0.9rem" }}>{item.desc}</p>
+              <p style={{ color: "#cbd5e1", lineHeight: 1.7, margin: 0, fontSize: "0.9rem" }}>{item.desc}</p>
             </div>
           ))}
         </div>
@@ -145,7 +145,7 @@ export default function PitchPage() {
         <div style={{ maxWidth: "1060px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "60px" }}>
             <h2 style={{ fontSize: "2.2rem", fontWeight: 800, marginBottom: "16px" }}>Platform Capabilities</h2>
-            <p style={{ color: "#94a3b8" }}>Six integrated engines powering an end-to-end digital services ecosystem.</p>
+            <p style={{ color: "#cbd5e1" }}>Six integrated engines powering an end-to-end digital services ecosystem.</p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "24px" }}>
             {features.map((f) => (
@@ -155,7 +155,7 @@ export default function PitchPage() {
               }}>
                 <div style={{ fontSize: "2.2rem", marginBottom: "16px" }}>{f.icon}</div>
                 <h3 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: "10px" }}>{f.title}</h3>
-                <p style={{ color: "#94a3b8", lineHeight: 1.7, margin: 0, fontSize: "0.88rem" }}>{f.desc}</p>
+                <p style={{ color: "#cbd5e1", lineHeight: 1.7, margin: 0, fontSize: "0.88rem" }}>{f.desc}</p>
               </div>
             ))}
           </div>
@@ -166,7 +166,7 @@ export default function PitchPage() {
       <section style={{ padding: "80px 24px", maxWidth: "960px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "60px" }}>
           <h2 style={{ fontSize: "2.2rem", fontWeight: 800, marginBottom: "16px" }}>Revenue Model</h2>
-          <p style={{ color: "#94a3b8" }}>Six independent income streams — diversified, recurring, and scalable.</p>
+          <p style={{ color: "#cbd5e1" }}>Six independent income streams — diversified, recurring, and scalable.</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "16px" }}>
           {revenueStreams.map((r) => (
@@ -178,7 +178,7 @@ export default function PitchPage() {
               <span style={{ fontSize: "1.8rem", flexShrink: 0 }}>{r.icon}</span>
               <div>
                 <div style={{ fontWeight: 700, marginBottom: "4px" }}>{r.name}</div>
-                <div style={{ color: "#94a3b8", fontSize: "0.85rem" }}>{r.desc}</div>
+                <div style={{ color: "#cbd5e1", fontSize: "0.85rem" }}>{r.desc}</div>
               </div>
             </div>
           ))}
@@ -196,7 +196,7 @@ export default function PitchPage() {
                 background: "rgba(255,255,255,0.03)", borderRadius: "10px", padding: "14px 20px",
                 border: "1px solid rgba(255,255,255,0.06)"
               }}>
-                <span style={{ color: "#94a3b8", fontSize: "0.85rem" }}>{label}</span>
+                <span style={{ color: "#cbd5e1", fontSize: "0.85rem" }}>{label}</span>
                 <span style={{ fontWeight: 600, fontSize: "0.85rem", color: "#a78bfa", textAlign: "right", maxWidth: "200px" }}>{value}</span>
               </div>
             ))}
@@ -218,7 +218,7 @@ export default function PitchPage() {
           ].map(({ stat, label }) => (
             <div key={stat} style={{ textAlign: "center", padding: "32px 16px", background: "rgba(108,71,255,0.08)", borderRadius: "16px", border: "1px solid rgba(108,71,255,0.2)" }}>
               <div style={{ fontSize: "2.2rem", fontWeight: 900, color: "#a78bfa", marginBottom: "8px" }}>{stat}</div>
-              <div style={{ color: "#94a3b8", fontSize: "0.85rem", lineHeight: 1.5 }}>{label}</div>
+              <div style={{ color: "#cbd5e1", fontSize: "0.85rem", lineHeight: 1.5 }}>{label}</div>
             </div>
           ))}
         </div>
@@ -291,7 +291,7 @@ export default function PitchPage() {
 
       {/* FOOTER */}
       <footer style={{ padding: "32px 24px", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-        <p style={{ color: "#475569", fontSize: "0.8rem" }}>
+        <p style={{ color: "#94a3b8", fontSize: "0.8rem" }}>
           © 2026 NovaX Digital Centre. All rights reserved. This document is confidential and intended solely for the recipient.
         </p>
       </footer>
