@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Settings, Database, Globe, Bell, Palette, Upload, Image as ImageIcon, CheckCircle2, ShieldAlert, Store, Plus, Trash2, ArrowUp, ArrowDown, ExternalLink, Share2, Link as LinkIcon, Facebook, Twitter, Linkedin, Instagram, MessageCircle, Save } from "lucide-react";
+import { Settings, Database, Globe, Bell, Palette, Upload, Image as ImageIcon, CheckCircle2, ShieldAlert, Store, Plus, Trash2, ArrowUp, ArrowDown, ExternalLink, Share2, Link as LinkIcon, MessageCircle, Save } from "lucide-react";
+
 
 function LinkManager({ 
   links, 
@@ -594,21 +595,25 @@ export default function AdminSettingsPage() {
             </h4>
             <div className="grid-2 gap-4">
                <div className="form-group">
-                 <label className="form-label flex items-center gap-2"><Twitter size={14} /> Twitter / X URL</label>
+                 <label className="form-label flex items-center gap-2"><Share2 size={14} /> Twitter / X URL</label>
                  <input type="text" name="twitterUrl" className="form-input" value={settings.twitterUrl} onChange={handleChange} />
                </div>
+
                <div className="form-group">
-                 <label className="form-label flex items-center gap-2"><Facebook size={14} /> Facebook URL</label>
+                 <label className="form-label flex items-center gap-2"><Share2 size={14} /> Facebook URL</label>
                  <input type="text" name="facebookUrl" className="form-input" value={settings.facebookUrl} onChange={handleChange} />
                </div>
+
                <div className="form-group">
-                 <label className="form-label flex items-center gap-2"><Linkedin size={14} /> LinkedIn URL</label>
+                 <label className="form-label flex items-center gap-2"><Share2 size={14} /> LinkedIn URL</label>
                  <input type="text" name="linkedinUrl" className="form-input" value={settings.linkedinUrl} onChange={handleChange} />
                </div>
+
                <div className="form-group">
-                 <label className="form-label flex items-center gap-2"><Instagram size={14} /> Instagram URL</label>
+                 <label className="form-label flex items-center gap-2"><Share2 size={14} /> Instagram URL</label>
                  <input type="text" name="instagramUrl" className="form-input" value={settings.instagramUrl} onChange={handleChange} />
                </div>
+
                <div className="form-group">
                  <label className="form-label flex items-center gap-2"><MessageCircle size={14} /> WhatsApp URL</label>
                  <input type="text" name="whatsappUrl" className="form-input" value={settings.whatsappUrl} onChange={handleChange} />
