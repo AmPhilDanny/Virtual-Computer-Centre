@@ -156,11 +156,6 @@ export default function AdminSettingsPage() {
     footerCopyright: `© ${new Date().getFullYear()} NovaX Digital Centre. All rights reserved.`,
 
     footerBrandText: "Nigeria's #1 AI-powered digital computer centre. Professional services delivered by intelligent agents, reviewed by experts.",
-    twitterUrl: "#",
-    facebookUrl: "#",
-    linkedinUrl: "#",
-    instagramUrl: "#",
-    whatsappUrl: "#",
   });
 
 
