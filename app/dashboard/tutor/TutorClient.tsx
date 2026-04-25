@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
+import AssessmentModal from "@/components/tutor/AssessmentModal";
 
 interface TutorClientProps {
   materials: any[];
@@ -27,6 +28,7 @@ export default function TutorClient({ materials: initialMaterials, subscription,
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
   const [subscribing, setSubscribing] = useState(false);
+  const [assessmentOpen, setAssessmentOpen] = useState(false);
 
   const [input, setInput] = useState("");
   const { messages, sendMessage, status, error, regenerate } = useChat({
@@ -232,6 +234,17 @@ export default function TutorClient({ materials: initialMaterials, subscription,
                  </div>
               </div>
            </div>
+            <div className="flex items-center gap-2">
+               {selectedMaterial && (
+                 <button 
+                   onClick={() => setAssessmentOpen(true)}
+                   className="btn btn-ghost btn-sm flex items-center gap-2 text-primary hover:bg-primary/5 px-4"
+                   style={{ borderRadius: "10px", fontWeight: 600 }}
+                 >
+                    <Award size={16} /> Verify Mastery
+                 </button>
+               )}
+            </div>
         </div>
 
         {/* Chat Messages */}
@@ -323,6 +336,15 @@ export default function TutorClient({ materials: initialMaterials, subscription,
            </div>
         </form>
       </div>
+      
+      {selectedMaterial && (
+        <AssessmentModal
+          isOpen={assessmentOpen}
+          onClose={() => setAssessmentOpen(false)}
+          materialId={selectedMaterial.id}
+          topic={selectedMaterial.title}
+        />
+      )}
     </div>
   );
 }

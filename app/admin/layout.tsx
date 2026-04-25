@@ -145,6 +145,11 @@ export default function AdminLayout({
             </Link>
           </li>
           <li>
+            <Link href="/admin/ai/tutor-health" className={isActive("/admin/ai/tutor-health") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
+              <Award className="nav-icon" /> Tutor Logic Health
+            </Link>
+          </li>
+          <li>
             <Link href="/admin/payments" className={isActive("/admin/payments") ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>
               <CreditCard className="nav-icon" /> Monetization & Pay
             </Link>

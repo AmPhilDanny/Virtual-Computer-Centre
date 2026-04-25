@@ -62,11 +62,18 @@ export async function POST(req: Request) {
           responseMessage
         ];
         
+        // 5. Run Reflection Agent to update learning patterns
+        // Note: We do this after saving the message to ensure context is complete
+        const newPatterns = await import("@/lib/ai/tutorAgent").then(m => 
+          m.reflectOnSession(updatedMessages as any, sessionData.learningPatterns)
+        );
+
         if (sessionId) {
           await prisma.tutorSession.update({
             where: { id: sessionId },
             data: {
               messages: updatedMessages as any,
+              learningPatterns: newPatterns,
               lastActivity: new Date()
             },
           });
@@ -75,7 +82,20 @@ export async function POST(req: Request) {
             data: {
               userId,
               messages: updatedMessages as any,
-              learningPatterns: {}
+              learningPatterns: newPatterns
+            }
+          });
+        }
+
+        // 6. Sync with Global Student Profile
+        if (newPatterns.preferredStyle) {
+          await prisma.user.update({
+            where: { id: userId },
+            data: {
+              studentProfile: {
+                ...(user?.studentProfile as any || {}),
+                learningStyle: newPatterns.preferredStyle
+              }
             }
           });
         }

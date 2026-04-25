@@ -30,6 +30,7 @@ model User {
   studyMaterials     StudyMaterial[]
   subscriptions      Subscription[]
   tutorSessions      TutorSession[]
+  assessments        Assessment[]
   consents           UserConsent[]
   vendorProfile      VendorProfile?
   walletTransactions WalletTransaction[]
@@ -91,6 +92,21 @@ model TutorSession {
   lastActivity     DateTime @default(now())
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Assessment {
+  id               String   @id @default(cuid())
+  userId           String
+  materialId       String?
+  topic            String
+  score            Float
+  totalQuestions   Int
+  correctAnswers   Int
+  questions        Json     // Stores the questions asked
+  answers          Json     // Stores the student's answers
+  aiFeedback       String?
+  createdAt        DateTime @default(now())
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
