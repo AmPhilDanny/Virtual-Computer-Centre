@@ -8,7 +8,7 @@ import { DefaultChatTransport } from "ai";
 import { 
   BookOpen, Upload, Send, Bot, User, 
   FileText, Plus, AlertCircle, CheckCircle2, 
-  ChevronRight, Library, Sparkles, MessageCircle
+  ChevronRight, Library, Sparkles, MessageCircle, Award
 } from "lucide-react";
 import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
