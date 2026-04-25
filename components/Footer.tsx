@@ -1,6 +1,16 @@
 "use client";
 import Link from "next/link";
 
+import { 
+  Twitter, 
+  Facebook, 
+  Linkedin, 
+  Instagram, 
+  MessageCircle, 
+  MapPin, 
+  ShieldCheck 
+} from "lucide-react";
+
 import { useSettings } from "./SettingsProvider";
 
 const defaultFooterLinks = {
@@ -33,11 +43,12 @@ export default function Footer() {
     : defaultFooterLinks;
 
   const socialLinks = [
-    { icon: "𝕏", url: settings.twitterUrl || "#" },
-    { icon: "📘", url: settings.facebookUrl || "#" },
-    { icon: "💼", url: settings.linkedinUrl || "#" },
-    { icon: "📸", url: settings.instagramUrl || "#" },
-    { icon: "💬", url: settings.whatsappUrl || "#" },
+    { icon: <Twitter size={18} />, url: settings.twitterUrl || "#", label: "Twitter" },
+    { icon: <Facebook size={18} />, url: settings.facebookUrl || "#", label: "Facebook" },
+    { icon: <Linkedin size={18} />, url: settings.linkedinUrl || "#", label: "LinkedIn" },
+    { icon: <Instagram size={18} />, url: settings.instagramUrl || "#", label: "Instagram" },
+    { icon: <MessageCircle size={18} />, url: settings.whatsappUrl || "#", label: "WhatsApp" },
+    { icon: <MapPin size={18} />, url: settings.googleBusinessUrl || "#", label: "Google Business" },
   ].filter(s => s.url !== "#");
 
   return (
@@ -53,7 +64,11 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="navbar-logo" style={{ marginBottom: "var(--space-4)" }}>
-              <div className="navbar-logo-icon">✨</div>
+              {settings.logoUrl ? (
+                <img src={settings.logoUrl} alt="Logo" style={{ height: "36px", width: "auto", borderRadius: "8px" }} />
+              ) : (
+                <div className="navbar-logo-icon">✨</div>
+              )}
               <span className="navbar-logo-text">
                 {settings.siteName?.split(" ")[0] || "NovaX"}<span>{settings.siteName?.split(" ").slice(1).join("") || "Digital"}</span>
               </span>
@@ -81,6 +96,7 @@ export default function Footer() {
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={social.label}
                   style={{
                     width: "36px",
                     height: "36px",
@@ -90,8 +106,16 @@ export default function Footer() {
                     background: "var(--bg-elevated)",
                     border: "1px solid var(--border-subtle)",
                     borderRadius: "var(--radius-md)",
-                    fontSize: "0.9rem",
+                    color: "var(--text-secondary)",
                     transition: "all var(--transition-fast)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "var(--brand-primary)";
+                    e.currentTarget.style.color = "#fff";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "var(--bg-elevated)";
+                    e.currentTarget.style.color = "var(--text-secondary)";
                   }}
                 >
                   {social.icon}
@@ -100,7 +124,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Links */}
           {Object.entries(menuLinks).map(([section, links]: [string, any]) => (
             <div key={section}>
               <h4

@@ -183,11 +183,30 @@ export default async function RootLayout({
           rel="stylesheet"
         />
         <style dangerouslySetInnerHTML={{ __html: brandStyles }} />
+        {settings.googleSearchConsoleTag && (
+           <div dangerouslySetInnerHTML={{ __html: settings.googleSearchConsoleTag }} />
+        )}
+        {settings.googleAnalyticsId && (
+          <>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${settings.googleAnalyticsId}`}></script>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${settings.googleAnalyticsId}');
+                `,
+              }}
+            />
+          </>
+        )}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
+
       <body>
         <Providers>
           <PrivacyModal />

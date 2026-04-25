@@ -68,10 +68,16 @@ export default function DashboardLayout({
       {/* Mobile Header */}
       <div className="mobile-dashboard-header">
         <Link href="/" className="navbar-logo">
-          <div className="navbar-logo-icon" style={{ width: 28, height: 28, fontSize: "0.8rem", background: "var(--brand-primary)", overflow: "hidden" }}>
-             <img src={settings.faviconUrl || settings.logoUrl || "/favicon.png"} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div className="navbar-logo-icon" style={{ width: 28, height: 28, fontSize: "0.8rem", background: "var(--brand-primary)", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {settings.faviconUrl || settings.logoUrl ? (
+               <img src={settings.faviconUrl || settings.logoUrl} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+               <span style={{ fontWeight: "bold", color: "#fff" }}>{(settings.siteName || "N").charAt(0)}</span>
+            )}
           </div>
-          <span className="navbar-logo-text" style={{ fontSize: "1rem" }}>AI<span>Centre</span></span>
+          <span className="navbar-logo-text" style={{ fontSize: "1rem" }}>
+            {settings.siteName?.split(" ")[0] || "NovaX"}<span>{settings.siteName?.split(" ").slice(1).join("") || "Digital"}</span>
+          </span>
         </Link>
         <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -93,10 +99,16 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside className={`sidebar ${isSidebarOpen ? 'mobile-open' : ''}`}>
         <Link href="/" className="sidebar-logo">
-          <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "1rem", background: "var(--brand-primary)", overflow: "hidden" }}>
-             <img src={settings.faviconUrl || settings.logoUrl || "/favicon.png"} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "1rem", background: "var(--brand-primary)", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {settings.faviconUrl || settings.logoUrl ? (
+               <img src={settings.faviconUrl || settings.logoUrl} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+               <span style={{ fontWeight: "bold", color: "#fff" }}>{(settings.siteName || "N").charAt(0)}</span>
+            )}
           </div>
-          <span className="navbar-logo-text">AI<span>Centre</span></span>
+          <span className="navbar-logo-text">
+            {settings.siteName?.split(" ")[0] || "NovaX"}<span>{settings.siteName?.split(" ").slice(1).join("") || "Digital"}</span>
+          </span>
         </Link>
 
         <div className="sidebar-section-label">Global Navigation</div>

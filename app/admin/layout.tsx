@@ -36,8 +36,12 @@ export default function AdminLayout({
       {/* Mobile Header */}
       <div className="mobile-dashboard-header">
         <Link href="/admin" className="navbar-logo">
-          <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "0.9rem", background: "var(--brand-danger)", overflow: "hidden" }}>
-             <img src={settings.faviconUrl || settings.logoUrl || "/favicon.png"} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "0.9rem", background: "var(--brand-danger)", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {settings.faviconUrl || settings.logoUrl ? (
+               <img src={settings.faviconUrl || settings.logoUrl} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+               <span style={{ fontWeight: "bold", color: "#fff" }}>A</span>
+            )}
           </div>
           <span className="navbar-logo-text" style={{ fontSize: "1.1rem" }}>Admin<span>Panel</span></span>
         </Link>
@@ -61,8 +65,12 @@ export default function AdminLayout({
       {/* Sidebar */}
       <aside className={`sidebar ${isSidebarOpen ? 'mobile-open' : ''}`}>
         <Link href="/admin" className="sidebar-logo">
-          <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "1rem", background: "var(--brand-danger)", overflow: "hidden" }}>
-             <img src={settings.faviconUrl || settings.logoUrl || "/favicon.png"} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div className="navbar-logo-icon" style={{ width: 32, height: 32, fontSize: "1rem", background: "var(--brand-danger)", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {settings.faviconUrl || settings.logoUrl ? (
+               <img src={settings.faviconUrl || settings.logoUrl} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+               <span style={{ fontWeight: "bold", color: "#fff" }}>A</span>
+            )}
           </div>
           <span className="navbar-logo-text">Admin<span>Panel</span></span>
         </Link>

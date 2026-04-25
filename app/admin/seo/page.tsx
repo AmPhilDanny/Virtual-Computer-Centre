@@ -120,21 +120,27 @@ export default function AdminSeoPage() {
 
       const res = await fetch("/api/admin/settings", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+
 
       if (res.ok) {
         setStatus("success");
         setTimeout(() => setStatus("idle"), 3000);
       } else {
+        const data = await res.json();
+        setErrorMsg(data.error || "Failed to save configuration. Please check your credentials and try again.");
         setStatus("error");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Save failed:", err);
+      setErrorMsg(err.message || "Network error occurred while saving.");
       setStatus("error");
     } finally {
       setIsSaving(false);
     }
+
   };
 
   const current = config[activeTab];

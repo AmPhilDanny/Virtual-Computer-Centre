@@ -145,6 +145,14 @@ export default function AdminSettingsPage() {
         { label: "AI Disclosure", href: "/p/ai" },
       ],
     }),
+    googleAnalyticsId: "",
+    googleSearchConsoleTag: "",
+    googleBusinessUrl: "",
+    facebookUrl: "",
+    twitterUrl: "",
+    instagramUrl: "",
+    linkedinUrl: "",
+    whatsappUrl: "",
     footerCopyright: `© ${new Date().getFullYear()} NovaX Digital Centre. All rights reserved.`,
 
     footerBrandText: "Nigeria's #1 AI-powered digital computer centre. Professional services delivered by intelligent agents, reviewed by experts.",
@@ -511,11 +519,6 @@ export default function AdminSettingsPage() {
                <Share2 size={18} /> Social Media Links
             </h4>
 
-            <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
-
-            <h4 className="flex items-center gap-2" style={{ margin: 0 }}>
-               <Share2 size={18} /> Social Media Links
-            </h4>
             <div className="grid-2 gap-4">
                <div className="form-group">
                  <label className="form-label flex items-center gap-2"><Share2 size={14} /> Twitter / X URL</label>
@@ -550,11 +553,40 @@ export default function AdminSettingsPage() {
             </h4>
             <div className="form-group">
                <label className="form-label">Virus Scanning API Key (Cloudmersive)</label>
-               <input type="password" name="virusScannerApiKey" className="form-input" value={settings.virusScannerApiKey} onChange={handleChange} placeholder="API_KEY_..." />
+               <input type="password" name="virusScannerApiKey" className="form-input" value={settings.virusScannerApiKey || ""} onChange={handleChange} placeholder="API_KEY_..." />
                <p className="text-muted" style={{ fontSize: "0.7rem", marginTop: "var(--space-1)" }}>
                   Used to automatically scan user-uploaded files for malware and threats.
                </p>
             </div>
+
+            <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
+
+            <div className="bg-info-subtle p-6 rounded-2xl border border-info-subtle flex-col gap-6" style={{ margin: "var(--space-6) 0" }}>
+               <h4 className="flex items-center gap-2" style={{ margin: 0 }}>
+                  <Globe size={20} className="text-info" /> Google Integrations & Analytics
+               </h4>
+               <p className="text-xs text-info leading-relaxed">
+                  Connect your Google services to track visitors and verify your site on Search Console.
+               </p>
+               <div className="grid-2 gap-6">
+                  <div className="form-group">
+                    <label className="form-label">Google Analytics ID (G-XXXXX)</label>
+                    <input type="text" name="googleAnalyticsId" className="form-input" value={settings.googleAnalyticsId || ""} onChange={handleChange} placeholder="G-XXXXXXXXXX" />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Google Search Console Tag</label>
+                    <input type="text" name="googleSearchConsoleTag" className="form-input" value={settings.googleSearchConsoleTag || ""} onChange={handleChange} placeholder='<meta name="google-site-verification" content="..." />' />
+                  </div>
+               </div>
+               <div className="form-group">
+                  <label className="form-label">Google Business Profile URL</label>
+                  <input type="text" name="googleBusinessUrl" className="form-input" value={settings.googleBusinessUrl || ""} onChange={handleChange} placeholder="https://g.page/r/..." />
+               </div>
+            </div>
+
+
+
+            <hr style={{ border: "none", borderTop: "1px solid var(--border-subtle)", margin: "var(--space-4) 0" }} />
 
 
 
@@ -813,10 +845,42 @@ export default function AdminSettingsPage() {
               </div>
            </div>
         </div>
+
+        {/* Integrations & Analytics */}
+        <div className="glass-card flex-col gap-6" style={{ padding: "var(--space-8)" }}>
+           <h3 className="flex items-center gap-2" style={{ fontSize: "1.25rem", margin: 0 }}>
+              <Globe size={20} className="text-primary" /> Integrations & Analytics
+           </h3>
+           <p className="text-secondary text-sm">Connect your site with external services for tracking and business management.</p>
+           
+           <div className="grid-2 gap-8">
+              <div className="flex-col gap-4">
+                 <div className="form-group">
+                    <label className="form-label">Google Analytics ID (G-XXXXX)</label>
+                    <input type="text" name="googleAnalyticsId" className="form-input" value={settings.googleAnalyticsId} onChange={handleChange} placeholder="G-XXXXXXXXXX" />
+                 </div>
+                 <div className="form-group">
+                    <label className="form-label">Google Search Console Tag</label>
+                    <input type="text" name="googleSearchConsoleTag" className="form-input" value={settings.googleSearchConsoleTag} onChange={handleChange} placeholder="<meta name='google-site-verification' ... />" />
+                 </div>
+              </div>
+
+              <div className="flex-col gap-4">
+                 <div className="form-group">
+                    <label className="form-label">Google Business Profile URL</label>
+                    <input type="text" name="googleBusinessUrl" className="form-input" value={settings.googleBusinessUrl} onChange={handleChange} placeholder="https://business.google.com/..." />
+                 </div>
+                 <div className="form-group">
+                    <label className="form-label">Tawk.to Chat ID</label>
+                    <input type="text" name="tawkToId" className="form-input" value={settings.tawkToId} onChange={handleChange} placeholder="Property ID" />
+                 </div>
+              </div>
+           </div>
+        </div>
+
       </div>
     </div>
   </div>
-
   );
 }
 

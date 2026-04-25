@@ -21,6 +21,11 @@ interface Settings {
   linkedinUrl?: string;
   instagramUrl?: string;
   whatsappUrl?: string;
+  // Added Analytics & Business
+  googleAnalyticsId?: string;
+  googleSearchConsoleTag?: string;
+  googleBusinessUrl?: string;
+  tawkToId?: string;
 }
 
 const defaultSettings: Settings = {
